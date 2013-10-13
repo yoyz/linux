@@ -1,0 +1,23 @@
+CC=g++
+CC=/opt/opendingux-toolchain/usr/bin/mipsel-linux-g++
+CC=/opt/open2x/gcc-4.1.1-glibc-2.3.6/bin/arm-open2x-linux-g++
+CFLAGS=-c -DLINUX -I. -LSDL/lib -g
+CFLAGS=-O2 -Wall -I.. -DHAVE_GETTIMEOFDAY -D__LINUX_ALSA__
+CFLAGS=-c -DLINUX -I. -I/opt/opendingux-toolchain/usr/include/ -L/opt/opendingux-toolchain/usr/lib/ -L/opt/opendingux-toolchain/usr/lib/ao/plugins-4/ -L/opt/opendingux-toolchain/usr/lib/  -lSDL -lSDL_ttf  -D__LINUX_ALSA__
+CFLAGS=-c -DLINUX -I. -I/opt/open2x/gcc-4.1.1-glibc-2.3.6/include -L/opt/open2x/lib
+#LDFLAGS=-lSDL -lSDL_gfx -lSDL_ttf  -lasound
+LDFLAGS=
+SOURCES=t1.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=t1
+
+all: $(SOURCES) $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+
+.cpp.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJECTS) $(EXECUTABLE)

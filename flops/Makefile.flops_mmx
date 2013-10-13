@@ -1,0 +1,17 @@
+CC=g++
+CFLAGS=-O1 -m64 -malign-double -c -DLINUX -I. -LSDL/lib -g
+LDFLAGS=
+SOURCES=flops_sse.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=flops_mmx
+
+all: $(SOURCES) $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+
+.cpp.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJECTS) $(EXECUTABLE)

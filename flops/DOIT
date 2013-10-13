@@ -1,0 +1,3 @@
+icpc -O3 -align -xavx -c t.c -o t.o -lmpi -lmpi++ -L/opt/intel/mpi-rt/4.1.0/lib64/ -I/opt/intel/mpi-rt/4.1.0/include64 && icpc t.o -o t -I/opt/intel/mpi-rt/4.1.0/include -L/opt/intel/mpi-rt/4.1.0/lib64/ -lmpi  && ./t
+g++ -O3 -msse3 -c t.c -o t.o -lmpi -lmpi++ -L/opt/mpi/bullxmpi/1.2.4.1/lib/ -I/opt/mpi/bullxmpi/1.2.4.1/include/ && g++ t.o -o t -I/opt/mpi/bullxmpi/1.2.4.1/include/ -L/opt/mpi/bullxmpi/1.2.4.1/lib/ -lmpi -lmpi_cxx^C
+g++ -O3 -msse3 -c t.c -o t.o -lmpi -lmpi++ -I/usr/include/mpi/ && g++ t.o -o t -lmpi -lmpi++ -I/usr/include/mpi/
