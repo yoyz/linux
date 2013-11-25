@@ -1,0 +1,34 @@
+Switch	: 0x08003800023ccc1e ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 649 lmc 0
+Switch	: 0x08003800023ccc6c ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 650 lmc 0
+Switch	: 0x08003800023ccd76 ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 628 lmc 0
+Switch	: 0x08003800023ccc5e ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 647 lmc 0
+Switch	: 0x08003800023ccc86 ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 651 lmc 0
+Switch	: 0x08003800023ccc10 ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 648 lmc 0
+Switch	: 0x08003800023ccd6c ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 626 lmc 0
+Switch	: 0x08003800023ccd74 ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 625 lmc 0
+Switch	: 0x08003800023ccd72 ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 624 lmc 0
+Switch	: 0x08003800023ccd70 ports 36 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 627 lmc 0
+Switch	: 0x0002c90200415330 ports 36 "Infiniscale-IV Mellanox Technologies" base port 0 lid 80 lmc 0
+Switch	: 0x0002c902004145b8 ports 36 "Infiniscale-IV Mellanox Technologies" base port 0 lid 79 lmc 0
+Switch	: 0x080038000235bb1d ports 36 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" base port 0 lid 33 lmc 0
+Switch	: 0x080038000235baf9 ports 36 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" base port 0 lid 34 lmc 0
+Switch	: 0x080038000235badb ports 36 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" base port 0 lid 256 lmc 0
+Switch	: 0x0002c903008f8d00 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 82 lmc 0
+Switch	: 0x0002c903008f9100 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 81 lmc 0
+Switch	: 0x0002c903008f8c80 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 78 lmc 0
+Switch	: 0x0002c903008f8b80 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 75 lmc 0
+Switch	: 0x0002c903008f9580 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 76 lmc 0
+Switch	: 0x0002c903008f9380 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 77 lmc 0
+Switch	: 0x0002c903008f8d80 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 73 lmc 0
+Switch	: 0x0002c903008f9280 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 74 lmc 0
+Switch	: 0x0002c903008d4980 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 71 lmc 0
+Switch	: 0x0002c903008d4580 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 72 lmc 0
+Switch	: 0x0002c903008f9200 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 69 lmc 0
+Switch	: 0x0002c903008f9600 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 70 lmc 0
+Switch	: 0x0002c903008f8b00 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 67 lmc 0
+Switch	: 0x0002c903008f8a80 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 68 lmc 0
+Switch	: 0x0002c903008f9400 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 66 lmc 0
+Switch	: 0x0002c903008f9480 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 10 lmc 0
+Switch	: 0x0002c903008f9500 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 9 lmc 0
+Switch	: 0x0002c903008f8800 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 8 lmc 0
+Switch	: 0x0002c903008cdc80 ports 36 "SwitchX -  Mellanox Technologies" base port 0 lid 3 lmc 0

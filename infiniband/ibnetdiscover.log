@@ -1,0 +1,2486 @@
+#
+# Topology file: generated on Mon Nov 25 15:58:49 2013
+#
+# Initiated from node 0002c903000c82f8 port 0002c903000c82f9
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccc1f
+switchguid=0x8003800023ccc1e(8003800023ccc1e)
+Switch	36 "S-08003800023ccc1e"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 649 lmc 0
+[1]	"S-0002c903008f8800"[26]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[26]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[26]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[26]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[26]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[26]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[26]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[26]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[26]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[26]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[26]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[26]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[26]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[26]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[26]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[26]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[26]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[26]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013b0489"[1](8003800013b048a) 		# "sid736 HCA-1" lid 732 4xFDR
+[20]	"H-08003800013b1977"[1](8003800013b1978) 		# "sid737 HCA-1" lid 725 4xFDR
+[21]	"H-08003800013ac643"[1](8003800013ac644) 		# "sid738 HCA-1" lid 658 4xFDR
+[22]	"H-08003800013ae20f"[1](8003800013ae210) 		# "sid739 HCA-1" lid 709 4xFDR
+[23]	"H-08003800013ae8c9"[1](8003800013ae8ca) 		# "sid740 HCA-1" lid 692 4xFDR
+[24]	"H-08003800013ab941"[1](8003800013ab942) 		# "sid741 HCA-1" lid 664 4xFDR
+[25]	"H-08003800013ae857"[1](8003800013ae858) 		# "sid742 HCA-1" lid 675 4xFDR
+[26]	"H-08003800013ad975"[1](8003800013ad976) 		# "sid743 HCA-1" lid 715 4xFDR
+[27]	"H-08003800013ad729"[1](8003800013ad72a) 		# "sid744 HCA-1" lid 723 4xFDR
+[28]	"H-08003800013b0963"[1](8003800013b0964) 		# "sid745 HCA-1" lid 724 4xFDR
+[29]	"H-08003800013afa7b"[1](8003800013afa7c) 		# "sid746 HCA-1" lid 655 4xFDR
+[30]	"H-08003800013abd73"[1](8003800013abd74) 		# "sid747 HCA-1" lid 654 4xFDR
+[31]	"H-08003800013adcbd"[1](8003800013adcbe) 		# "sid748 HCA-1" lid 690 4xFDR
+[32]	"H-08003800013afa5d"[1](8003800013afa5e) 		# "sid749 HCA-1" lid 703 4xFDR
+[33]	"H-08003800013abce3"[1](8003800013abce4) 		# "sid750 HCA-1" lid 720 4xFDR
+[34]	"H-08003800013af907"[1](8003800013af908) 		# "sid751 HCA-1" lid 708 4xFDR
+[35]	"H-08003800013ad405"[1](8003800013ad406) 		# "sid752 HCA-1" lid 669 4xFDR
+[36]	"H-08003800013ad64b"[1](8003800013ad64c) 		# "sid753 HCA-1" lid 730 4xFDR
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccc6d
+switchguid=0x8003800023ccc6c(8003800023ccc6c)
+Switch	36 "S-08003800023ccc6c"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 650 lmc 0
+[1]	"S-0002c903008f8800"[29]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[29]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[29]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[29]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[29]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[29]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[29]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[29]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[29]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[29]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[29]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[29]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[29]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[29]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[29]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[29]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[29]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[29]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013ae72b"[1](8003800013ae72c) 		# "sid772 HCA-1" lid 701 4xFDR
+[20]	"H-08003800013af0c7"[1](8003800013af0c8) 		# "sid773 HCA-1" lid 666 4xFDR
+[21]	"H-08003800013aedd3"[1](8003800013aedd4) 		# "sid774 HCA-1" lid 707 4xFDR
+[22]	"H-08003800013b02f1"[1](8003800013b02f2) 		# "sid775 HCA-1" lid 697 4xFDR
+[23]	"H-08003800013ae881"[1](8003800013ae882) 		# "sid776 HCA-1" lid 687 4xFDR
+[24]	"H-08003800013b0345"[1](8003800013b0346) 		# "sid777 HCA-1" lid 681 4xFDR
+[25]	"H-08003800013b06cf"[1](8003800013b06d0) 		# "sid778 HCA-1" lid 667 4xFDR
+[26]	"H-08003800013b053d"[1](8003800013b053e) 		# "sid779 HCA-1" lid 736 4xFDR
+[27]	"H-08003800013aed1f"[1](8003800013aed20) 		# "sid780 HCA-1" lid 679 4xFDR
+[28]	"H-08003800013afa9f"[1](8003800013afaa0) 		# "sid781 HCA-1" lid 726 4xFDR
+[29]	"H-08003800013af3bb"[1](8003800013af3bc) 		# "sid782 HCA-1" lid 718 4xFDR
+[30]	"H-08003800013b0d3b"[1](8003800013b0d3c) 		# "sid783 HCA-1" lid 728 4xFDR
+[31]	"H-08003800013b0ba9"[1](8003800013b0baa) 		# "sid784 HCA-1" lid 130 4xFDR
+[32]	"H-08003800013af91f"[1](8003800013af920) 		# "sid785 HCA-1" lid 711 4xFDR
+[33]	"H-08003800013b0ced"[1](8003800013b0cee) 		# "sid786 HCA-1" lid 737 4xFDR
+[34]	"H-08003800013b0c39"[1](8003800013b0c3a) 		# "sid787 HCA-1" lid 673 4xFDR
+[35]	"H-08003800013b085b"[1](8003800013b085c) 		# "sid788 HCA-1" lid 682 4xFDR
+[36]	"H-08003800013af6af"[1](8003800013af6b0) 		# "sid789 HCA-1" lid 717 4xFDR
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccd77
+switchguid=0x8003800023ccd76(8003800023ccd76)
+Switch	36 "S-08003800023ccd76"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 628 lmc 0
+[1]	"S-0002c903008f8800"[28]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[28]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[28]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[28]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[28]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[28]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[28]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[28]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[28]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[28]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[28]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[28]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[36]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[28]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[36]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[28]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[28]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[28]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013b19b3"[1](8003800013b19b4) 		# "sid672 HCA-1" lid 619 4xFDR
+[20]	"H-08003800013b185d"[1](8003800013b185e) 		# "sid673 HCA-1" lid 612 4xFDR
+[22]	"H-08003800013ac859"[1](8003800013ac85a) 		# "sid675 HCA-1" lid 611 4xFDR
+[23]	"H-08003800013aca57"[1](8003800013aca58) 		# "sid676 HCA-1" lid 610 4xFDR
+[24]	"H-08003800013b0543"[1](8003800013b0544) 		# "sid677 HCA-1" lid 609 4xFDR
+[25]	"H-08003800013b06a5"[1](8003800013b06a6) 		# "sid678 HCA-1" lid 618 4xFDR
+[26]	"H-08003800013ae9e3"[1](8003800013ae9e4) 		# "sid679 HCA-1" lid 623 4xFDR
+[27]	"H-08003800013ac58f"[1](8003800013ac590) 		# "sid680 HCA-1" lid 617 4xFDR
+[28]	"H-08003800013b0c7b"[1](8003800013b0c7c) 		# "sid681 HCA-1" lid 615 4xFDR
+[29]	"H-08003800013b0d05"[1](8003800013b0d06) 		# "sid682 HCA-1" lid 605 4xFDR
+[30]	"H-08003800013addd7"[1](8003800013addd8) 		# "sid683 HCA-1" lid 622 4xFDR
+[31]	"H-08003800013ad1b9"[1](8003800013ad1ba) 		# "sid684 HCA-1" lid 620 4xFDR
+[32]	"H-08003800013ad05d"[1](8003800013ad05e) 		# "sid685 HCA-1" lid 613 4xFDR
+[33]	"H-08003800013b098d"[1](8003800013b098e) 		# "sid686 HCA-1" lid 616 4xFDR
+[34]	"H-08003800013b096f"[1](8003800013b0970) 		# "sid687 HCA-1" lid 614 4xFDR
+[35]	"H-08003800013afb23"[1](8003800013afb24) 		# "sid688 HCA-1" lid 607 4xFDR
+[36]	"H-08003800013ab3bf"[1](8003800013ab3c0) 		# "sid689 HCA-1" lid 621 4xFDR
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccc5f
+switchguid=0x8003800023ccc5e(8003800023ccc5e)
+Switch	36 "S-08003800023ccc5e"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 647 lmc 0
+[1]	"S-0002c903008f8800"[27]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[27]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[27]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[27]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[27]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[27]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[27]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[27]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[27]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[27]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[27]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[27]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[27]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[27]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[27]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[27]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[27]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[27]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013af0e5"[1](8003800013af0e6) 		# "sid754 HCA-1" lid 695 4xFDR
+[20]	"H-08003800013aee0f"[1](8003800013aee10) 		# "sid755 HCA-1" lid 710 4xFDR
+[21]	"H-08003800013ac4f9"[1](8003800013ac4fa) 		# "sid756 HCA-1" lid 698 4xFDR
+[22]	"H-08003800013aea43"[1](8003800013aea44) 		# "sid757 HCA-1" lid 729 4xFDR
+[23]	"H-08003800013aba67"[1](8003800013aba68) 		# "sid758 HCA-1" lid 661 4xFDR
+[24]	"H-08003800013b0519"[1](8003800013b051a) 		# "sid759 HCA-1" lid 678 4xFDR
+[25]	"H-08003800013ac26b"[1](8003800013ac26c) 		# "sid760 HCA-1" lid 653 4xFDR
+[26]	"H-08003800013b0741"[1](8003800013b0742) 		# "sid761 HCA-1" lid 712 4xFDR
+[27]	"H-08003800013aefe9"[1](8003800013aefea) 		# "sid762 HCA-1" lid 677 4xFDR
+[28]	"H-08003800013af64f"[1](8003800013af650) 		# "sid763 HCA-1" lid 674 4xFDR
+[29]	"H-08003800013af75d"[1](8003800013af75e) 		# "sid764 HCA-1" lid 676 4xFDR
+[30]	"H-08003800013ad315"[1](8003800013ad316) 		# "sid765 HCA-1" lid 699 4xFDR
+[31]	"H-08003800013af979"[1](8003800013af97a) 		# "sid766 HCA-1" lid 716 4xFDR
+[32]	"H-08003800013ab41f"[1](8003800013ab420) 		# "sid767 HCA-1" lid 652 4xFDR
+[33]	"H-08003800013b0c75"[1](8003800013b0c76) 		# "sid768 HCA-1" lid 714 4xFDR
+[34]	"H-08003800013ab4eb"[1](8003800013ab4ec) 		# "sid769 HCA-1" lid 660 4xFDR
+[35]	"H-08003800013b0dc5"[1](8003800013b0dc6) 		# "sid770 HCA-1" lid 691 4xFDR
+[36]	"H-08003800013b0aa7"[1](8003800013b0aa8) 		# "sid771 HCA-1" lid 705 4xFDR
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccc87
+switchguid=0x8003800023ccc86(8003800023ccc86)
+Switch	36 "S-08003800023ccc86"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 651 lmc 0
+[1]	"S-0002c903008f8800"[25]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[25]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[25]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[25]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[25]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[25]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[25]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[25]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[25]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[25]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[25]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[25]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[25]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[25]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[25]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[25]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[25]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[25]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013ab917"[1](8003800013ab918) 		# "sid718 HCA-1" lid 740 4xFDR
+[20]	"H-08003800013ad795"[1](8003800013ad796) 		# "sid719 HCA-1" lid 733 4xFDR
+[21]	"H-08003800013b04e9"[1](8003800013b04ea) 		# "sid720 HCA-1" lid 721 4xFDR
+[22]	"H-08003800013ac4f3"[1](8003800013ac4f4) 		# "sid721 HCA-1" lid 668 4xFDR
+[23]	"H-08003800013ae6b9"[1](8003800013ae6ba) 		# "sid722 HCA-1" lid 735 4xFDR
+[24]	"H-08003800013ae821"[1](8003800013ae822) 		# "sid723 HCA-1" lid 680 4xFDR
+[25]	"H-08003800013ac445"[1](8003800013ac446) 		# "sid724 HCA-1" lid 659 4xFDR
+[26]	"H-08003800013b0765"[1](8003800013b0766) 		# "sid725 HCA-1" lid 731 4xFDR
+[27]	"H-08003800013ad97b"[1](8003800013ad97c) 		# "sid726 HCA-1" lid 686 4xFDR
+[28]	"H-08003800013ab7df"[1](8003800013ab7e0) 		# "sid727 HCA-1" lid 656 4xFDR
+[29]	"H-08003800013ad417"[1](8003800013ad418) 		# "sid728 HCA-1" lid 700 4xFDR
+[30]	"H-08003800013b0a5f"[1](8003800013b0a60) 		# "sid729 HCA-1" lid 713 4xFDR
+[31]	"H-08003800013abdd3"[1](8003800013abdd4) 		# "sid730 HCA-1" lid 719 4xFDR
+[32]	"H-08003800013af775"[1](8003800013af776) 		# "sid731 HCA-1" lid 684 4xFDR
+[33]	"H-08003800013af955"[1](8003800013af956) 		# "sid732 HCA-1" lid 665 4xFDR
+[34]	"H-08003800013abec3"[1](8003800013abec4) 		# "sid733 HCA-1" lid 662 4xFDR
+[35]	"H-08003800013b0837"[1](8003800013b0838) 		# "sid734 HCA-1" lid 672 4xFDR
+[36]	"H-08003800013ad36f"[1](8003800013ad370) 		# "sid735 HCA-1" lid 683 4xFDR
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccc11
+switchguid=0x8003800023ccc10(8003800023ccc10)
+Switch	36 "S-08003800023ccc10"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 648 lmc 0
+[1]	"S-0002c903008f8800"[24]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[24]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[24]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[24]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[24]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[24]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[24]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[24]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[24]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[24]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[24]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[24]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[24]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[24]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[24]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[24]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[24]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[24]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013ae9a1"[1](8003800013ae9a2) 		# "sid700 HCA-1" lid 739 4xFDR
+[20]	"H-08003800013b069f"[1](8003800013b06a0) 		# "sid701 HCA-1" lid 704 4xFDR
+[21]	"H-08003800013ada2f"[1](8003800013ada30) 		# "sid702 HCA-1" lid 657 4xFDR
+[22]	"H-08003800013b04bf"[1](8003800013b04c0) 		# "sid703 HCA-1" lid 670 4xFDR
+[23]	"H-08003800013b18e7"[1](8003800013b18e8) 		# "sid704 HCA-1" lid 696 4xFDR
+[24]	"H-08003800013aca7b"[1](8003800013aca7c) 		# "sid705 HCA-1" lid 685 4xFDR
+[25]	"H-08003800013ae1af"[1](8003800013ae1b0) 		# "sid706 HCA-1" lid 734 4xFDR
+[26]	"H-08003800013b19cb"[1](8003800013b19cc) 		# "sid707 HCA-1" lid 738 4xFDR
+[27]	"H-08003800013aecef"[1](8003800013aecf0) 		# "sid708 HCA-1" lid 722 4xFDR
+[28]	"H-08003800013afa93"[1](8003800013afa94) 		# "sid709 HCA-1" lid 689 4xFDR
+[29]	"H-08003800013b0be5"[1](8003800013b0be6) 		# "sid710 HCA-1" lid 694 4xFDR
+[30]	"H-08003800013ad3ff"[1](8003800013ad400) 		# "sid711 HCA-1" lid 663 4xFDR
+[31]	"H-08003800013af32b"[1](8003800013af32c) 		# "sid712 HCA-1" lid 671 4xFDR
+[32]	"H-08003800013b15db"[1](8003800013b15dc) 		# "sid713 HCA-1" lid 693 4xFDR
+[33]	"H-08003800013acdbd"[1](8003800013acdbe) 		# "sid714 HCA-1" lid 706 4xFDR
+[34]	"H-08003800013adbeb"[1](8003800013adbec) 		# "sid715 HCA-1" lid 727 4xFDR
+[35]	"H-08003800013b145b"[1](8003800013b145c) 		# "sid716 HCA-1" lid 702 4xFDR
+[36]	"H-08003800013af48d"[1](8003800013af48e) 		# "sid717 HCA-1" lid 688 4xFDR
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccd6d
+switchguid=0x8003800023ccd6c(8003800023ccd6c)
+Switch	36 "S-08003800023ccd6c"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 626 lmc 0
+[1]	"S-0002c903008f8800"[23]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[23]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[23]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[23]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[23]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[23]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[23]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[23]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[23]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[23]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[23]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[23]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[23]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[23]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[23]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[23]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[23]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[23]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013b0735"[1](8003800013b0736) 		# "sid654 HCA-1" lid 588 4xFDR
+[20]	"H-08003800013aeb51"[1](8003800013aeb52) 		# "sid655 HCA-1" lid 591 4xFDR
+[21]	"H-08003800013abbdb"[1](8003800013abbdc) 		# "sid656 HCA-1" lid 601 4xFDR
+[22]	"H-08003800013b0645"[1](8003800013b0646) 		# "sid657 HCA-1" lid 589 4xFDR
+[23]	"H-08003800013b0483"[1](8003800013b0484) 		# "sid658 HCA-1" lid 594 4xFDR
+[24]	"H-08003800013ae7b5"[1](8003800013ae7b6) 		# "sid659 HCA-1" lid 599 4xFDR
+[25]	"H-08003800013ad807"[1](8003800013ad808) 		# "sid660 HCA-1" lid 586 4xFDR
+[26]	"H-08003800013ae965"[1](8003800013ae966) 		# "sid661 HCA-1" lid 592 4xFDR
+[27]	"H-08003800013ac2e9"[1](8003800013ac2ea) 		# "sid662 HCA-1" lid 603 4xFDR
+[28]	"H-08003800013b0969"[1](8003800013b096a) 		# "sid663 HCA-1" lid 593 4xFDR
+[29]	"H-08003800013afaf9"[1](8003800013afafa) 		# "sid664 HCA-1" lid 604 4xFDR
+[30]	"H-08003800013ab72b"[1](8003800013ab72c) 		# "sid665 HCA-1" lid 587 4xFDR
+[31]	"H-08003800013b0a89"[1](8003800013b0a8a) 		# "sid666 HCA-1" lid 596 4xFDR
+[32]	"H-08003800013b0ae9"[1](8003800013b0aea) 		# "sid667 HCA-1" lid 602 4xFDR
+[33]	"H-08003800013b1485"[1](8003800013b1486) 		# "sid668 HCA-1" lid 595 4xFDR
+[34]	"H-08003800013ad693"[1](8003800013ad694) 		# "sid669 HCA-1" lid 597 4xFDR
+[35]	"H-08003800013afa45"[1](8003800013afa46) 		# "sid670 HCA-1" lid 590 4xFDR
+[36]	"H-08003800013ac097"[1](8003800013ac098) 		# "sid671 HCA-1" lid 598 4xFDR
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccd75
+switchguid=0x8003800023ccd74(8003800023ccd74)
+Switch	36 "S-08003800023ccd74"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 625 lmc 0
+[1]	"S-0002c903008f8800"[21]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[21]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[21]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[21]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[21]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[21]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[21]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[21]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[21]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[21]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[21]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[21]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[21]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[21]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[21]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[21]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[21]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[21]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013ad72f"[1](8003800013ad730) 		# "sid618 HCA-1" lid 554 4xFDR
+[20]	"H-08003800013ad93f"[1](8003800013ad940) 		# "sid619 HCA-1" lid 557 4xFDR
+[21]	"H-08003800013ac667"[1](8003800013ac668) 		# "sid620 HCA-1" lid 560 4xFDR
+[22]	"H-08003800013ae707"[1](8003800013ae708) 		# "sid621 HCA-1" lid 549 4xFDR
+[23]	"H-08003800013ab2ff"[1](8003800013ab300) 		# "sid622 HCA-1" lid 548 4xFDR
+[24]	"H-08003800013ae6f5"[1](8003800013ae6f6) 		# "sid623 HCA-1" lid 566 4xFDR
+[25]	"H-08003800013b1917"[1](8003800013b1918) 		# "sid624 HCA-1" lid 551 4xFDR
+[26]	"H-08003800013aee33"[1](8003800013aee34) 		# "sid625 HCA-1" lid 555 4xFDR
+[27]	"H-08003800013b02d9"[1](8003800013b02da) 		# "sid626 HCA-1" lid 563 4xFDR
+[28]	"H-08003800013ad42f"[1](8003800013ad430) 		# "sid627 HCA-1" lid 553 4xFDR
+[29]	"H-08003800013ad3ab"[1](8003800013ad3ac) 		# "sid628 HCA-1" lid 561 4xFDR
+[30]	"H-08003800013ab749"[1](8003800013ab74a) 		# "sid629 HCA-1" lid 558 4xFDR
+[31]	"H-08003800013af751"[1](8003800013af752) 		# "sid630 HCA-1" lid 559 4xFDR
+[32]	"H-08003800013ab11f"[1](8003800013ab120) 		# "sid631 HCA-1" lid 552 4xFDR
+[33]	"H-08003800013af8b3"[1](8003800013af8b4) 		# "sid632 HCA-1" lid 562 4xFDR
+[34]	"H-08003800013af835"[1](8003800013af836) 		# "sid633 HCA-1" lid 556 4xFDR
+[35]	"H-08003800013af4f3"[1](8003800013af4f4) 		# "sid634 HCA-1" lid 565 4xFDR
+[36]	"H-08003800013b0b0d"[1](8003800013b0b0e) 		# "sid635 HCA-1" lid 550 4xFDR
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccd73
+switchguid=0x8003800023ccd72(8003800023ccd72)
+Switch	36 "S-08003800023ccd72"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 624 lmc 0
+[1]	"S-0002c903008f8800"[22]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[22]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[22]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[22]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[22]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[22]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[22]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[22]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[22]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[22]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[22]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[22]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[22]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[22]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[22]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[22]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[36]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[22]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013aeb7b"[1](8003800013aeb7c) 		# "sid636 HCA-1" lid 576 4xFDR
+[20]	"H-08003800013aef47"[1](8003800013aef48) 		# "sid637 HCA-1" lid 571 4xFDR
+[21]	"H-08003800013aea8b"[1](8003800013aea8c) 		# "sid638 HCA-1" lid 579 4xFDR
+[22]	"H-08003800013ae6cb"[1](8003800013ae6cc) 		# "sid639 HCA-1" lid 581 4xFDR
+[24]	"H-08003800013af181"[1](8003800013af182) 		# "sid641 HCA-1" lid 577 4xFDR
+[25]	"H-08003800013ac685"[1](8003800013ac686) 		# "sid642 HCA-1" lid 578 4xFDR
+[26]	"H-08003800013b05cd"[1](8003800013b05ce) 		# "sid643 HCA-1" lid 582 4xFDR
+[27]	"H-08003800013ac80b"[1](8003800013ac80c) 		# "sid644 HCA-1" lid 567 4xFDR
+[28]	"H-08003800013af9f7"[1](8003800013af9f8) 		# "sid645 HCA-1" lid 585 4xFDR
+[29]	"H-08003800013af439"[1](8003800013af43a) 		# "sid646 HCA-1" lid 569 4xFDR
+[30]	"H-08003800013afa69"[1](8003800013afa6a) 		# "sid647 HCA-1" lid 573 4xFDR
+[31]	"H-08003800013afa75"[1](8003800013afa76) 		# "sid648 HCA-1" lid 574 4xFDR
+[33]	"H-08003800013af43f"[1](8003800013af440) 		# "sid650 HCA-1" lid 570 4xFDR
+[34]	"H-08003800013abe7b"[1](8003800013abe7c) 		# "sid651 HCA-1" lid 575 4xFDR
+[35]	"H-08003800013b140d"[1](8003800013b140e) 		# "sid652 HCA-1" lid 568 4xFDR
+[36]	"H-08003800013ad1f5"[1](8003800013ad1f6) 		# "sid653 HCA-1" lid 584 4xFDR
+
+vendid=0x119f
+devid=0x1b50
+sysimgguid=0x8003800023ccd71
+switchguid=0x8003800023ccd70(8003800023ccd70)
+Switch	36 "S-08003800023ccd70"		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" base port 0 lid 627 lmc 0
+[1]	"S-0002c903008f8800"[20]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[20]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[20]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[20]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[20]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[20]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[20]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[20]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[20]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[20]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[20]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[36]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[20]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[20]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[20]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[36]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[20]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[20]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-08003800013aed0d"[1](8003800013aed0e) 		# "sid600 HCA-1" lid 531 4xFDR
+[20]	"H-08003800013ad711"[1](8003800013ad712) 		# "sid601 HCA-1" lid 532 4xFDR
+[21]	"H-08003800013aeb81"[1](8003800013aeb82) 		# "sid602 HCA-1" lid 540 4xFDR
+[22]	"H-08003800013ab2c3"[1](8003800013ab2c4) 		# "sid603 HCA-1" lid 544 4xFDR
+[23]	"H-08003800013ae833"[1](8003800013ae834) 		# "sid604 HCA-1" lid 535 4xFDR
+[24]	"H-08003800013b05c1"[1](8003800013b05c2) 		# "sid605 HCA-1" lid 543 4xFDR
+[25]	"H-08003800013b17f1"[1](8003800013b17f2) 		# "sid606 HCA-1" lid 547 4xFDR
+[26]	"H-08003800013af103"[1](8003800013af104) 		# "sid607 HCA-1" lid 529 4xFDR
+[27]	"H-08003800013ad7ad"[1](8003800013ad7ae) 		# "sid608 HCA-1" lid 630 4xFDR
+[28]	"H-08003800013adcb7"[1](8003800013adcb8) 		# "sid609 HCA-1" lid 541 4xFDR
+[29]	"H-08003800013ad309"[1](8003800013ad30a) 		# "sid610 HCA-1" lid 530 4xFDR
+[30]	"H-08003800013afb29"[1](8003800013afb2a) 		# "sid611 HCA-1" lid 534 4xFDR
+[31]	"H-08003800013ab0d7"[1](8003800013ab0d8) 		# "sid612 HCA-1" lid 545 4xFDR
+[32]	"H-08003800013afceb"[1](8003800013afcec) 		# "sid613 HCA-1" lid 546 4xFDR
+[33]	"H-08003800013afa15"[1](8003800013afa16) 		# "sid614 HCA-1" lid 533 4xFDR
+[34]	"H-08003800013b1437"[1](8003800013b1438) 		# "sid615 HCA-1" lid 536 4xFDR
+[35]	"H-08003800013af2b9"[1](8003800013af2ba) 		# "sid616 HCA-1" lid 542 4xFDR
+[36]	"H-08003800013acd63"[1](8003800013acd64) 		# "sid617 HCA-1" lid 629 4xFDR
+
+vendid=0x2c9
+devid=0xbd36
+sysimgguid=0x2c90200415333
+switchguid=0x2c90200415330(2c90200415330)
+Switch	36 "S-0002c90200415330"		# "Infiniscale-IV Mellanox Technologies" base port 0 lid 80 lmc 0
+[9]	"S-0002c903008f9100"[2]		# "SwitchX -  Mellanox Technologies" lid 81 4xQDR
+[10]	"S-0002c903008f8d00"[2]		# "SwitchX -  Mellanox Technologies" lid 82 4xQDR
+[11]	"S-0002c903008f8800"[18]		# "SwitchX -  Mellanox Technologies" lid 8 4xQDR
+[12]	"S-0002c903008f9500"[18]		# "SwitchX -  Mellanox Technologies" lid 9 4xQDR
+[13]	"S-0002c903008f9480"[18]		# "SwitchX -  Mellanox Technologies" lid 10 4xQDR
+[14]	"S-0002c903008f9400"[18]		# "SwitchX -  Mellanox Technologies" lid 66 4xQDR
+[15]	"S-0002c903008f8a80"[18]		# "SwitchX -  Mellanox Technologies" lid 68 4xQDR
+[16]	"S-0002c903008f8b00"[18]		# "SwitchX -  Mellanox Technologies" lid 67 4xQDR
+[17]	"S-0002c903008f9600"[18]		# "SwitchX -  Mellanox Technologies" lid 70 4xQDR
+[18]	"S-0002c903008f9200"[18]		# "SwitchX -  Mellanox Technologies" lid 69 4xQDR
+[19]	"S-0002c903008d4580"[18]		# "SwitchX -  Mellanox Technologies" lid 72 4xQDR
+[20]	"S-0002c903008d4980"[18]		# "SwitchX -  Mellanox Technologies" lid 71 4xQDR
+[21]	"S-0002c903008f9280"[18]		# "SwitchX -  Mellanox Technologies" lid 74 4xQDR
+[22]	"S-0002c903008f8d80"[18]		# "SwitchX -  Mellanox Technologies" lid 73 4xQDR
+[23]	"S-0002c903008f9380"[18]		# "SwitchX -  Mellanox Technologies" lid 77 4xQDR
+[24]	"S-0002c903008f9580"[18]		# "SwitchX -  Mellanox Technologies" lid 76 4xQDR
+[25]	"S-0002c903008f8b80"[18]		# "SwitchX -  Mellanox Technologies" lid 75 4xQDR
+[26]	"S-0002c903008f8c80"[18]		# "SwitchX -  Mellanox Technologies" lid 78 4xQDR
+
+vendid=0x2c9
+devid=0xbd36
+sysimgguid=0x2c902004145bb
+switchguid=0x2c902004145b8(2c902004145b8)
+Switch	36 "S-0002c902004145b8"		# "Infiniscale-IV Mellanox Technologies" base port 0 lid 79 lmc 0
+[9]	"S-0002c903008f9100"[1]		# "SwitchX -  Mellanox Technologies" lid 81 4xQDR
+[10]	"S-0002c903008f8d00"[1]		# "SwitchX -  Mellanox Technologies" lid 82 4xQDR
+[11]	"S-0002c903008f8800"[17]		# "SwitchX -  Mellanox Technologies" lid 8 4xQDR
+[12]	"S-0002c903008f9500"[17]		# "SwitchX -  Mellanox Technologies" lid 9 4xQDR
+[13]	"S-0002c903008f9480"[17]		# "SwitchX -  Mellanox Technologies" lid 10 4xQDR
+[14]	"S-0002c903008f9400"[17]		# "SwitchX -  Mellanox Technologies" lid 66 4xQDR
+[15]	"S-0002c903008f8a80"[17]		# "SwitchX -  Mellanox Technologies" lid 68 4xQDR
+[16]	"S-0002c903008f8b00"[17]		# "SwitchX -  Mellanox Technologies" lid 67 4xQDR
+[17]	"S-0002c903008f9600"[17]		# "SwitchX -  Mellanox Technologies" lid 70 4xQDR
+[18]	"S-0002c903008f9200"[17]		# "SwitchX -  Mellanox Technologies" lid 69 4xQDR
+[19]	"S-0002c903008d4580"[17]		# "SwitchX -  Mellanox Technologies" lid 72 4xQDR
+[20]	"S-0002c903008d4980"[17]		# "SwitchX -  Mellanox Technologies" lid 71 4xQDR
+[21]	"S-0002c903008f9280"[17]		# "SwitchX -  Mellanox Technologies" lid 74 4xQDR
+[22]	"S-0002c903008f8d80"[17]		# "SwitchX -  Mellanox Technologies" lid 73 4xQDR
+[23]	"S-0002c903008f9380"[17]		# "SwitchX -  Mellanox Technologies" lid 77 4xQDR
+[24]	"S-0002c903008f9580"[17]		# "SwitchX -  Mellanox Technologies" lid 76 4xQDR
+[25]	"S-0002c903008f8b80"[17]		# "SwitchX -  Mellanox Technologies" lid 75 4xQDR
+[26]	"S-0002c903008f8c80"[17]		# "SwitchX -  Mellanox Technologies" lid 78 4xQDR
+
+vendid=0x119f
+devid=0x1b01
+sysimgguid=0x80038000235bb1e
+switchguid=0x80038000235bb1d(80038000235bb1d)
+Switch	36 "S-080038000235bb1d"		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" base port 0 lid 33 lmc 0
+[1]	"S-0002c903008f8800"[3]		# "SwitchX -  Mellanox Technologies" lid 8 4xQDR
+[2]	"S-0002c903008f9500"[3]		# "SwitchX -  Mellanox Technologies" lid 9 4xQDR
+[3]	"S-0002c903008f9480"[3]		# "SwitchX -  Mellanox Technologies" lid 10 4xQDR
+[4]	"S-0002c903008f9400"[3]		# "SwitchX -  Mellanox Technologies" lid 66 4xQDR
+[5]	"S-0002c903008f8a80"[7]		# "SwitchX -  Mellanox Technologies" lid 68 4xQDR
+[6]	"S-0002c903008f8b00"[7]		# "SwitchX -  Mellanox Technologies" lid 67 4xQDR
+[7]	"S-0002c903008f9600"[7]		# "SwitchX -  Mellanox Technologies" lid 70 4xQDR
+[8]	"S-0002c903008f9200"[7]		# "SwitchX -  Mellanox Technologies" lid 69 4xQDR
+[9]	"S-0002c903008d4580"[7]		# "SwitchX -  Mellanox Technologies" lid 72 4xQDR
+[10]	"S-0002c903008d4980"[7]		# "SwitchX -  Mellanox Technologies" lid 71 4xQDR
+[11]	"S-0002c903008f9280"[7]		# "SwitchX -  Mellanox Technologies" lid 74 4xQDR
+[12]	"S-0002c903008f8d80"[7]		# "SwitchX -  Mellanox Technologies" lid 73 4xQDR
+[13]	"S-0002c903008f9380"[7]		# "SwitchX -  Mellanox Technologies" lid 77 4xQDR
+[14]	"S-0002c903008f9580"[7]		# "SwitchX -  Mellanox Technologies" lid 76 4xQDR
+[15]	"S-0002c903008f8b80"[7]		# "SwitchX -  Mellanox Technologies" lid 75 4xQDR
+[16]	"S-0002c903008f8c80"[7]		# "SwitchX -  Mellanox Technologies" lid 78 4xQDR
+[17]	"S-0002c903008f9100"[5]		# "SwitchX -  Mellanox Technologies" lid 81 4xQDR
+[18]	"S-0002c903008f8d00"[5]		# "SwitchX -  Mellanox Technologies" lid 82 4xQDR
+[19]	"H-08003800013a8903"[1](8003800013a8904) 		# "sid136 HCA-1" lid 36 4xQDR
+[20]	"H-08003800013a88f7"[1](8003800013a88f8) 		# "sid137 HCA-1" lid 40 4xQDR
+[21]	"H-08003800013a8a6b"[1](8003800013a8a6c) 		# "sid138 HCA-1" lid 42 4xQDR
+[22]	"H-08003800013a8a3b"[1](8003800013a8a3c) 		# "sid139 HCA-1" lid 44 4xQDR
+[23]	"H-08003800013a87cb"[1](8003800013a87cc) 		# "sid140 HCA-1" lid 50 4xQDR
+[24]	"H-08003800013a4d4b"[1](8003800013a4d4c) 		# "sid141 HCA-1" lid 53 4xQDR
+[25]	"H-08003800013a8453"[1](8003800013a8454) 		# "sid142 HCA-1" lid 54 4xQDR
+[26]	"H-08003800013a846b"[1](8003800013a846c) 		# "sid143 HCA-1" lid 55 4xQDR
+[27]	"H-08003800013a81b9"[1](8003800013a81ba) 		# "sid144 HCA-1" lid 56 4xQDR
+[28]	"H-08003800013a897b"[1](8003800013a897c) 		# "sid145 HCA-1" lid 57 4xQDR
+[29]	"H-08003800013a88b5"[1](8003800013a88b6) 		# "sid146 HCA-1" lid 58 4xQDR
+[30]	"H-08003800013a4f91"[1](8003800013a4f92) 		# "sid147 HCA-1" lid 59 4xQDR
+[31]	"H-08003800013a8849"[1](8003800013a884a) 		# "sid148 HCA-1" lid 60 4xQDR
+[32]	"H-08003800013a830f"[1](8003800013a8310) 		# "sid149 HCA-1" lid 61 4xQDR
+[33]	"H-08003800013a84fb"[1](8003800013a84fc) 		# "sid150 HCA-1" lid 62 4xQDR
+[34]	"H-08003800013a883d"[1](8003800013a883e) 		# "sid151 HCA-1" lid 63 4xQDR
+
+vendid=0x119f
+devid=0x1b01
+sysimgguid=0x80038000235bafa
+switchguid=0x80038000235baf9(80038000235baf9)
+Switch	36 "S-080038000235baf9"		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" base port 0 lid 34 lmc 0
+[1]	"S-0002c903008f8800"[2]		# "SwitchX -  Mellanox Technologies" lid 8 4xQDR
+[2]	"S-0002c903008f9500"[2]		# "SwitchX -  Mellanox Technologies" lid 9 4xQDR
+[3]	"S-0002c903008f9480"[2]		# "SwitchX -  Mellanox Technologies" lid 10 4xQDR
+[4]	"S-0002c903008f9400"[2]		# "SwitchX -  Mellanox Technologies" lid 66 4xQDR
+[5]	"S-0002c903008f8a80"[6]		# "SwitchX -  Mellanox Technologies" lid 68 4xQDR
+[6]	"S-0002c903008f8b00"[6]		# "SwitchX -  Mellanox Technologies" lid 67 4xQDR
+[7]	"S-0002c903008f9600"[6]		# "SwitchX -  Mellanox Technologies" lid 70 4xQDR
+[8]	"S-0002c903008f9200"[6]		# "SwitchX -  Mellanox Technologies" lid 69 4xQDR
+[9]	"S-0002c903008d4580"[6]		# "SwitchX -  Mellanox Technologies" lid 72 4xQDR
+[10]	"S-0002c903008d4980"[6]		# "SwitchX -  Mellanox Technologies" lid 71 4xQDR
+[11]	"S-0002c903008f9280"[6]		# "SwitchX -  Mellanox Technologies" lid 74 4xQDR
+[12]	"S-0002c903008f8d80"[6]		# "SwitchX -  Mellanox Technologies" lid 73 4xQDR
+[13]	"S-0002c903008f9380"[6]		# "SwitchX -  Mellanox Technologies" lid 77 4xQDR
+[14]	"S-0002c903008f9580"[6]		# "SwitchX -  Mellanox Technologies" lid 76 4xQDR
+[15]	"S-0002c903008f8b80"[6]		# "SwitchX -  Mellanox Technologies" lid 75 4xQDR
+[16]	"S-0002c903008f8c80"[6]		# "SwitchX -  Mellanox Technologies" lid 78 4xQDR
+[17]	"S-0002c903008f9100"[4]		# "SwitchX -  Mellanox Technologies" lid 81 4xQDR
+[18]	"S-0002c903008f8d00"[4]		# "SwitchX -  Mellanox Technologies" lid 82 4xQDR
+[21]	"H-0800380001389f3f"[1](800380001389f40) 		# "sid120 HCA-1" lid 39 4xQDR
+
+vendid=0x119f
+devid=0x1b01
+sysimgguid=0x80038000235badc
+switchguid=0x80038000235badb(80038000235badb)
+Switch	36 "S-080038000235badb"		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" base port 0 lid 256 lmc 0
+[1]	"S-0002c903008f8800"[1]		# "SwitchX -  Mellanox Technologies" lid 8 4xQDR
+[2]	"S-0002c903008f9500"[1]		# "SwitchX -  Mellanox Technologies" lid 9 4xQDR
+[3]	"S-0002c903008f9480"[1]		# "SwitchX -  Mellanox Technologies" lid 10 4xQDR
+[4]	"S-0002c903008f9400"[1]		# "SwitchX -  Mellanox Technologies" lid 66 4xQDR
+[5]	"S-0002c903008f8a80"[5]		# "SwitchX -  Mellanox Technologies" lid 68 4xQDR
+[6]	"S-0002c903008f8b00"[5]		# "SwitchX -  Mellanox Technologies" lid 67 4xQDR
+[8]	"S-0002c903008f9200"[5]		# "SwitchX -  Mellanox Technologies" lid 69 4xQDR
+[9]	"S-0002c903008d4580"[5]		# "SwitchX -  Mellanox Technologies" lid 72 4xQDR
+[10]	"S-0002c903008d4980"[5]		# "SwitchX -  Mellanox Technologies" lid 71 4xQDR
+[11]	"S-0002c903008f9280"[5]		# "SwitchX -  Mellanox Technologies" lid 74 4xQDR
+[12]	"S-0002c903008f8d80"[5]		# "SwitchX -  Mellanox Technologies" lid 73 4xQDR
+[13]	"S-0002c903008f9380"[5]		# "SwitchX -  Mellanox Technologies" lid 77 4xQDR
+[14]	"S-0002c903008f9580"[5]		# "SwitchX -  Mellanox Technologies" lid 76 4xQDR
+[15]	"S-0002c903008f8b80"[5]		# "SwitchX -  Mellanox Technologies" lid 75 4xQDR
+[16]	"S-0002c903008f8c80"[5]		# "SwitchX -  Mellanox Technologies" lid 78 4xQDR
+[17]	"S-0002c903008f9100"[3]		# "SwitchX -  Mellanox Technologies" lid 81 4xQDR
+[18]	"S-0002c903008f8d00"[3]		# "SwitchX -  Mellanox Technologies" lid 82 4xQDR
+[21]	"H-0800380001373282"[1](800380001373283) 		# "sid102 HCA-1" lid 257 4xQDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f9480
+switchguid=0x2c903008f9480(2c903008f9480)
+Switch	36 "S-0002c903008f9480"		# "SwitchX -  Mellanox Technologies" base port 0 lid 10 lmc 0
+[1]	"S-080038000235badb"[3]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[2]	"S-080038000235baf9"[3]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[3]	"S-080038000235bb1d"[3]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[13]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[13]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[3]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[3]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f8d00
+switchguid=0x2c903008f8d00(2c903008f8d00)
+Switch	36 "S-0002c903008f8d00"		# "SwitchX -  Mellanox Technologies" base port 0 lid 82 lmc 0
+[1]	"S-0002c902004145b8"[10]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[2]	"S-0002c90200415330"[10]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[3]	"S-080038000235badb"[18]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[4]	"S-080038000235baf9"[18]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[5]	"S-080038000235bb1d"[18]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[19]	"S-0002c903008cdc80"[18]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[18]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f9100
+switchguid=0x2c903008f9100(2c903008f9100)
+Switch	36 "S-0002c903008f9100"		# "SwitchX -  Mellanox Technologies" base port 0 lid 81 lmc 0
+[1]	"S-0002c902004145b8"[9]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[2]	"S-0002c90200415330"[9]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[3]	"S-080038000235badb"[17]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[4]	"S-080038000235baf9"[17]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[5]	"S-080038000235bb1d"[17]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[19]	"S-0002c903008cdc80"[17]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[23]	"S-08003800023ccd6c"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+[36]	"S-08003800023ccd72"[17]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f8c80
+switchguid=0x2c903008f8c80(2c903008f8c80)
+Switch	36 "S-0002c903008f8c80"		# "SwitchX -  Mellanox Technologies" base port 0 lid 78 lmc 0
+[5]	"S-080038000235badb"[16]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[16]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[16]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[26]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[26]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[16]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[21]	"S-08003800023ccd74"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+[36]	"S-08003800023ccd70"[16]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f8b80
+switchguid=0x2c903008f8b80(2c903008f8b80)
+Switch	36 "S-0002c903008f8b80"		# "SwitchX -  Mellanox Technologies" base port 0 lid 75 lmc 0
+[5]	"S-080038000235badb"[15]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[15]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[15]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[25]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[25]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[15]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[29]	"S-08003800023ccc6c"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+[36]	"S-08003800023ccd76"[15]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f9580
+switchguid=0x2c903008f9580(2c903008f9580)
+Switch	36 "S-0002c903008f9580"		# "SwitchX -  Mellanox Technologies" base port 0 lid 76 lmc 0
+[5]	"S-080038000235badb"[14]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[14]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[14]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[24]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[24]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[14]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[14]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f9380
+switchguid=0x2c903008f9380(2c903008f9380)
+Switch	36 "S-0002c903008f9380"		# "SwitchX -  Mellanox Technologies" base port 0 lid 77 lmc 0
+[5]	"S-080038000235badb"[13]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[13]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[13]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[23]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[23]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[13]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[29]	"S-08003800023ccc6c"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+[36]	"S-08003800023ccd76"[13]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f8d80
+switchguid=0x2c903008f8d80(2c903008f8d80)
+Switch	36 "S-0002c903008f8d80"		# "SwitchX -  Mellanox Technologies" base port 0 lid 73 lmc 0
+[5]	"S-080038000235badb"[12]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[12]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[12]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[22]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[22]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[12]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[21]	"S-08003800023ccd74"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+[36]	"S-08003800023ccd70"[12]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f9280
+switchguid=0x2c903008f9280(2c903008f9280)
+Switch	36 "S-0002c903008f9280"		# "SwitchX -  Mellanox Technologies" base port 0 lid 74 lmc 0
+[5]	"S-080038000235badb"[11]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[11]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[11]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[21]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[21]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[11]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[11]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008d4980
+switchguid=0x2c903008d4980(2c903008d4980)
+Switch	36 "S-0002c903008d4980"		# "SwitchX -  Mellanox Technologies" base port 0 lid 71 lmc 0
+[5]	"S-080038000235badb"[10]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[10]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[10]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[20]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[20]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[10]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[10]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008d4580
+switchguid=0x2c903008d4580(2c903008d4580)
+Switch	36 "S-0002c903008d4580"		# "SwitchX -  Mellanox Technologies" base port 0 lid 72 lmc 0
+[5]	"S-080038000235badb"[9]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[9]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[9]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[19]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[19]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[9]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[9]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f9200
+switchguid=0x2c903008f9200(2c903008f9200)
+Switch	36 "S-0002c903008f9200"		# "SwitchX -  Mellanox Technologies" base port 0 lid 69 lmc 0
+[5]	"S-080038000235badb"[8]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[8]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[8]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[18]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[18]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[8]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[8]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f9600
+switchguid=0x2c903008f9600(2c903008f9600)
+Switch	36 "S-0002c903008f9600"		# "SwitchX -  Mellanox Technologies" base port 0 lid 70 lmc 0
+[6]	"S-080038000235baf9"[7]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[7]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[17]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[17]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[7]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[7]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f8b00
+switchguid=0x2c903008f8b00(2c903008f8b00)
+Switch	36 "S-0002c903008f8b00"		# "SwitchX -  Mellanox Technologies" base port 0 lid 67 lmc 0
+[5]	"S-080038000235badb"[6]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[6]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[6]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[16]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[16]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[6]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[6]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f8a80
+switchguid=0x2c903008f8a80(2c903008f8a80)
+Switch	36 "S-0002c903008f8a80"		# "SwitchX -  Mellanox Technologies" base port 0 lid 68 lmc 0
+[5]	"S-080038000235badb"[5]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[6]	"S-080038000235baf9"[5]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[7]	"S-080038000235bb1d"[5]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[15]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[15]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[5]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[5]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f9400
+switchguid=0x2c903008f9400(2c903008f9400)
+Switch	36 "S-0002c903008f9400"		# "SwitchX -  Mellanox Technologies" base port 0 lid 66 lmc 0
+[1]	"S-080038000235badb"[4]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[2]	"S-080038000235baf9"[4]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[3]	"S-080038000235bb1d"[4]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[14]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[14]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[4]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[4]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f9500
+switchguid=0x2c903008f9500(2c903008f9500)
+Switch	36 "S-0002c903008f9500"		# "SwitchX -  Mellanox Technologies" base port 0 lid 9 lmc 0
+[1]	"S-080038000235badb"[2]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[2]	"S-080038000235baf9"[2]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[3]	"S-080038000235bb1d"[2]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[12]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[12]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[2]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[2]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008f8800
+switchguid=0x2c903008f8800(2c903008f8800)
+Switch	36 "S-0002c903008f8800"		# "SwitchX -  Mellanox Technologies" base port 0 lid 8 lmc 0
+[1]	"S-080038000235badb"[1]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+[2]	"S-080038000235baf9"[1]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+[3]	"S-080038000235bb1d"[1]		# "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+[17]	"S-0002c902004145b8"[11]		# "Infiniscale-IV Mellanox Technologies" lid 79 4xQDR
+[18]	"S-0002c90200415330"[11]		# "Infiniscale-IV Mellanox Technologies" lid 80 4xQDR
+[19]	"S-0002c903008cdc80"[1]		# "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+[20]	"S-08003800023ccd70"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+[21]	"S-08003800023ccd74"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+[22]	"S-08003800023ccd72"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+[23]	"S-08003800023ccd6c"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+[24]	"S-08003800023ccc10"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+[25]	"S-08003800023ccc86"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+[26]	"S-08003800023ccc1e"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+[27]	"S-08003800023ccc5e"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+[28]	"S-08003800023ccd76"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+[29]	"S-08003800023ccc6c"[1]		# "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x2c9
+devid=0xc738
+sysimgguid=0x2c903008cdc80
+switchguid=0x2c903008cdc80(2c903008cdc80)
+Switch	36 "S-0002c903008cdc80"		# "SwitchX -  Mellanox Technologies" base port 0 lid 3 lmc 0
+[1]	"S-0002c903008f8800"[19]		# "SwitchX -  Mellanox Technologies" lid 8 4xFDR
+[2]	"S-0002c903008f9500"[19]		# "SwitchX -  Mellanox Technologies" lid 9 4xFDR
+[3]	"S-0002c903008f9480"[19]		# "SwitchX -  Mellanox Technologies" lid 10 4xFDR
+[4]	"S-0002c903008f9400"[19]		# "SwitchX -  Mellanox Technologies" lid 66 4xFDR
+[5]	"S-0002c903008f8a80"[19]		# "SwitchX -  Mellanox Technologies" lid 68 4xFDR
+[6]	"S-0002c903008f8b00"[19]		# "SwitchX -  Mellanox Technologies" lid 67 4xFDR
+[7]	"S-0002c903008f9600"[19]		# "SwitchX -  Mellanox Technologies" lid 70 4xFDR
+[8]	"S-0002c903008f9200"[19]		# "SwitchX -  Mellanox Technologies" lid 69 4xFDR
+[9]	"S-0002c903008d4580"[19]		# "SwitchX -  Mellanox Technologies" lid 72 4xFDR
+[10]	"S-0002c903008d4980"[19]		# "SwitchX -  Mellanox Technologies" lid 71 4xFDR
+[11]	"S-0002c903008f9280"[19]		# "SwitchX -  Mellanox Technologies" lid 74 4xFDR
+[12]	"S-0002c903008f8d80"[19]		# "SwitchX -  Mellanox Technologies" lid 73 4xFDR
+[13]	"S-0002c903008f9380"[19]		# "SwitchX -  Mellanox Technologies" lid 77 4xFDR
+[14]	"S-0002c903008f9580"[19]		# "SwitchX -  Mellanox Technologies" lid 76 4xFDR
+[15]	"S-0002c903008f8b80"[19]		# "SwitchX -  Mellanox Technologies" lid 75 4xFDR
+[16]	"S-0002c903008f8c80"[19]		# "SwitchX -  Mellanox Technologies" lid 78 4xFDR
+[17]	"S-0002c903008f9100"[19]		# "SwitchX -  Mellanox Technologies" lid 81 4xFDR
+[18]	"S-0002c903008f8d00"[19]		# "SwitchX -  Mellanox Technologies" lid 82 4xFDR
+[19]	"H-0002c903000c82dc"[1](2c903000c82dd) 		# "sid0 HCA-1" lid 1 4xQDR
+[20]	"H-0002c903000c82f8"[1](2c903000c82f9) 		# "sid4 HCA-1" lid 4 4xQDR
+[21]	"H-0002c903000f6236"[1](2c903000f6237) 		# "sid15 HCA-1" lid 2 4xQDR
+[22]	"H-0002c90300523a2e"[1](2c90300523a2f) 		# "localhost HCA-1" lid 197 4xQDR
+[23]	"H-0002c9030052395e"[1](2c9030052395f) 		# "sid1 HCA-1" lid 7 4xQDR
+[24]	"H-0002c903000c8308"[1](2c903000c8309) 		# "sid2 HCA-1" lid 5 4xQDR
+[25]	"H-0002c903000f6476"[1](2c903000f6477) 		# "sid3 HCA-1" lid 6 4xQDR
+[26]	"H-0002c90300038f48"[1](2c90300038f49) 		# "sid12 HCA-1" lid 12 4xQDR
+[27]	"H-0002c90300043eb0"[1](2c90300043eb1) 		# "localhost HCA-1" lid 13 4xQDR
+[28]	"H-0002c90300043ee0"[1](2c90300043ee1) 		# "sid11 HCA-1" lid 14 4xQDR
+[29]	"H-0002c90300197470"[1](2c90300197471) 		# "sid16 HCA-2" lid 638 4xFDR
+[30]	"H-0002c903003d86e0"[1](2c903003d86e1) 		# "sid16 HCA-3" lid 637 4xFDR
+[31]	"H-0002c90300197450"[1](2c90300197451) 		# "sid17 HCA-2" lid 646 4xFDR
+[32]	"H-0002c903001e68e0"[1](2c903001e68e1) 		# "sid17 HCA-3" lid 643 4xFDR
+[33]	"H-0002c903003d8630"[1](2c903003d8631) 		# "sid18 HCA-2" lid 644 4xFDR
+[34]	"H-0002c903001e6970"[1](2c903001e6971) 		# "sid18 HCA-3" lid 645 4xFDR
+[35]	"H-0002c903001d49b0"[1](2c903001d49b1) 		# "sid19 HCA-2" lid 641 4xFDR
+[36]	"H-0002c903001e8a30"[1](2c903001e8a31) 		# "sid19 HCA-3" lid 642 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad64d
+caguid=0x8003800013ad64b
+Ca	1 "H-08003800013ad64b"		# "sid753 HCA-1"
+[1](8003800013ad64c) 	"S-08003800023ccc1e"[36]		# lid 730 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad407
+caguid=0x8003800013ad405
+Ca	1 "H-08003800013ad405"		# "sid752 HCA-1"
+[1](8003800013ad406) 	"S-08003800023ccc1e"[35]		# lid 669 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013abce5
+caguid=0x8003800013abce3
+Ca	1 "H-08003800013abce3"		# "sid750 HCA-1"
+[1](8003800013abce4) 	"S-08003800023ccc1e"[33]		# lid 720 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af909
+caguid=0x8003800013af907
+Ca	1 "H-08003800013af907"		# "sid751 HCA-1"
+[1](8003800013af908) 	"S-08003800023ccc1e"[34]		# lid 708 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afa5f
+caguid=0x8003800013afa5d
+Ca	1 "H-08003800013afa5d"		# "sid749 HCA-1"
+[1](8003800013afa5e) 	"S-08003800023ccc1e"[32]		# lid 703 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013adcbf
+caguid=0x8003800013adcbd
+Ca	1 "H-08003800013adcbd"		# "sid748 HCA-1"
+[1](8003800013adcbe) 	"S-08003800023ccc1e"[31]		# lid 690 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013abd75
+caguid=0x8003800013abd73
+Ca	1 "H-08003800013abd73"		# "sid747 HCA-1"
+[1](8003800013abd74) 	"S-08003800023ccc1e"[30]		# lid 654 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afa7d
+caguid=0x8003800013afa7b
+Ca	1 "H-08003800013afa7b"		# "sid746 HCA-1"
+[1](8003800013afa7c) 	"S-08003800023ccc1e"[29]		# lid 655 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0965
+caguid=0x8003800013b0963
+Ca	1 "H-08003800013b0963"		# "sid745 HCA-1"
+[1](8003800013b0964) 	"S-08003800023ccc1e"[28]		# lid 724 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad72b
+caguid=0x8003800013ad729
+Ca	1 "H-08003800013ad729"		# "sid744 HCA-1"
+[1](8003800013ad72a) 	"S-08003800023ccc1e"[27]		# lid 723 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae859
+caguid=0x8003800013ae857
+Ca	1 "H-08003800013ae857"		# "sid742 HCA-1"
+[1](8003800013ae858) 	"S-08003800023ccc1e"[25]		# lid 675 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad977
+caguid=0x8003800013ad975
+Ca	1 "H-08003800013ad975"		# "sid743 HCA-1"
+[1](8003800013ad976) 	"S-08003800023ccc1e"[26]		# lid 715 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab943
+caguid=0x8003800013ab941
+Ca	1 "H-08003800013ab941"		# "sid741 HCA-1"
+[1](8003800013ab942) 	"S-08003800023ccc1e"[24]		# lid 664 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae8cb
+caguid=0x8003800013ae8c9
+Ca	1 "H-08003800013ae8c9"		# "sid740 HCA-1"
+[1](8003800013ae8ca) 	"S-08003800023ccc1e"[23]		# lid 692 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac645
+caguid=0x8003800013ac643
+Ca	1 "H-08003800013ac643"		# "sid738 HCA-1"
+[1](8003800013ac644) 	"S-08003800023ccc1e"[21]		# lid 658 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae211
+caguid=0x8003800013ae20f
+Ca	1 "H-08003800013ae20f"		# "sid739 HCA-1"
+[1](8003800013ae210) 	"S-08003800023ccc1e"[22]		# lid 709 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b1979
+caguid=0x8003800013b1977
+Ca	1 "H-08003800013b1977"		# "sid737 HCA-1"
+[1](8003800013b1978) 	"S-08003800023ccc1e"[20]		# lid 725 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b048b
+caguid=0x8003800013b0489
+Ca	1 "H-08003800013b0489"		# "sid736 HCA-1"
+[1](8003800013b048a) 	"S-08003800023ccc1e"[19]		# lid 732 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 649 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af6b1
+caguid=0x8003800013af6af
+Ca	1 "H-08003800013af6af"		# "sid789 HCA-1"
+[1](8003800013af6b0) 	"S-08003800023ccc6c"[36]		# lid 717 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b085d
+caguid=0x8003800013b085b
+Ca	1 "H-08003800013b085b"		# "sid788 HCA-1"
+[1](8003800013b085c) 	"S-08003800023ccc6c"[35]		# lid 682 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0c3b
+caguid=0x8003800013b0c39
+Ca	1 "H-08003800013b0c39"		# "sid787 HCA-1"
+[1](8003800013b0c3a) 	"S-08003800023ccc6c"[34]		# lid 673 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0cef
+caguid=0x8003800013b0ced
+Ca	1 "H-08003800013b0ced"		# "sid786 HCA-1"
+[1](8003800013b0cee) 	"S-08003800023ccc6c"[33]		# lid 737 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af921
+caguid=0x8003800013af91f
+Ca	1 "H-08003800013af91f"		# "sid785 HCA-1"
+[1](8003800013af920) 	"S-08003800023ccc6c"[32]		# lid 711 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0bab
+caguid=0x8003800013b0ba9
+Ca	1 "H-08003800013b0ba9"		# "sid784 HCA-1"
+[1](8003800013b0baa) 	"S-08003800023ccc6c"[31]		# lid 130 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0d3d
+caguid=0x8003800013b0d3b
+Ca	1 "H-08003800013b0d3b"		# "sid783 HCA-1"
+[1](8003800013b0d3c) 	"S-08003800023ccc6c"[30]		# lid 728 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af3bd
+caguid=0x8003800013af3bb
+Ca	1 "H-08003800013af3bb"		# "sid782 HCA-1"
+[1](8003800013af3bc) 	"S-08003800023ccc6c"[29]		# lid 718 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afaa1
+caguid=0x8003800013afa9f
+Ca	1 "H-08003800013afa9f"		# "sid781 HCA-1"
+[1](8003800013afaa0) 	"S-08003800023ccc6c"[28]		# lid 726 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aed21
+caguid=0x8003800013aed1f
+Ca	1 "H-08003800013aed1f"		# "sid780 HCA-1"
+[1](8003800013aed20) 	"S-08003800023ccc6c"[27]		# lid 679 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b06d1
+caguid=0x8003800013b06cf
+Ca	1 "H-08003800013b06cf"		# "sid778 HCA-1"
+[1](8003800013b06d0) 	"S-08003800023ccc6c"[25]		# lid 667 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b053f
+caguid=0x8003800013b053d
+Ca	1 "H-08003800013b053d"		# "sid779 HCA-1"
+[1](8003800013b053e) 	"S-08003800023ccc6c"[26]		# lid 736 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0347
+caguid=0x8003800013b0345
+Ca	1 "H-08003800013b0345"		# "sid777 HCA-1"
+[1](8003800013b0346) 	"S-08003800023ccc6c"[24]		# lid 681 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae883
+caguid=0x8003800013ae881
+Ca	1 "H-08003800013ae881"		# "sid776 HCA-1"
+[1](8003800013ae882) 	"S-08003800023ccc6c"[23]		# lid 687 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b02f3
+caguid=0x8003800013b02f1
+Ca	1 "H-08003800013b02f1"		# "sid775 HCA-1"
+[1](8003800013b02f2) 	"S-08003800023ccc6c"[22]		# lid 697 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aedd5
+caguid=0x8003800013aedd3
+Ca	1 "H-08003800013aedd3"		# "sid774 HCA-1"
+[1](8003800013aedd4) 	"S-08003800023ccc6c"[21]		# lid 707 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af0c9
+caguid=0x8003800013af0c7
+Ca	1 "H-08003800013af0c7"		# "sid773 HCA-1"
+[1](8003800013af0c8) 	"S-08003800023ccc6c"[20]		# lid 666 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae72d
+caguid=0x8003800013ae72b
+Ca	1 "H-08003800013ae72b"		# "sid772 HCA-1"
+[1](8003800013ae72c) 	"S-08003800023ccc6c"[19]		# lid 701 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 650 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab3c1
+caguid=0x8003800013ab3bf
+Ca	1 "H-08003800013ab3bf"		# "sid689 HCA-1"
+[1](8003800013ab3c0) 	"S-08003800023ccd76"[36]		# lid 621 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afb25
+caguid=0x8003800013afb23
+Ca	1 "H-08003800013afb23"		# "sid688 HCA-1"
+[1](8003800013afb24) 	"S-08003800023ccd76"[35]		# lid 607 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0971
+caguid=0x8003800013b096f
+Ca	1 "H-08003800013b096f"		# "sid687 HCA-1"
+[1](8003800013b0970) 	"S-08003800023ccd76"[34]		# lid 614 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b098f
+caguid=0x8003800013b098d
+Ca	1 "H-08003800013b098d"		# "sid686 HCA-1"
+[1](8003800013b098e) 	"S-08003800023ccd76"[33]		# lid 616 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad05f
+caguid=0x8003800013ad05d
+Ca	1 "H-08003800013ad05d"		# "sid685 HCA-1"
+[1](8003800013ad05e) 	"S-08003800023ccd76"[32]		# lid 613 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad1bb
+caguid=0x8003800013ad1b9
+Ca	1 "H-08003800013ad1b9"		# "sid684 HCA-1"
+[1](8003800013ad1ba) 	"S-08003800023ccd76"[31]		# lid 620 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013addd9
+caguid=0x8003800013addd7
+Ca	1 "H-08003800013addd7"		# "sid683 HCA-1"
+[1](8003800013addd8) 	"S-08003800023ccd76"[30]		# lid 622 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0d07
+caguid=0x8003800013b0d05
+Ca	1 "H-08003800013b0d05"		# "sid682 HCA-1"
+[1](8003800013b0d06) 	"S-08003800023ccd76"[29]		# lid 605 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0c7d
+caguid=0x8003800013b0c7b
+Ca	1 "H-08003800013b0c7b"		# "sid681 HCA-1"
+[1](8003800013b0c7c) 	"S-08003800023ccd76"[28]		# lid 615 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac591
+caguid=0x8003800013ac58f
+Ca	1 "H-08003800013ac58f"		# "sid680 HCA-1"
+[1](8003800013ac590) 	"S-08003800023ccd76"[27]		# lid 617 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae9e5
+caguid=0x8003800013ae9e3
+Ca	1 "H-08003800013ae9e3"		# "sid679 HCA-1"
+[1](8003800013ae9e4) 	"S-08003800023ccd76"[26]		# lid 623 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b06a7
+caguid=0x8003800013b06a5
+Ca	1 "H-08003800013b06a5"		# "sid678 HCA-1"
+[1](8003800013b06a6) 	"S-08003800023ccd76"[25]		# lid 618 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0545
+caguid=0x8003800013b0543
+Ca	1 "H-08003800013b0543"		# "sid677 HCA-1"
+[1](8003800013b0544) 	"S-08003800023ccd76"[24]		# lid 609 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aca59
+caguid=0x8003800013aca57
+Ca	1 "H-08003800013aca57"		# "sid676 HCA-1"
+[1](8003800013aca58) 	"S-08003800023ccd76"[23]		# lid 610 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac85b
+caguid=0x8003800013ac859
+Ca	1 "H-08003800013ac859"		# "sid675 HCA-1"
+[1](8003800013ac85a) 	"S-08003800023ccd76"[22]		# lid 611 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b185f
+caguid=0x8003800013b185d
+Ca	1 "H-08003800013b185d"		# "sid673 HCA-1"
+[1](8003800013b185e) 	"S-08003800023ccd76"[20]		# lid 612 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b19b5
+caguid=0x8003800013b19b3
+Ca	1 "H-08003800013b19b3"		# "sid672 HCA-1"
+[1](8003800013b19b4) 	"S-08003800023ccd76"[19]		# lid 619 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 628 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0aa9
+caguid=0x8003800013b0aa7
+Ca	1 "H-08003800013b0aa7"		# "sid771 HCA-1"
+[1](8003800013b0aa8) 	"S-08003800023ccc5e"[36]		# lid 705 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0dc7
+caguid=0x8003800013b0dc5
+Ca	1 "H-08003800013b0dc5"		# "sid770 HCA-1"
+[1](8003800013b0dc6) 	"S-08003800023ccc5e"[35]		# lid 691 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab4ed
+caguid=0x8003800013ab4eb
+Ca	1 "H-08003800013ab4eb"		# "sid769 HCA-1"
+[1](8003800013ab4ec) 	"S-08003800023ccc5e"[34]		# lid 660 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab421
+caguid=0x8003800013ab41f
+Ca	1 "H-08003800013ab41f"		# "sid767 HCA-1"
+[1](8003800013ab420) 	"S-08003800023ccc5e"[32]		# lid 652 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0c77
+caguid=0x8003800013b0c75
+Ca	1 "H-08003800013b0c75"		# "sid768 HCA-1"
+[1](8003800013b0c76) 	"S-08003800023ccc5e"[33]		# lid 714 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af97b
+caguid=0x8003800013af979
+Ca	1 "H-08003800013af979"		# "sid766 HCA-1"
+[1](8003800013af97a) 	"S-08003800023ccc5e"[31]		# lid 716 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad317
+caguid=0x8003800013ad315
+Ca	1 "H-08003800013ad315"		# "sid765 HCA-1"
+[1](8003800013ad316) 	"S-08003800023ccc5e"[30]		# lid 699 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af75f
+caguid=0x8003800013af75d
+Ca	1 "H-08003800013af75d"		# "sid764 HCA-1"
+[1](8003800013af75e) 	"S-08003800023ccc5e"[29]		# lid 676 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af651
+caguid=0x8003800013af64f
+Ca	1 "H-08003800013af64f"		# "sid763 HCA-1"
+[1](8003800013af650) 	"S-08003800023ccc5e"[28]		# lid 674 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aefeb
+caguid=0x8003800013aefe9
+Ca	1 "H-08003800013aefe9"		# "sid762 HCA-1"
+[1](8003800013aefea) 	"S-08003800023ccc5e"[27]		# lid 677 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0743
+caguid=0x8003800013b0741
+Ca	1 "H-08003800013b0741"		# "sid761 HCA-1"
+[1](8003800013b0742) 	"S-08003800023ccc5e"[26]		# lid 712 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac26d
+caguid=0x8003800013ac26b
+Ca	1 "H-08003800013ac26b"		# "sid760 HCA-1"
+[1](8003800013ac26c) 	"S-08003800023ccc5e"[25]		# lid 653 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aba69
+caguid=0x8003800013aba67
+Ca	1 "H-08003800013aba67"		# "sid758 HCA-1"
+[1](8003800013aba68) 	"S-08003800023ccc5e"[23]		# lid 661 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b051b
+caguid=0x8003800013b0519
+Ca	1 "H-08003800013b0519"		# "sid759 HCA-1"
+[1](8003800013b051a) 	"S-08003800023ccc5e"[24]		# lid 678 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aea45
+caguid=0x8003800013aea43
+Ca	1 "H-08003800013aea43"		# "sid757 HCA-1"
+[1](8003800013aea44) 	"S-08003800023ccc5e"[22]		# lid 729 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac4fb
+caguid=0x8003800013ac4f9
+Ca	1 "H-08003800013ac4f9"		# "sid756 HCA-1"
+[1](8003800013ac4fa) 	"S-08003800023ccc5e"[21]		# lid 698 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af0e7
+caguid=0x8003800013af0e5
+Ca	1 "H-08003800013af0e5"		# "sid754 HCA-1"
+[1](8003800013af0e6) 	"S-08003800023ccc5e"[19]		# lid 695 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aee11
+caguid=0x8003800013aee0f
+Ca	1 "H-08003800013aee0f"		# "sid755 HCA-1"
+[1](8003800013aee10) 	"S-08003800023ccc5e"[20]		# lid 710 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 647 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad371
+caguid=0x8003800013ad36f
+Ca	1 "H-08003800013ad36f"		# "sid735 HCA-1"
+[1](8003800013ad370) 	"S-08003800023ccc86"[36]		# lid 683 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0839
+caguid=0x8003800013b0837
+Ca	1 "H-08003800013b0837"		# "sid734 HCA-1"
+[1](8003800013b0838) 	"S-08003800023ccc86"[35]		# lid 672 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013abec5
+caguid=0x8003800013abec3
+Ca	1 "H-08003800013abec3"		# "sid733 HCA-1"
+[1](8003800013abec4) 	"S-08003800023ccc86"[34]		# lid 662 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af957
+caguid=0x8003800013af955
+Ca	1 "H-08003800013af955"		# "sid732 HCA-1"
+[1](8003800013af956) 	"S-08003800023ccc86"[33]		# lid 665 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af777
+caguid=0x8003800013af775
+Ca	1 "H-08003800013af775"		# "sid731 HCA-1"
+[1](8003800013af776) 	"S-08003800023ccc86"[32]		# lid 684 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013abdd5
+caguid=0x8003800013abdd3
+Ca	1 "H-08003800013abdd3"		# "sid730 HCA-1"
+[1](8003800013abdd4) 	"S-08003800023ccc86"[31]		# lid 719 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0a61
+caguid=0x8003800013b0a5f
+Ca	1 "H-08003800013b0a5f"		# "sid729 HCA-1"
+[1](8003800013b0a60) 	"S-08003800023ccc86"[30]		# lid 713 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad419
+caguid=0x8003800013ad417
+Ca	1 "H-08003800013ad417"		# "sid728 HCA-1"
+[1](8003800013ad418) 	"S-08003800023ccc86"[29]		# lid 700 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab7e1
+caguid=0x8003800013ab7df
+Ca	1 "H-08003800013ab7df"		# "sid727 HCA-1"
+[1](8003800013ab7e0) 	"S-08003800023ccc86"[28]		# lid 656 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad97d
+caguid=0x8003800013ad97b
+Ca	1 "H-08003800013ad97b"		# "sid726 HCA-1"
+[1](8003800013ad97c) 	"S-08003800023ccc86"[27]		# lid 686 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0767
+caguid=0x8003800013b0765
+Ca	1 "H-08003800013b0765"		# "sid725 HCA-1"
+[1](8003800013b0766) 	"S-08003800023ccc86"[26]		# lid 731 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac447
+caguid=0x8003800013ac445
+Ca	1 "H-08003800013ac445"		# "sid724 HCA-1"
+[1](8003800013ac446) 	"S-08003800023ccc86"[25]		# lid 659 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae823
+caguid=0x8003800013ae821
+Ca	1 "H-08003800013ae821"		# "sid723 HCA-1"
+[1](8003800013ae822) 	"S-08003800023ccc86"[24]		# lid 680 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac4f5
+caguid=0x8003800013ac4f3
+Ca	1 "H-08003800013ac4f3"		# "sid721 HCA-1"
+[1](8003800013ac4f4) 	"S-08003800023ccc86"[22]		# lid 668 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae6bb
+caguid=0x8003800013ae6b9
+Ca	1 "H-08003800013ae6b9"		# "sid722 HCA-1"
+[1](8003800013ae6ba) 	"S-08003800023ccc86"[23]		# lid 735 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad797
+caguid=0x8003800013ad795
+Ca	1 "H-08003800013ad795"		# "sid719 HCA-1"
+[1](8003800013ad796) 	"S-08003800023ccc86"[20]		# lid 733 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b04eb
+caguid=0x8003800013b04e9
+Ca	1 "H-08003800013b04e9"		# "sid720 HCA-1"
+[1](8003800013b04ea) 	"S-08003800023ccc86"[21]		# lid 721 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab919
+caguid=0x8003800013ab917
+Ca	1 "H-08003800013ab917"		# "sid718 HCA-1"
+[1](8003800013ab918) 	"S-08003800023ccc86"[19]		# lid 740 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 651 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af48f
+caguid=0x8003800013af48d
+Ca	1 "H-08003800013af48d"		# "sid717 HCA-1"
+[1](8003800013af48e) 	"S-08003800023ccc10"[36]		# lid 688 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b145d
+caguid=0x8003800013b145b
+Ca	1 "H-08003800013b145b"		# "sid716 HCA-1"
+[1](8003800013b145c) 	"S-08003800023ccc10"[35]		# lid 702 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013adbed
+caguid=0x8003800013adbeb
+Ca	1 "H-08003800013adbeb"		# "sid715 HCA-1"
+[1](8003800013adbec) 	"S-08003800023ccc10"[34]		# lid 727 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013acdbf
+caguid=0x8003800013acdbd
+Ca	1 "H-08003800013acdbd"		# "sid714 HCA-1"
+[1](8003800013acdbe) 	"S-08003800023ccc10"[33]		# lid 706 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b15dd
+caguid=0x8003800013b15db
+Ca	1 "H-08003800013b15db"		# "sid713 HCA-1"
+[1](8003800013b15dc) 	"S-08003800023ccc10"[32]		# lid 693 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af32d
+caguid=0x8003800013af32b
+Ca	1 "H-08003800013af32b"		# "sid712 HCA-1"
+[1](8003800013af32c) 	"S-08003800023ccc10"[31]		# lid 671 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad401
+caguid=0x8003800013ad3ff
+Ca	1 "H-08003800013ad3ff"		# "sid711 HCA-1"
+[1](8003800013ad400) 	"S-08003800023ccc10"[30]		# lid 663 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0be7
+caguid=0x8003800013b0be5
+Ca	1 "H-08003800013b0be5"		# "sid710 HCA-1"
+[1](8003800013b0be6) 	"S-08003800023ccc10"[29]		# lid 694 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afa95
+caguid=0x8003800013afa93
+Ca	1 "H-08003800013afa93"		# "sid709 HCA-1"
+[1](8003800013afa94) 	"S-08003800023ccc10"[28]		# lid 689 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aecf1
+caguid=0x8003800013aecef
+Ca	1 "H-08003800013aecef"		# "sid708 HCA-1"
+[1](8003800013aecf0) 	"S-08003800023ccc10"[27]		# lid 722 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b19cd
+caguid=0x8003800013b19cb
+Ca	1 "H-08003800013b19cb"		# "sid707 HCA-1"
+[1](8003800013b19cc) 	"S-08003800023ccc10"[26]		# lid 738 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae1b1
+caguid=0x8003800013ae1af
+Ca	1 "H-08003800013ae1af"		# "sid706 HCA-1"
+[1](8003800013ae1b0) 	"S-08003800023ccc10"[25]		# lid 734 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aca7d
+caguid=0x8003800013aca7b
+Ca	1 "H-08003800013aca7b"		# "sid705 HCA-1"
+[1](8003800013aca7c) 	"S-08003800023ccc10"[24]		# lid 685 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b18e9
+caguid=0x8003800013b18e7
+Ca	1 "H-08003800013b18e7"		# "sid704 HCA-1"
+[1](8003800013b18e8) 	"S-08003800023ccc10"[23]		# lid 696 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ada31
+caguid=0x8003800013ada2f
+Ca	1 "H-08003800013ada2f"		# "sid702 HCA-1"
+[1](8003800013ada30) 	"S-08003800023ccc10"[21]		# lid 657 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b04c1
+caguid=0x8003800013b04bf
+Ca	1 "H-08003800013b04bf"		# "sid703 HCA-1"
+[1](8003800013b04c0) 	"S-08003800023ccc10"[22]		# lid 670 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b06a1
+caguid=0x8003800013b069f
+Ca	1 "H-08003800013b069f"		# "sid701 HCA-1"
+[1](8003800013b06a0) 	"S-08003800023ccc10"[20]		# lid 704 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae9a3
+caguid=0x8003800013ae9a1
+Ca	1 "H-08003800013ae9a1"		# "sid700 HCA-1"
+[1](8003800013ae9a2) 	"S-08003800023ccc10"[19]		# lid 739 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 648 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac099
+caguid=0x8003800013ac097
+Ca	1 "H-08003800013ac097"		# "sid671 HCA-1"
+[1](8003800013ac098) 	"S-08003800023ccd6c"[36]		# lid 598 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afa47
+caguid=0x8003800013afa45
+Ca	1 "H-08003800013afa45"		# "sid670 HCA-1"
+[1](8003800013afa46) 	"S-08003800023ccd6c"[35]		# lid 590 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad695
+caguid=0x8003800013ad693
+Ca	1 "H-08003800013ad693"		# "sid669 HCA-1"
+[1](8003800013ad694) 	"S-08003800023ccd6c"[34]		# lid 597 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b1487
+caguid=0x8003800013b1485
+Ca	1 "H-08003800013b1485"		# "sid668 HCA-1"
+[1](8003800013b1486) 	"S-08003800023ccd6c"[33]		# lid 595 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0aeb
+caguid=0x8003800013b0ae9
+Ca	1 "H-08003800013b0ae9"		# "sid667 HCA-1"
+[1](8003800013b0aea) 	"S-08003800023ccd6c"[32]		# lid 602 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0a8b
+caguid=0x8003800013b0a89
+Ca	1 "H-08003800013b0a89"		# "sid666 HCA-1"
+[1](8003800013b0a8a) 	"S-08003800023ccd6c"[31]		# lid 596 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab72d
+caguid=0x8003800013ab72b
+Ca	1 "H-08003800013ab72b"		# "sid665 HCA-1"
+[1](8003800013ab72c) 	"S-08003800023ccd6c"[30]		# lid 587 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afafb
+caguid=0x8003800013afaf9
+Ca	1 "H-08003800013afaf9"		# "sid664 HCA-1"
+[1](8003800013afafa) 	"S-08003800023ccd6c"[29]		# lid 604 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b096b
+caguid=0x8003800013b0969
+Ca	1 "H-08003800013b0969"		# "sid663 HCA-1"
+[1](8003800013b096a) 	"S-08003800023ccd6c"[28]		# lid 593 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac2eb
+caguid=0x8003800013ac2e9
+Ca	1 "H-08003800013ac2e9"		# "sid662 HCA-1"
+[1](8003800013ac2ea) 	"S-08003800023ccd6c"[27]		# lid 603 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae967
+caguid=0x8003800013ae965
+Ca	1 "H-08003800013ae965"		# "sid661 HCA-1"
+[1](8003800013ae966) 	"S-08003800023ccd6c"[26]		# lid 592 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad809
+caguid=0x8003800013ad807
+Ca	1 "H-08003800013ad807"		# "sid660 HCA-1"
+[1](8003800013ad808) 	"S-08003800023ccd6c"[25]		# lid 586 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae7b7
+caguid=0x8003800013ae7b5
+Ca	1 "H-08003800013ae7b5"		# "sid659 HCA-1"
+[1](8003800013ae7b6) 	"S-08003800023ccd6c"[24]		# lid 599 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0485
+caguid=0x8003800013b0483
+Ca	1 "H-08003800013b0483"		# "sid658 HCA-1"
+[1](8003800013b0484) 	"S-08003800023ccd6c"[23]		# lid 594 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0647
+caguid=0x8003800013b0645
+Ca	1 "H-08003800013b0645"		# "sid657 HCA-1"
+[1](8003800013b0646) 	"S-08003800023ccd6c"[22]		# lid 589 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013abbdd
+caguid=0x8003800013abbdb
+Ca	1 "H-08003800013abbdb"		# "sid656 HCA-1"
+[1](8003800013abbdc) 	"S-08003800023ccd6c"[21]		# lid 601 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aeb53
+caguid=0x8003800013aeb51
+Ca	1 "H-08003800013aeb51"		# "sid655 HCA-1"
+[1](8003800013aeb52) 	"S-08003800023ccd6c"[20]		# lid 591 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0737
+caguid=0x8003800013b0735
+Ca	1 "H-08003800013b0735"		# "sid654 HCA-1"
+[1](8003800013b0736) 	"S-08003800023ccd6c"[19]		# lid 588 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 626 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b0b0f
+caguid=0x8003800013b0b0d
+Ca	1 "H-08003800013b0b0d"		# "sid635 HCA-1"
+[1](8003800013b0b0e) 	"S-08003800023ccd74"[36]		# lid 550 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af4f5
+caguid=0x8003800013af4f3
+Ca	1 "H-08003800013af4f3"		# "sid634 HCA-1"
+[1](8003800013af4f4) 	"S-08003800023ccd74"[35]		# lid 565 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af837
+caguid=0x8003800013af835
+Ca	1 "H-08003800013af835"		# "sid633 HCA-1"
+[1](8003800013af836) 	"S-08003800023ccd74"[34]		# lid 556 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af8b5
+caguid=0x8003800013af8b3
+Ca	1 "H-08003800013af8b3"		# "sid632 HCA-1"
+[1](8003800013af8b4) 	"S-08003800023ccd74"[33]		# lid 562 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab121
+caguid=0x8003800013ab11f
+Ca	1 "H-08003800013ab11f"		# "sid631 HCA-1"
+[1](8003800013ab120) 	"S-08003800023ccd74"[32]		# lid 552 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af753
+caguid=0x8003800013af751
+Ca	1 "H-08003800013af751"		# "sid630 HCA-1"
+[1](8003800013af752) 	"S-08003800023ccd74"[31]		# lid 559 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad3ad
+caguid=0x8003800013ad3ab
+Ca	1 "H-08003800013ad3ab"		# "sid628 HCA-1"
+[1](8003800013ad3ac) 	"S-08003800023ccd74"[29]		# lid 561 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab74b
+caguid=0x8003800013ab749
+Ca	1 "H-08003800013ab749"		# "sid629 HCA-1"
+[1](8003800013ab74a) 	"S-08003800023ccd74"[30]		# lid 558 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad431
+caguid=0x8003800013ad42f
+Ca	1 "H-08003800013ad42f"		# "sid627 HCA-1"
+[1](8003800013ad430) 	"S-08003800023ccd74"[28]		# lid 553 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b02db
+caguid=0x8003800013b02d9
+Ca	1 "H-08003800013b02d9"		# "sid626 HCA-1"
+[1](8003800013b02da) 	"S-08003800023ccd74"[27]		# lid 563 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aee35
+caguid=0x8003800013aee33
+Ca	1 "H-08003800013aee33"		# "sid625 HCA-1"
+[1](8003800013aee34) 	"S-08003800023ccd74"[26]		# lid 555 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b1919
+caguid=0x8003800013b1917
+Ca	1 "H-08003800013b1917"		# "sid624 HCA-1"
+[1](8003800013b1918) 	"S-08003800023ccd74"[25]		# lid 551 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae6f7
+caguid=0x8003800013ae6f5
+Ca	1 "H-08003800013ae6f5"		# "sid623 HCA-1"
+[1](8003800013ae6f6) 	"S-08003800023ccd74"[24]		# lid 566 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab301
+caguid=0x8003800013ab2ff
+Ca	1 "H-08003800013ab2ff"		# "sid622 HCA-1"
+[1](8003800013ab300) 	"S-08003800023ccd74"[23]		# lid 548 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac669
+caguid=0x8003800013ac667
+Ca	1 "H-08003800013ac667"		# "sid620 HCA-1"
+[1](8003800013ac668) 	"S-08003800023ccd74"[21]		# lid 560 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae709
+caguid=0x8003800013ae707
+Ca	1 "H-08003800013ae707"		# "sid621 HCA-1"
+[1](8003800013ae708) 	"S-08003800023ccd74"[22]		# lid 549 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad941
+caguid=0x8003800013ad93f
+Ca	1 "H-08003800013ad93f"		# "sid619 HCA-1"
+[1](8003800013ad940) 	"S-08003800023ccd74"[20]		# lid 557 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad731
+caguid=0x8003800013ad72f
+Ca	1 "H-08003800013ad72f"		# "sid618 HCA-1"
+[1](8003800013ad730) 	"S-08003800023ccd74"[19]		# lid 554 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 625 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad1f7
+caguid=0x8003800013ad1f5
+Ca	1 "H-08003800013ad1f5"		# "sid653 HCA-1"
+[1](8003800013ad1f6) 	"S-08003800023ccd72"[36]		# lid 584 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b140f
+caguid=0x8003800013b140d
+Ca	1 "H-08003800013b140d"		# "sid652 HCA-1"
+[1](8003800013b140e) 	"S-08003800023ccd72"[35]		# lid 568 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af441
+caguid=0x8003800013af43f
+Ca	1 "H-08003800013af43f"		# "sid650 HCA-1"
+[1](8003800013af440) 	"S-08003800023ccd72"[33]		# lid 570 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013abe7d
+caguid=0x8003800013abe7b
+Ca	1 "H-08003800013abe7b"		# "sid651 HCA-1"
+[1](8003800013abe7c) 	"S-08003800023ccd72"[34]		# lid 575 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afa77
+caguid=0x8003800013afa75
+Ca	1 "H-08003800013afa75"		# "sid648 HCA-1"
+[1](8003800013afa76) 	"S-08003800023ccd72"[31]		# lid 574 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afa6b
+caguid=0x8003800013afa69
+Ca	1 "H-08003800013afa69"		# "sid647 HCA-1"
+[1](8003800013afa6a) 	"S-08003800023ccd72"[30]		# lid 573 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af43b
+caguid=0x8003800013af439
+Ca	1 "H-08003800013af439"		# "sid646 HCA-1"
+[1](8003800013af43a) 	"S-08003800023ccd72"[29]		# lid 569 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af9f9
+caguid=0x8003800013af9f7
+Ca	1 "H-08003800013af9f7"		# "sid645 HCA-1"
+[1](8003800013af9f8) 	"S-08003800023ccd72"[28]		# lid 585 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac80d
+caguid=0x8003800013ac80b
+Ca	1 "H-08003800013ac80b"		# "sid644 HCA-1"
+[1](8003800013ac80c) 	"S-08003800023ccd72"[27]		# lid 567 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b05cf
+caguid=0x8003800013b05cd
+Ca	1 "H-08003800013b05cd"		# "sid643 HCA-1"
+[1](8003800013b05ce) 	"S-08003800023ccd72"[26]		# lid 582 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ac687
+caguid=0x8003800013ac685
+Ca	1 "H-08003800013ac685"		# "sid642 HCA-1"
+[1](8003800013ac686) 	"S-08003800023ccd72"[25]		# lid 578 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af183
+caguid=0x8003800013af181
+Ca	1 "H-08003800013af181"		# "sid641 HCA-1"
+[1](8003800013af182) 	"S-08003800023ccd72"[24]		# lid 577 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aea8d
+caguid=0x8003800013aea8b
+Ca	1 "H-08003800013aea8b"		# "sid638 HCA-1"
+[1](8003800013aea8c) 	"S-08003800023ccd72"[21]		# lid 579 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae6cd
+caguid=0x8003800013ae6cb
+Ca	1 "H-08003800013ae6cb"		# "sid639 HCA-1"
+[1](8003800013ae6cc) 	"S-08003800023ccd72"[22]		# lid 581 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aef49
+caguid=0x8003800013aef47
+Ca	1 "H-08003800013aef47"		# "sid637 HCA-1"
+[1](8003800013aef48) 	"S-08003800023ccd72"[20]		# lid 571 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aeb7d
+caguid=0x8003800013aeb7b
+Ca	1 "H-08003800013aeb7b"		# "sid636 HCA-1"
+[1](8003800013aeb7c) 	"S-08003800023ccd72"[19]		# lid 576 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 624 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013acd65
+caguid=0x8003800013acd63
+Ca	1 "H-08003800013acd63"		# "sid617 HCA-1"
+[1](8003800013acd64) 	"S-08003800023ccd70"[36]		# lid 629 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af2bb
+caguid=0x8003800013af2b9
+Ca	1 "H-08003800013af2b9"		# "sid616 HCA-1"
+[1](8003800013af2ba) 	"S-08003800023ccd70"[35]		# lid 542 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b1439
+caguid=0x8003800013b1437
+Ca	1 "H-08003800013b1437"		# "sid615 HCA-1"
+[1](8003800013b1438) 	"S-08003800023ccd70"[34]		# lid 536 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afa17
+caguid=0x8003800013afa15
+Ca	1 "H-08003800013afa15"		# "sid614 HCA-1"
+[1](8003800013afa16) 	"S-08003800023ccd70"[33]		# lid 533 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afced
+caguid=0x8003800013afceb
+Ca	1 "H-08003800013afceb"		# "sid613 HCA-1"
+[1](8003800013afcec) 	"S-08003800023ccd70"[32]		# lid 546 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab0d9
+caguid=0x8003800013ab0d7
+Ca	1 "H-08003800013ab0d7"		# "sid612 HCA-1"
+[1](8003800013ab0d8) 	"S-08003800023ccd70"[31]		# lid 545 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013afb2b
+caguid=0x8003800013afb29
+Ca	1 "H-08003800013afb29"		# "sid611 HCA-1"
+[1](8003800013afb2a) 	"S-08003800023ccd70"[30]		# lid 534 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad30b
+caguid=0x8003800013ad309
+Ca	1 "H-08003800013ad309"		# "sid610 HCA-1"
+[1](8003800013ad30a) 	"S-08003800023ccd70"[29]		# lid 530 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013adcb9
+caguid=0x8003800013adcb7
+Ca	1 "H-08003800013adcb7"		# "sid609 HCA-1"
+[1](8003800013adcb8) 	"S-08003800023ccd70"[28]		# lid 541 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad7af
+caguid=0x8003800013ad7ad
+Ca	1 "H-08003800013ad7ad"		# "sid608 HCA-1"
+[1](8003800013ad7ae) 	"S-08003800023ccd70"[27]		# lid 630 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013af105
+caguid=0x8003800013af103
+Ca	1 "H-08003800013af103"		# "sid607 HCA-1"
+[1](8003800013af104) 	"S-08003800023ccd70"[26]		# lid 529 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b17f3
+caguid=0x8003800013b17f1
+Ca	1 "H-08003800013b17f1"		# "sid606 HCA-1"
+[1](8003800013b17f2) 	"S-08003800023ccd70"[25]		# lid 547 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013b05c3
+caguid=0x8003800013b05c1
+Ca	1 "H-08003800013b05c1"		# "sid605 HCA-1"
+[1](8003800013b05c2) 	"S-08003800023ccd70"[24]		# lid 543 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ae835
+caguid=0x8003800013ae833
+Ca	1 "H-08003800013ae833"		# "sid604 HCA-1"
+[1](8003800013ae834) 	"S-08003800023ccd70"[23]		# lid 535 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aeb83
+caguid=0x8003800013aeb81
+Ca	1 "H-08003800013aeb81"		# "sid602 HCA-1"
+[1](8003800013aeb82) 	"S-08003800023ccd70"[21]		# lid 540 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ab2c5
+caguid=0x8003800013ab2c3
+Ca	1 "H-08003800013ab2c3"		# "sid603 HCA-1"
+[1](8003800013ab2c4) 	"S-08003800023ccd70"[22]		# lid 544 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013ad713
+caguid=0x8003800013ad711
+Ca	1 "H-08003800013ad711"		# "sid601 HCA-1"
+[1](8003800013ad712) 	"S-08003800023ccd70"[20]		# lid 532 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013aed0f
+caguid=0x8003800013aed0d
+Ca	1 "H-08003800013aed0d"		# "sid600 HCA-1"
+[1](8003800013aed0e) 	"S-08003800023ccd70"[19]		# lid 531 lmc 0 "Bullx DLC B700 Chassis IBSW 36-Port QSFP FDR Infiniband Switch" lid 627 4xFDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013a84fd
+caguid=0x8003800013a84fb
+Ca	1 "H-08003800013a84fb"		# "sid150 HCA-1"
+[1](8003800013a84fc) 	"S-080038000235bb1d"[33]		# lid 62 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013a883f
+caguid=0x8003800013a883d
+Ca	1 "H-08003800013a883d"		# "sid151 HCA-1"
+[1](8003800013a883e) 	"S-080038000235bb1d"[34]		# lid 63 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a884b
+caguid=0x8003800013a8849
+Ca	1 "H-08003800013a8849"		# "sid148 HCA-1"
+[1](8003800013a884a) 	"S-080038000235bb1d"[31]		# lid 60 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1003
+sysimgguid=0x8003800013a8311
+caguid=0x8003800013a830f
+Ca	1 "H-08003800013a830f"		# "sid149 HCA-1"
+[1](8003800013a8310) 	"S-080038000235bb1d"[32]		# lid 61 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a88b7
+caguid=0x8003800013a88b5
+Ca	1 "H-08003800013a88b5"		# "sid146 HCA-1"
+[1](8003800013a88b6) 	"S-080038000235bb1d"[29]		# lid 58 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a4f93
+caguid=0x8003800013a4f91
+Ca	1 "H-08003800013a4f91"		# "sid147 HCA-1"
+[1](8003800013a4f92) 	"S-080038000235bb1d"[30]		# lid 59 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a81bb
+caguid=0x8003800013a81b9
+Ca	1 "H-08003800013a81b9"		# "sid144 HCA-1"
+[1](8003800013a81ba) 	"S-080038000235bb1d"[27]		# lid 56 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a897d
+caguid=0x8003800013a897b
+Ca	1 "H-08003800013a897b"		# "sid145 HCA-1"
+[1](8003800013a897c) 	"S-080038000235bb1d"[28]		# lid 57 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a846d
+caguid=0x8003800013a846b
+Ca	1 "H-08003800013a846b"		# "sid143 HCA-1"
+[1](8003800013a846c) 	"S-080038000235bb1d"[26]		# lid 55 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a8455
+caguid=0x8003800013a8453
+Ca	1 "H-08003800013a8453"		# "sid142 HCA-1"
+[1](8003800013a8454) 	"S-080038000235bb1d"[25]		# lid 54 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a4d4d
+caguid=0x8003800013a4d4b
+Ca	1 "H-08003800013a4d4b"		# "sid141 HCA-1"
+[1](8003800013a4d4c) 	"S-080038000235bb1d"[24]		# lid 53 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a87cd
+caguid=0x8003800013a87cb
+Ca	1 "H-08003800013a87cb"		# "sid140 HCA-1"
+[1](8003800013a87cc) 	"S-080038000235bb1d"[23]		# lid 50 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a8a3d
+caguid=0x8003800013a8a3b
+Ca	1 "H-08003800013a8a3b"		# "sid139 HCA-1"
+[1](8003800013a8a3c) 	"S-080038000235bb1d"[22]		# lid 44 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a8a6d
+caguid=0x8003800013a8a6b
+Ca	1 "H-08003800013a8a6b"		# "sid138 HCA-1"
+[1](8003800013a8a6c) 	"S-080038000235bb1d"[21]		# lid 42 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a88f9
+caguid=0x8003800013a88f7
+Ca	1 "H-08003800013a88f7"		# "sid137 HCA-1"
+[1](8003800013a88f8) 	"S-080038000235bb1d"[20]		# lid 40 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b33
+sysimgguid=0x8003800013a8905
+caguid=0x8003800013a8903
+Ca	1 "H-08003800013a8903"		# "sid136 HCA-1"
+[1](8003800013a8904) 	"S-080038000235bb1d"[19]		# lid 36 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 33 4xQDR
+
+vendid=0x119f
+devid=0x1b12
+sysimgguid=0x800380001389f41
+caguid=0x800380001389f3f
+Ca	1 "H-0800380001389f3f"		# "sid120 HCA-1"
+[1](800380001389f40) 	"S-080038000235baf9"[21]		# lid 39 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 34 4xQDR
+
+vendid=0x119f
+devid=0x1b12
+sysimgguid=0x800380001373284
+caguid=0x800380001373282
+Ca	1 "H-0800380001373282"		# "sid102 HCA-1"
+[1](800380001373283) 	"S-080038000235badb"[21]		# lid 257 lmc 0 "Bullx Chassis 36-Port QSFP QDR Infiniband Switch" lid 256 4xQDR
+
+vendid=0x2c9
+devid=0x1003
+sysimgguid=0x2c903001e8a33
+caguid=0x2c903001e8a30
+Ca	1 "H-0002c903001e8a30"		# "sid19 HCA-3"
+[1](2c903001e8a31) 	"S-0002c903008cdc80"[36]		# lid 642 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+
+vendid=0x2c9
+devid=0x1003
+sysimgguid=0x2c903001d49b3
+caguid=0x2c903001d49b0
+Ca	1 "H-0002c903001d49b0"		# "sid19 HCA-2"
+[1](2c903001d49b1) 	"S-0002c903008cdc80"[35]		# lid 641 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+
+vendid=0x2c9
+devid=0x1003
+sysimgguid=0x2c903001e6973
+caguid=0x2c903001e6970
+Ca	1 "H-0002c903001e6970"		# "sid18 HCA-3"
+[1](2c903001e6971) 	"S-0002c903008cdc80"[34]		# lid 645 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+
+vendid=0x2c9
+devid=0x1003
+sysimgguid=0x2c903003d8633
+caguid=0x2c903003d8630
+Ca	1 "H-0002c903003d8630"		# "sid18 HCA-2"
+[1](2c903003d8631) 	"S-0002c903008cdc80"[33]		# lid 644 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+
+vendid=0x2c9
+devid=0x1003
+sysimgguid=0x2c903001e68e3
+caguid=0x2c903001e68e0
+Ca	1 "H-0002c903001e68e0"		# "sid17 HCA-3"
+[1](2c903001e68e1) 	"S-0002c903008cdc80"[32]		# lid 643 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+
+vendid=0x2c9
+devid=0x1003
+sysimgguid=0x2c90300197453
+caguid=0x2c90300197450
+Ca	1 "H-0002c90300197450"		# "sid17 HCA-2"
+[1](2c90300197451) 	"S-0002c903008cdc80"[31]		# lid 646 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+
+vendid=0x2c9
+devid=0x1003
+sysimgguid=0x2c90300197473
+caguid=0x2c90300197470
+Ca	1 "H-0002c90300197470"		# "sid16 HCA-2"
+[1](2c90300197471) 	"S-0002c903008cdc80"[29]		# lid 638 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+
+vendid=0x2c9
+devid=0x1003
+sysimgguid=0x2c903003d86e3
+caguid=0x2c903003d86e0
+Ca	1 "H-0002c903003d86e0"		# "sid16 HCA-3"
+[1](2c903003d86e1) 	"S-0002c903008cdc80"[30]		# lid 637 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xFDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c90300043ee3
+caguid=0x2c90300043ee0
+Ca	1 "H-0002c90300043ee0"		# "sid11 HCA-1"
+[1](2c90300043ee1) 	"S-0002c903008cdc80"[28]		# lid 14 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c90300043eb3
+caguid=0x2c90300043eb0
+Ca	1 "H-0002c90300043eb0"		# "localhost HCA-1"
+[1](2c90300043eb1) 	"S-0002c903008cdc80"[27]		# lid 13 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c90300038f4b
+caguid=0x2c90300038f48
+Ca	1 "H-0002c90300038f48"		# "sid12 HCA-1"
+[1](2c90300038f49) 	"S-0002c903008cdc80"[26]		# lid 12 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000f6479
+caguid=0x2c903000f6476
+Ca	1 "H-0002c903000f6476"		# "sid3 HCA-1"
+[1](2c903000f6477) 	"S-0002c903008cdc80"[25]		# lid 6 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000c830b
+caguid=0x2c903000c8308
+Ca	1 "H-0002c903000c8308"		# "sid2 HCA-1"
+[1](2c903000c8309) 	"S-0002c903008cdc80"[24]		# lid 5 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c90300523961
+caguid=0x2c9030052395e
+Ca	1 "H-0002c9030052395e"		# "sid1 HCA-1"
+[1](2c9030052395f) 	"S-0002c903008cdc80"[23]		# lid 7 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c90300523a31
+caguid=0x2c90300523a2e
+Ca	1 "H-0002c90300523a2e"		# "localhost HCA-1"
+[1](2c90300523a2f) 	"S-0002c903008cdc80"[22]		# lid 197 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000f6239
+caguid=0x2c903000f6236
+Ca	1 "H-0002c903000f6236"		# "sid15 HCA-1"
+[1](2c903000f6237) 	"S-0002c903008cdc80"[21]		# lid 2 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000c82df
+caguid=0x2c903000c82dc
+Ca	1 "H-0002c903000c82dc"		# "sid0 HCA-1"
+[1](2c903000c82dd) 	"S-0002c903008cdc80"[19]		# lid 1 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000c82fb
+caguid=0x2c903000c82f8
+Ca	1 "H-0002c903000c82f8"		# "sid4 HCA-1"
+[1](2c903000c82f9) 	"S-0002c903008cdc80"[20]		# lid 4 lmc 0 "SwitchX -  Mellanox Technologies" lid 3 4xQDR
