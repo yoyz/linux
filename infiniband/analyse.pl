@@ -32,6 +32,12 @@ sub new()
     return $self;
 }
 
+sub getFabric()
+{
+    my $self=shift;
+    return $self->{ibfab};
+}
+
 sub open()
 {
     my $self=shift;
@@ -98,20 +104,20 @@ sub numberOfSwitch()
     my $self=shift;
     my $ref_switchList=$self->{switchList};
     my @switchList=@$ref_switchList;  
-    my $i=0;
-#    for my $switch (@switchList)
-#    {
-	#print
-	#$switch->printme();
-	#$i++;
-#    }
-    #print $i;
-    #print "\n";
-    #print $#switchList;    
     return $#switchList+1; 
 }
 
-sub addSwitch($$)
+sub getSwitch($)
+{
+    my $self=shift;
+    my $number=shift;
+    my $ref_switchList=$self->{switchList};
+    my @switchList=@$ref_switchList;  
+    return $switchList[$number]; 
+}
+
+
+sub addSwitch($)
 {
     my $self=shift;
     my $switchToAdd=shift;
@@ -128,18 +134,41 @@ sub addSwitch($$)
     $self->{switchList}=$ref_switchList;
 }
 
-sub printSwitch()
+sub getStr()
 {
     my $self=shift;
     my $switch=shift;
     my $ref_switchList=$self->{switchList};
+    my @switchList=@$ref_switchList;
+    my $str="";
+    my $i=0;
+    for my $switch (@switchList)
+    {
+	if ($i!=0) { $str.="\n"; }
+	$str.=$switch->getStr();
+	$i++;
+    }
+    return $str;
+}
+
+sub printMe()
+{
+    my $self=shift;
+    print $self->getStr()."\n";
+}
+
+# add switch from the $1 fabric
+sub mergeFabric($)
+{
+    my $self=shift;
+    my $ibfab=shift;
+    my $ref_switchList=$ibfab->{switchList};
     my @switchList=@$ref_switchList;    
     for my $switch (@switchList)
     {
-	$switch->printme();
+	$self->addSwitch($switch);
     }
 }
-
 
 1;
 ################################################################################
@@ -212,13 +241,13 @@ sub setnbport($$)
     $self->{nbport}=$nb;
 }
 
-sub getstr()
+sub getStr()
 {
     my $self=shift;
     return "guid:".$self->{guid}." lid:".$self->{lid}." desc:".$self->{desc};
 }
 
-sub printme()
+sub printMe()
 {
     my $self=shift;
     print $self->getstr()."\n";
@@ -231,28 +260,61 @@ sub printme()
 
 my $sw1;
 my $sw2;
-my $fabric;
+my $sw3;
+my $sw4;
+my $fabric1;
+my $fabric2;
 my $ibswParser;
 
 
-$fabric=IBFabric::new();
+$fabric1=IBFabric::new();
+$fabric2=IBFabric::new();
 $ibswParser=ibswitchParser::new();
 
 $sw1=IBSwitch::new();
 $sw1->setguid("08003800013b0489");
 $sw1->setlid(12);
+$sw1->setdesc("sw1");
+
 
 $sw2=IBSwitch::new();
-$sw2->setguid("08003800013b0489");
-$sw2->setlid(12);
+$sw2->setguid("08003800013b0490");
+$sw2->setlid(13);
+$sw2->setdesc("sw2");
 
+$sw3=IBSwitch::new();
+$sw3->setguid("08003800013b0491");
+$sw3->setlid(14);
+$sw3->setdesc("sw3");
+
+$sw4=IBSwitch::new();
+$sw4->setguid("08003800013b0492");
+$sw4->setlid(15);
+$sw4->setdesc("sw4");
 #print $sw1->equal($sw2);
 #exit(0);
-$fabric->addSwitch($sw1);
-$fabric->addSwitch($sw2);
-#$fabric->printSwitch();
+$fabric1->addSwitch($sw1);
+$fabric1->addSwitch($sw2);
 
-$ibswParser->open();
+$fabric2->addSwitch($sw3);
+$fabric2->addSwitch($sw4);
+
+
+print "fab1\n";
+$fabric1->printMe();
+
+print "fab2\n";
+$fabric2->printMe();
+
+print "fabmerge\n";
+$fabric1->mergeFabric($fabric2);
+$fabric1->printMe();
+
+#$ibswParser->open();
+#$fabric2=$ibswParser->getFabric();
+#print $fabric2->getSwitch(2)->getStr();
+
+
 #print "\n";
 #print $ibswParser->{ibfab}->numberOfSwitch();
 #$ib->printme();
