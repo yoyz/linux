@@ -18,6 +18,13 @@ sub new()
     return $self;
 }
 
+sub getFabric()
+{
+    my $self=shift;
+    return $self->{ibfab};
+}
+
+
 ################################################################################
 package ibswitchParser;
 sub new()
@@ -38,7 +45,7 @@ sub getFabric()
     return $self->{ibfab};
 }
 
-sub open()
+sub openAndParse()
 {
     my $self=shift;
     my $file="ibswitches.log";
@@ -310,7 +317,7 @@ print "fabmerge\n";
 $fabric1->mergeFabric($fabric2);
 $fabric1->printMe();
 
-#$ibswParser->open();
+#$ibswParser->openAndParse();
 #$fabric2=$ibswParser->getFabric();
 #print $fabric2->getSwitch(2)->getStr();
 
