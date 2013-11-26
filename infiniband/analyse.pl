@@ -3,6 +3,21 @@
 use strict;
 use warnings;
 
+
+################################################################################
+package ibnetdiscoverParser;
+sub new()
+{
+   my $class=shift;
+    my $ibfab=IBFabric::new();
+    my $self=
+    {
+	"ibfab" => $ibfab,
+    };
+    bless $self;
+    return $self;
+}
+
 ################################################################################
 package ibswitchParser;
 sub new()
@@ -55,7 +70,7 @@ sub open()
 	
     }
     close(FH);
-    $self->{ibfab}->printSwitch();
+    #$self->{ibfab}->printSwitch();
 }
 
 1;
@@ -76,6 +91,24 @@ sub new()
     };
     bless $self;
     return $self;
+}
+
+sub numberOfSwitch()
+{
+    my $self=shift;
+    my $ref_switchList=$self->{switchList};
+    my @switchList=@$ref_switchList;  
+    my $i=0;
+#    for my $switch (@switchList)
+#    {
+	#print
+	#$switch->printme();
+	#$i++;
+#    }
+    #print $i;
+    #print "\n";
+    #print $#switchList;    
+    return $#switchList+1; 
 }
 
 sub addSwitch($$)
@@ -179,10 +212,17 @@ sub setnbport($$)
     $self->{nbport}=$nb;
 }
 
+sub getstr()
+{
+    my $self=shift;
+    return "guid:".$self->{guid}." lid:".$self->{lid}." desc:".$self->{desc};
+}
+
 sub printme()
 {
     my $self=shift;
-    print "guid:".$self->{guid}." lid:".$self->{lid}." desc:".$self->{desc}."\n";
+    print $self->getstr()."\n";
+    #print "guid:".$self->{guid}." lid:".$self->{lid}." desc:".$self->{desc}."\n";
 }
 
 
@@ -210,10 +250,11 @@ $sw2->setlid(12);
 #exit(0);
 $fabric->addSwitch($sw1);
 $fabric->addSwitch($sw2);
-$fabric->printSwitch();
+#$fabric->printSwitch();
 
 $ibswParser->open();
-
+#print "\n";
+#print $ibswParser->{ibfab}->numberOfSwitch();
 #$ib->printme();
 
 # print "toto";
