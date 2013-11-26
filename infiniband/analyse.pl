@@ -8,9 +8,10 @@ package ibswitchParser;
 sub new()
 {
     my $class=shift;
+    my $ibfab=IBFabric::new();
     my $self=
     {
-	
+	"ibfab" => $ibfab,
     };
     bless $self;
     return $self;
@@ -18,14 +19,43 @@ sub new()
 
 sub open()
 {
+    my $self=shift;
     my $file="ibswitches.log";
     open(FH,"<$file") or die "can not open $file\n";
     while (my $line=<FH>)
     {
 	#print $line;
-	if ($line=~//);
+	if ($line=~/^Switch/)
+	{
+	    if ($line=~/Switch\s+:\s+0x([0-9a-fA-F\s+-]+)\s+ports\s+(\d+)\s+"([0-9a-zA-Z\s+-]+)"\sbase\sport\s(\d+)\s+lid\s(\d+)\s+lmc\s+(\d+)/x)
+	    {
+		    
+		# 1 guid
+		# 2 nbport
+		# 3 desc
+		# 5 base port
+		# 6 lid
+		# 7 lmc
+
+		my $guid=$1;
+		my $numberofport=$2;
+		my $desc=$3;
+		my $baseport=$4;
+		my $lid=$5;
+		my $lmc=$6;
+		my $switch=IBSwitch::new();
+
+		$switch->setguid($guid);
+		$switch->setlid($lid);
+		$switch->setdesc($desc);
+		$switch->setnbport($numberofport);
+		$self->{ibfab}->addSwitch($switch);
+	    }
+	}
+	
     }
     close(FH);
+    $self->{ibfab}->printSwitch();
 }
 
 1;
@@ -102,8 +132,10 @@ sub new()
     my $class=shift;
     my $self=
     {
-	"guid" => undef,
-	"lid"  => undef,
+	"guid"   => undef,
+	"lid"    => undef,
+	"desc"   => undef,
+	"nbport" => undef,
     };
     bless  $self;
     return $self;
@@ -132,10 +164,25 @@ sub setlid($$)
     my $l=shift;
     $self->{lid}=$l;
 }
+
+sub setdesc($$)
+{
+    my $self=shift;
+    my $d=shift;
+    $self->{desc}=$d;
+}
+
+sub setnbport($$)
+{
+    my $self=shift;
+    my $nb=shift;
+    $self->{nbport}=$nb;
+}
+
 sub printme()
 {
     my $self=shift;
-    print "guid:".$self->{guid}." lid:".$self->{lid}."\n";
+    print "guid:".$self->{guid}." lid:".$self->{lid}." desc:".$self->{desc}."\n";
 }
 
 
