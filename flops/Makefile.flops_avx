@@ -1,17 +1,26 @@
-CC=g++
-CFLAGS=-c -DLINUX -I. -LSDL/lib -g
-LDFLAGS=-lSDL -lSDL_gfx -lSDL_ttf 
-SOURCES=t1.cpp
-OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=t1
+CC=gcc
+CPP=g++
+CFLAGS=-O3 -mavx -D__AVX__ -I. -g
+LDFLAGS=
 
-all: $(SOURCES) $(EXECUTABLE)
+SRC=gflops.cpp
+OBJ=gflops.o
+BIN=gflops
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-.cpp.o:
-	$(CC) $(CFLAGS) -c $< -o $@
+
+
+all: ${BIN}
+
+
+${BIN}: ${OBJ}
+	${CPP} $(CFLAGS) $(OBJ) -o $(BIN)   $(LDLIBS)
+
+${OBJ}: ${SRC}
+	${CPP} ${CFLAGS} -c ${SRC} -o ${OBJ}
 
 clean:
-	rm -f $(OBJECTS) $(EXECUTABLE)
+	rm -f $(BIN) $(OBJ) gflops.exe
+
+
+
