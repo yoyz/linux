@@ -1,0 +1,24 @@
+{root@sid119 ~]# yum install scsi-target-utils
+[root@sid119 ~]# yum install iscsi-initiator-utils
+
+[root@sid119 ~]# grep -v ^# /etc/tgt/targets.conf
+
+default-driver iscsi
+
+iSNSServerIP 0.0.0.0
+iSNSServerPort 3205
+
+<target t1:server.target1>
+     backing-store /dev/shm/sd
+</target>
+
+[root@sid119 ~]# dd if=/dev/zero of=/dev/shm/sd bs=1M count=10000
+[root@sid119 ~]# losetup /dev/loop0 /dev/shm/sd 
+[root@sid119 ~]# /etc/init.d/tgtd restart
+Arrêt de SCSI target daemon :                              [  OK  ]
+Démarrage de SCSI target daemon :                          [  OK  ]
+
+[root@sid119 ~]# iscsiadm -m discovery -t sendtargets -p $(host sid119  | awk '{print $4}' )
+10.16.1.20:3260,1 t1:server.target1
+
+
