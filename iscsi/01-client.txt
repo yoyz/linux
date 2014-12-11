@@ -1,0 +1,22 @@
+[root@sid120 ~]# iscsiadm -m discovery -t sendtargets -p $(host sid119-ic0  | awk '{print $4}' )
+10.17.1.20:3260,1 t1:server.target1
+
+[root@sid120 ~]# iscsiadm -m node -T t1:server.target1 -p sid119-ib0 -l
+[root@sid120 ~]# lsscsi 
+[0:0:0:0]    disk    ATA      TOSHIBA MK1229GS PS11  /dev/sda 
+[6:0:0:0]    storage IET      Controller       0001  -       
+[6:0:0:1]    disk    IET      VIRTUAL-DISK     0001  /dev/sdb 
+
+[root@sid120 ~]# dd if=/dev/zero of=/dev/sdb bs=1M count=10000
+10000+0 enregistrements lus
+10000+0 enregistrements écrits
+10485760000 octets (10 GB) copiés, 19,2435 s, 545 MB/s
+
+[root@sid120 ~]# iscsiadm -m node -T t1:server.target1 -p sid119-ib0 -u
+Logging out of session [sid: 1, target: t1:server.target1, portal: 10.17.1.20,3260]
+Logout of [sid: 1, target: t1:server.target1, portal: 10.17.1.20,3260] successful.
+
+[root@sid120 ~]# lsscsi 
+[0:0:0:0]    disk    ATA      TOSHIBA MK1229GS PS11  /dev/sda 
+
+
