@@ -14,14 +14,20 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/xattr.h>
+#include <map>
+#include <string>
+#include <iostream>
 
 class ExampleFS {
 private: 
-	const char *_root;
+  const char *_root;
+  
+  static ExampleFS *_instance;
+  
+  void AbsPath(char dest[PATH_MAX], const char *path);
 
-	static ExampleFS *_instance;
-
-	void AbsPath(char dest[PATH_MAX], const char *path);
+  std::map<std::string,double> total_write_size;
+  std::map<std::string,double> total_read_size;
 
 public:
 	static ExampleFS *Instance();
