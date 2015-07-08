@@ -25,9 +25,10 @@ void ExampleFS::AbsPath(char dest[PATH_MAX], const char *path) {
 	//printf("translated path: %s to %s\n", path, dest);
 }
 
-void ExampleFS::setRootDir(const char *path) {
-	printf("setting FS root to: %s\n", path);
-	_root = path;
+void ExampleFS::setRootDir(const char *path)
+{
+  printf("setting FS root to: %s\n", path);
+  _root = path;
 }
 
 int ExampleFS::Getattr(const char *path, struct stat *statbuf) {
@@ -133,14 +134,26 @@ int ExampleFS::Open(const char *path, struct fuse_file_info *fileInfo) {
 	return 0;
 }
 
-int ExampleFS::Read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
-	printf("read(path=%s, size=%d, offset=%d)\n", path, (int)size, (int)offset);
-	return RETURN_ERRNO(pread(fileInfo->fh, buf, size, offset));
+int ExampleFS::Read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo)
+{
+  int size_read=0;
+  printf("read(path=%s, size=%d, offset=%d)\n", path, (int)size, (int)offset);
+  size_read=pread(fileInfo->fh, buf, size, offset);
+  return size_read;
+    
+  //return RETURN_ERRNO(pread(fileInfo->fh, buf, size, offset));
+	
 }
 
-int ExampleFS::Write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
-	printf("write(path=%s, size=%d, offset=%d)\n", path, (int)size, (int)offset);
-	return RETURN_ERRNO(pwrite(fileInfo->fh, buf, size, offset));
+int ExampleFS::Write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo)
+{
+  int size_write=0;
+  printf("write(path=%s, size=%d, offset=%d)\n", path, (int)size, (int)offset);
+  size_write=pwrite(fileInfo->fh, buf, size, offset);
+  return size_write;
+		    
+	//return RETURN_ERRNO(pwrite(fileInfo->fh, buf, size, offset));
+	
 }
 
 int ExampleFS::Statfs(const char *path, struct statvfs *statInfo) {
