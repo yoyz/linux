@@ -2,7 +2,7 @@
 
 #include <fuse.h>
 #include <stdio.h>
-
+#include "examplefs.hh"
 struct fuse_operations examplefs_oper;
 
 int main(int argc, char *argv[]) {
@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
 
 	printf("fuse_main returned %d\n", fuse_stat);
 
+	delete ExampleFS::Instance();
 	return fuse_stat;
 }
 

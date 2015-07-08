@@ -33,7 +33,9 @@ ExampleFS::~ExampleFS()
        twi++)
     {
       //std::cout << twi->first << " : " << twi->second << std::endl;
-      printf("%.64s : %.12f MiB\n",twi->first.c_str(),twi->second/1024/1024);
+      printf("%.64s : %.12f MiB \n",
+	     twi->first.c_str(),
+	     twi->second/1024/1024);
     }
 
   printf("\n");
@@ -45,7 +47,10 @@ ExampleFS::~ExampleFS()
        twi++)
     {
       //std::cout << twi->first << " : " << twi->second << std::endl;
-      printf("%.64s : %.12f MiB\n",twi->first.c_str(),twi->second/1024/1024);
+      printf("%.64s : %.12f MiB \n",
+	     twi->first.c_str(),
+	     twi->second/1024/1024);
+     
     }
 
 
@@ -180,8 +185,10 @@ int ExampleFS::Read(const char *path, char *buf, size_t size, off_t offset, stru
 {
   int size_read=0;
   double total=total_read_size[std::string(path)]+size;
-
-  total_read_size[std::string(path)]=total;
+  std::string spth=std::string(path);
+  
+  total_read_size[spth]=total;
+  total_read_count[spth]++;
 
   //printf("read(path=%s, size=%d, offset=%d)\n", path, (int)size, (int)offset);
   size_read=pread(fileInfo->fh, buf, size, offset);
@@ -194,9 +201,11 @@ int ExampleFS::Read(const char *path, char *buf, size_t size, off_t offset, stru
 int ExampleFS::Write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo)
 {
   int size_write=0;
-  double total=total_write_size[std::string(path)]+size;
+  std::string spth=std::string(path);
+  double total=total_write_size[spth]+size;
 
-  total_write_size[std::string(path)]=total;
+  total_write_size[spth]=total;
+  total_write_count[spth]++;
   //printf("write(path=%.64s, size=%.8d, offset=%.16d) total:%fMib\n", path, (int)size, (int)offset,(total/1024)/1024);
 
   size_write=pwrite(fileInfo->fh, buf, size, offset);

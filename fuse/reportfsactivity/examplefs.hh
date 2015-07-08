@@ -29,6 +29,10 @@ private:
   std::map<std::string,double> total_write_size;
   std::map<std::string,double> total_read_size;
 
+  std::map<std::string,double> total_write_count;
+  std::map<std::string,double> total_read_count;
+
+
 public:
 	static ExampleFS *Instance();
 
