@@ -9,6 +9,7 @@
 #include <pthread.h>  // for pthread_create
 #include <string.h>   // for strcpy
 #include <getopt.h>   // for getopt_long
+
 #define ALIGNED 512
 
 struct operation
@@ -34,6 +35,10 @@ long int    time_to_wait=10;
 int         op_read=0;
 int         op_write=0;
 int         nb_thread=1;
+int         seeknone=0;
+
+int         size_in_byte_to_operate=1024*1024;
+int         size_in_byte_set=0;
 
 int         thread_need_to_finish=0;
 
@@ -45,8 +50,9 @@ operation * op_threads;
 void display_help()
 {
   printf("Need filename to output\n");
-  printf("./directio [-op <op>] [-seq <seq>] [-threads <thread>] [-time <time>] [--filename <filename>] \n");
+  printf("./directio [-byte <bytes>] [-op <op>] [-seq <seq>] [-threads <thread>] [-time <time>] [--filename <filename>] \n");
   printf("op:       0 write,1 read                         \n");  // 1
+  printf("byte:     number of byte multiple of 512         \n");  // 2
   printf("seq:      0 seq,1 loop                           \n");  // 2
   printf("thread:   nb thread                              \n");  // 3
   printf("time  :   time in second                         \n");  // 4
@@ -68,7 +74,7 @@ int stick_this_thread_to_core(int core_id)
   return pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset);
 }
 
-void *write_one_mib(void *void_ptr)
+void *operation_thread(void *void_ptr)
 {
   int        fd;
   int        firstwrite=0;
@@ -81,8 +87,13 @@ void *write_one_mib(void *void_ptr)
 
   while(!thread_need_to_finish)
     {
-      lseek(fd,0,SEEK_SET);
-      output_written=write(fd,output_buffer,(sizeof(uint64_t)/8)*1024*1024);
+      if (firstwrite==0)
+	lseek(fd,0,SEEK_SET);
+
+      if (seeknone)
+	lseek(fd,0,SEEK_SET);
+
+      output_written=write(fd,output_buffer,(sizeof(uint64_t)/8)*size_in_byte_to_operate);
       if(output_written<=0)
 	{ printf("can not write to %s : %d\n",filenames[0],output_written); exit(1); }
       if (firstwrite==0)
@@ -99,18 +110,20 @@ int main(int argc, char **argv)
   int i;
   int c;
 
-  const  char   * short_opt  = "hf:t:";
+  const  char   * short_opt  = "lhf:t:b:s:";
   struct option   long_opt[] =
     {
       {"help",          no_argument,       NULL, 'h'},
+      {"byte",          required_argument, NULL, 'b'},
       {"file",          required_argument, NULL, 'f'},
+      {"seeknone",      optional_argument, NULL, 'l'},
       {"threads",       optional_argument, NULL, 't'},
       {"runtime",       optional_argument, NULL, 's'},
       {"operation",     required_argument, NULL, 'o'},
       {NULL,            0,                 NULL, 0  }
     };
 
-  int option_index;
+  int option_index=0;
 
   filenames=(char**)malloc(sizeof(char**)*1024);
   pth_threads=(pthread_t*)malloc(sizeof(pthread_t*)*1024);
@@ -120,7 +133,7 @@ int main(int argc, char **argv)
       switch(c)
 	{
 	case -1:       /* no more arguments */
-	case 0:        /* long options toggles */
+	case  0:       /* long options toggles */
 	  break;
 
 	case 'o':
@@ -134,18 +147,37 @@ int main(int argc, char **argv)
 	      exit(1);
 	    }
 	  break;
+
+	case 'l':
+	  seeknone=1;
+	  break;
+
 	  
+	case 'b':
+	  size_in_byte_to_operate=strtol(optarg,&tmp_char_star,0);
+	  if (*tmp_char_star != '\0') { printf("size_in_byte_to_operate is not a number\n"); exit(1); }
+	  size_in_byte_set=1;
+	  break;
+	  
+
 	case 's':
 	  time_to_wait=strtol(optarg,&tmp_char_star,0);
 	  if (*tmp_char_star != '\0') { printf("time is not a number\n"); exit(1); }
 	  break;
 	  
 	case 'f':
-	  printf("selected file \"%s\"\n", optarg);
-	  filenames[filename_number]=(char*)malloc(sizeof(char*)*1024);
-	  strcpy(filenames[0],optarg);
-	  filename_set=1;
-	  filename_number++;
+	  printf("F : %d %d \n",argc,optind);
+	  i=optind-1;
+	  while (i < argc && 
+		 *argv[i] != '-')
+	    {
+	      printf("selected file \"%s\"\n", argv[i]);
+	      filenames[filename_number]=(char*)malloc(sizeof(char*)*1024);
+	      strcpy(filenames[filename_number],argv[i]);
+	      filename_number++;
+	      i++;
+	      filename_set=1;
+	    }
 	  break;	  
 
 	case 'h':
@@ -171,28 +203,27 @@ int main(int argc, char **argv)
   
   if (!filename_set) 
     { printf("filename is a mandatory parameter\n"); exit(1); }
+
+  if (!size_in_byte_set) 
+    { printf("byte is a mandatory parameter\n"); exit(1); }
   
-  output_buffer=(uint64_t*)memalign(ALIGNED,(sizeof(uint64_t)/8)*1024*1024);
+  output_buffer=(uint64_t*)memalign(ALIGNED,(sizeof(uint64_t)/8)*size_in_byte_to_operate);
   
   if(!output_buffer)
     { printf("can not allocate aligned memory : %d\n",output_buffer); exit(1); }
 
 
-  //pthread_t pth_thread1;
-  //pthread_t pth_thread2;
-  
-  //while(1)
-  //{
   printf("Launching %d thread for %d second\n",nb_thread,time_to_wait);
 
-  i=1;
-  while(i<=nb_thread) { pthread_create(&pth_threads[i],NULL,write_one_mib,tmp); i++; }
+  for (i=1;i<=nb_thread;i++)
+    { pthread_create(&pth_threads[i],NULL,operation_thread,tmp); }
 
   sleep(time_to_wait);
   thread_need_to_finish=1;
 
-  i=1;
-  while(i<=nb_thread) { pthread_join(pth_threads[i],NULL);                      i++; }
+  for (i=1;i<=nb_thread;i++)
+  { pthread_join(pth_threads[i],NULL);                           }
+
   printf("All thread join\n");
 
   return 0;
