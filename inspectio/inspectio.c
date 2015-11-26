@@ -2,10 +2,17 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include<stdarg.h> // va_arg
  
 typedef int     (*orig_open_f_type)(const char *pathname, int flags);
 typedef int     (*orig_close_f_type)(int fd);
 
+typedef int     (*orig_dup3_f_type)(int oldfd,int newfd,int flags);
 typedef int     (*orig_dup2_f_type)(int oldfd,int newfd);
 typedef int     (*orig_dup_f_type)(int oldfd); 
 
@@ -64,7 +71,7 @@ void printf_info_stdout(int fd,int retcode)
 {
   //printf("%s close(%d)=%d (%s)\n",inspectio_str,fd,retcode,tab_fd_to_name[fd]);
   fprintf(stderr,"%s close(%d)=%d rcall=%ld wcall=%ld %s\n",inspectio_str,fd,retcode,tab_fd_to_readcall[fd],tab_fd_to_writecall[fd],tab_fd_to_name[fd]);
-  fprintf(stderr,"%s close readreport  4k=%ld 8k=%ld 16k=%ld 32k=%ld 64k=%ld 128k=%ld 256k=%ld 512k=%ld 1024k=%ld 2048k=%ld 4096k=%ld %s\n",inspectio_str,
+  fprintf(stderr,"%s close readreport  4k=%8.1ld 8k=%8.1ld 16k=%8.1ld 32k=%8.1ld 64k=%8.1ld 128k=%8.1ld 256k=%8.1ld 512k=%8.1ld 1024k=%8.1ld 2048k=%8.1ld 4096k=%8.1ld %s\n",inspectio_str,
 	  tab_fd_to_readcall4k[fd],
 	  tab_fd_to_readcall8k[fd],
 	  tab_fd_to_readcall16k[fd],
@@ -78,7 +85,7 @@ void printf_info_stdout(int fd,int retcode)
 	  tab_fd_to_readcall4096k[fd],
 	  tab_fd_to_name[fd]
 	  );  
-  fprintf(stderr,"%s close writereport 4k=%ld 8k=%ld 16k=%ld 32k=%ld 64k=%ld 128k=%ld 256k=%ld 512k=%ld 1024k=%ld 2048k=%ld 4096k=%ld %s\n",inspectio_str,
+  fprintf(stderr,"%s close writereport 4k=%8.1ld 8k=%8.1ld 16k=%8.1ld 32k=%8.1ld 64k=%8.1ld 128k=%8.1ld 256k=%8.1ld 512k=%8.1ld 1024k=%8.1ld 2048k=%8.1ld 4096k=%8.1ld %s\n",inspectio_str,
 	  tab_fd_to_writecall4k[fd],
 	  tab_fd_to_writecall8k[fd],
 	  tab_fd_to_writecall16k[fd],
@@ -137,7 +144,7 @@ size_t read(int fd, void *buf, size_t count)
   size=orig_read(fd,buf,count);
   if (size>=0)
     {
-      fprintf(stderr,"%s read(%d,,%d)=%d\n",inspectio_str,fd,size_t_count,size);      
+      //fprintf(stderr,"%s read(%d,,%d)=%d\n",inspectio_str,fd,size_t_count,size);      
       tab_fd_to_readcall[fd]++;
       count_read(count,fd);
     }
@@ -154,7 +161,7 @@ size_t write(int fd, void *buf, size_t count)
   size=orig_write(fd,buf,count);
   if (size>=0)
     {
-      fprintf(stderr,"%s write(%d,,%d)=%d\n",inspectio_str,fd,size_t_count,size);      
+      //fprintf(stderr,"%s write(%d,,%d)=%d\n",inspectio_str,fd,size_t_count,size);      
       tab_fd_to_writecall[fd]++;
       count_write(count,fd);
     }
@@ -187,9 +194,26 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 int    open(const char *pathname, int flags,...)
 {
   int retcode;
+  int mode = 0;
+
   orig_open_f_type orig_open;
   orig_open  = (void*)dlsym(RTLD_NEXT,"open");
-  retcode=orig_open(pathname,flags);
+  
+  if (flags & O_CREAT)
+    {
+      va_list arg;
+      va_start(arg, flags);
+      mode = va_arg(arg, int);
+      va_end(arg);
+      retcode=orig_open(pathname,flags,mode);
+    }
+    else
+      {
+      retcode=orig_open(pathname,flags);      
+    }
+  
+  
+
   if (retcode>=0)
     {
       fprintf(stderr,"%s open(%s,%d)=%d\n",inspectio_str,pathname,flags,retcode);
@@ -233,6 +257,18 @@ int close(int fd)
     }
   return retcode;
 }
+
+int dup3(int oldfd, int newfd, int flags)
+{
+  int retcode;
+
+  orig_dup3_f_type orig_dup3;
+  orig_dup3 = (void*)dlsym(RTLD_NEXT,"dup3");
+  retcode=orig_dup3(oldfd,newfd,flags);
+  strcpy(tab_fd_to_name[newfd],tab_fd_to_name[oldfd]);
+  return retcode;
+}
+
 
 int dup2(int oldfd, int newfd)
 {
