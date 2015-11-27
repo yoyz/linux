@@ -9,7 +9,7 @@
 
 #include<stdarg.h> // va_arg
  
-typedef int     (*orig_open_f_type)(const char *pathname, int flags);
+typedef int     (*orig_open_f_type)(const char *pathname, int flags,...);
 typedef int     (*orig_close_f_type)(int fd);
 
 typedef int     (*orig_dup3_f_type)(int oldfd,int newfd,int flags);
@@ -199,18 +199,18 @@ int    open(const char *pathname, int flags,...)
   orig_open_f_type orig_open;
   orig_open  = (void*)dlsym(RTLD_NEXT,"open");
   
-  /* if (flags & O_CREAT) */
-  /*   { */
-  /*     va_list arg; */
-  /*     va_start(arg, flags); */
-  /*     mode = va_arg(arg, int); */
-  /*     va_end(arg); */
-  /*     retcode=orig_open(pathname,flags,mode); */
-  /*   } */
-  /*   else */
-  /*     { */
-      retcode=orig_open(pathname,flags);      
-      //}
+   if (flags & O_CREAT)
+     { 
+       va_list arg; 
+       va_start(arg, flags); 
+       mode = va_arg(arg, int); 
+       va_end(arg); 
+       retcode=orig_open(pathname,flags,mode); 
+     } 
+     else
+       {
+       retcode=orig_open(pathname,flags);      
+     }
   
   
 
