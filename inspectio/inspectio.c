@@ -8,7 +8,12 @@
 #include <fcntl.h>
 
 #include<stdarg.h> // va_arg
- 
+
+//typedef int     (*orig_main_f_type)(int argc, char ** argv);
+typedef void     (*orig_init_f_type)();
+//typedef void     (*orig_fini_f_type)();
+
+
 typedef int     (*orig_open_f_type)(const char *pathname, int flags,...);
 typedef int     (*orig_close_f_type)(int fd);
 
@@ -292,5 +297,35 @@ int dup(int oldfd)
   return retcode;
 }
 
+/* int main(int argc, char ** argv) */
+/* { */
+/*   int retcode; */
+
+/*   orig_main_f_type orig_main; */
+
+/*   orig_main = (void*)dlsym(RTLD_NEXT,"main"); */
+/*   printf("Launching main()\n"); */
+/*   retcode=orig_main(argc,argv); */
+/*   printf("Ending main()\n"); */
+
+/*   return retcode; */
+/* } */
 
 
+
+ void init() 
+ { 
+   printf("Launching init()\n");
+ } 
+
+ void fini()  
+ {  
+   printf("Launching fini()\n");  
+ }  
+
+
+
+/* void end() */
+/* { */
+/*   printf("Launching main()\n"); */
+/* } */
