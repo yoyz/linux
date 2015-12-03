@@ -1,0 +1,4 @@
+gcc -Wl,-init,init -Wl,-fini,fini  -fPIC -shared -ldl -o inspectio.so  inspectio.c
+gcc -o toto toto.c
+export LD_PRELOAD=./inspectio.so
+unset LD_PRELOAD
