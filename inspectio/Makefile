@@ -6,7 +6,8 @@ OBJ     = inspectio.so
 
 
 CC       = gcc
-CFLAGS   = -Wall -fPIC -shared -ldl
+CFLAGS   = -Wall -Wunused-variable -fPIC -shared -ldl
+CFLAGS   = -fPIC -shared -ldl
 LDLIBS   =
 
 all: ${OBJ}
