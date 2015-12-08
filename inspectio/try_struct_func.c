@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-typedef struct   iobyfile {
+struct   ioByFileObj {
 
   int         state;              // 
-  //int         current_fd;         // -1 at the beginning // -2 at the end // >=0 
+  int         current_fd;         // -1 at the beginning // -2 at the end // >=0 
   long long   tab_fd_to_readcall;
   long long   tab_fd_to_writecall;
   
@@ -35,143 +36,133 @@ typedef struct   iobyfile {
 } iobyfile_t;
 
 
-
-typedef struct fd_chainlist
+struct ioByFileChainlist
 {
-  int                     fd;
-  iobyfile_t            * iobf;
-  struct   fd_chainlist * next;
-} fd_chainlist_t;
+  struct   ioByFileObj       * iobfo;
+  struct   ioByFileChainlist * next;
 
-
-
-
-
-void print_list(fd_chainlist_t * head)
-{
-    fd_chainlist_t * current = head;
-
-    while (current != NULL)
-      {
-        printf("%d\n", current->fd);
-        current = current->next;
-      }
-}
-void push_end(fd_chainlist_t * head, int fd)
-{
-    fd_chainlist_t * current = head;
-    while (current->next != NULL)
-      {
-        current = current->next;
-      }
-
-    /* now we can add a new variable */
-    current->next = malloc(sizeof(fd_chainlist_t));
-    current->next->fd = fd;
-    current->next->next = NULL;
-}
-
-void push(fd_chainlist_t ** head, int fd)
-{
-    fd_chainlist_t * new_node;
-    new_node = malloc(sizeof(fd_chainlist_t));
-
-    new_node->fd = fd;
-    new_node->next = *head;
-    *head = new_node;
-}
-
-
-int pop(fd_chainlist_t ** head)
-{
-    int retval = -1;
-    fd_chainlist_t * next_node = NULL;
-
-    if (*head == NULL) {
-        return -1;
-    }
-
-    next_node = (*head)->next;
-    retval = (*head)->fd;
-    free(*head);
-    *head = next_node;
-
-    return retval;
-}
-
-int remove_last(fd_chainlist_t * head)
-{
-    int retval = 0;
-    /* if there is only one item in the list, remove it */
-    if (head->next == NULL)
-      {
-	head->fd;
-	free(head);
-	head = NULL;
-	//return fd;
-      }
-
-    fd_chainlist_t * current = head;
-
-    while (current->next->next != NULL)
-      {
-        current = current->next;
-      }
-}
-
-int remove_by_index(fd_chainlist_t ** head, int n) {
-    int i = 0;
-    int retval = -1;
-    fd_chainlist_t * current = *head;
-    fd_chainlist_t * temp_node = NULL;
-    //int i;
-
-    if (n == 0)
-      {
-        return pop(head);
-      }
-
-    for (i = 0; i < n-1; i++)
-      {
-        if (current->next == NULL)
-	  {
-            return -1;
-	  }
-        current = current->next;
-      }
-
-    temp_node = current->next;
-    retval = temp_node->fd;
-    current->next = temp_node->next;
-    free(temp_node);
-
-    return retval;
-
-}
-
-fd_chainlist_t * create_node()
-{
-  fd_chainlist_t * head = NULL;
-  head = malloc(sizeof(fd_chainlist_t));
-  if (head == NULL)
-    {
-      return NULL;
-    }
+  void                       (*noop)(     struct ioByFileChainlist  * self);
+  int                        (*size)(     struct ioByFileChainlist  * self);
+  void                       (*printList)(struct ioByFileChainlist  * self);
   
-  head->fd = -1;
-  head->next = NULL;
-  return head;
+  struct ioByFileChainlist * (*new)(      struct ioByFileChainlist  * self);
+  struct ioByFileChainlist * (*get)(      struct ioByFileChainlist  * self,int elemNumber);  
+};
+
+struct ioByFileChainlist * prepareIoByFileChainlist();
+
+
+void noopFuncIoByFileChainlist(struct ioByFileChainlist * self)
+{
+  printf("noop\n");
 }
+
+int sizeFuncIoByFileChainlist(struct ioByFileChainlist * self)
+{
+   struct ioByFileChainlist * iter=self;
+   int i=0;
+
+   while(iter!=NULL) 
+   { 
+     iter=iter->next;
+     i++;
+   } 
+   return i;
+}
+
+struct ioByFileChainlist * newFuncIoByFileChainlist(struct ioByFileChainlist * self)
+{
+  struct ioByFileChainlist * new;
+  struct ioByFileChainlist * iter;
+  
+  new=prepareIoByFileChainlist();
+  while(iter->next!=NULL) 
+    { 
+      iter=iter->next;
+    } 
+  iter->next=new;
+  return new;
+}
+
+struct ioByFileChainlist * getFuncIoByFileChainlist(struct ioByFileChainlist * self,int elemNumber)
+{
+   struct ioByFileChainlist * iter=self;
+   int i=0;
+   int size=self->size(self);
+
+   if (i>size)
+     return NULL;
+   
+   for (i=1;i<size;i++)
+     {
+       iter=iter->next;
+     }
+   return iter;
+}
+
+ void printListIoByFileChainlist(struct ioByFileChainlist * self) 
+ { 
+   struct ioByFileChainlist * iter=self; 
+   printf("printing\n"); 
+
+   while(iter!=NULL) 
+   { 
+     printf("[%d] [%s]\n",iter->iobfo->current_fd,iter->iobfo->tab_fd_to_name); 
+     iter=iter->next; 
+   } 
+ } 
+
+struct ioByFileChainlist * prepareIoByFileChainlist()
+{
+  struct ioByFileChainlist * self;
+
+  printf("prepare\n");
+  self=malloc(sizeof(struct ioByFileChainlist));
+
+
+  self->iobfo      = malloc(sizeof(struct ioByFileObj));
+  self->next       = NULL;
+  self->noop       = noopFuncIoByFileChainlist;
+  self->printList  = printListIoByFileChainlist;
+  self->size       = sizeFuncIoByFileChainlist;
+  self->get        = getFuncIoByFileChainlist;
+  self->new        = newFuncIoByFileChainlist;
+  
+  return(self);
+}
+
 
 
 int main(int argc, char **argv)
 {
-  printf("bla\n");
+  struct ioByFileChainlist * chainlist_head;
+  struct ioByFileChainlist * chainlist_elem;
 
-  iobyfile_t bla;
-  fd_chainlist_t list;
-  list.iobf->state=1;
+
+  chainlist_head = prepareIoByFileChainlist();
+  chainlist_head->size(chainlist_head);
+  chainlist_head->noop(chainlist_head);
+  chainlist_head->printList(chainlist_head);
+
+  printf("ListSize:%d\n",chainlist_head->size(chainlist_head));
+  //chainlist_head->printList(chainlist_head);
+
+  chainlist_elem=chainlist_head->get(chainlist_head,0);
+  strcpy(chainlist_elem->iobfo->tab_fd_to_name,"file0");
+
+  chainlist_elem=chainlist_head->new(chainlist_head);
+  strcpy(chainlist_elem->iobfo->tab_fd_to_name,"file1");
+
+  chainlist_elem=chainlist_head->new(chainlist_head);
+  strcpy(chainlist_elem->iobfo->tab_fd_to_name,"file2");
+  chainlist_elem->iobfo->current_fd=4;
   
+  printf("ListSize:%d\n",chainlist_head->size(chainlist_head));
   
+  /* chainlist_elem=chainlist_head->get(chainlist_head,0); */
+  /* strcpy(chainlist_elem->iobfo->tab_fd_to_name,"file0"); */
+
+  
+  chainlist_head->printList(chainlist_head);
   return 0;
 }
