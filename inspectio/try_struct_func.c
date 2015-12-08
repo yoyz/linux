@@ -190,7 +190,7 @@ struct ioByFileChainlist * prepareIoByFileChainlist()
 }
 
 
-
+/*
 int main(int argc, char **argv)
 {
   struct ioByFileChainlist * chainlist_head;
@@ -232,3 +232,4 @@ int main(int argc, char **argv)
   chainlist_head->printList(chainlist_head);
   return 0;
 }
+*/
