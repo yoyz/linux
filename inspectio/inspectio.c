@@ -36,6 +36,7 @@ typedef FILE * (*orig_fopen_f_type)(const char *path, const char *mode);
 char tab_fd_to_name[1024][1024];
 
 long   tab_fd_to_readcall[1024];
+long   tab_fd_to_readtime[1024];
 
 long   tab_fd_to_readcall4k[1024];
 long   tab_fd_to_readcall8k[1024];
@@ -50,6 +51,7 @@ long   tab_fd_to_readcall2048k[1024];
 long   tab_fd_to_readcall4096k[1024];
 
 long   tab_fd_to_writecall[1024];
+long   tab_fd_to_writetime[1024];
 
 long   tab_fd_to_writecall4k[1024];
 long   tab_fd_to_writecall8k[1024];
