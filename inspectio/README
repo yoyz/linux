@@ -2,3 +2,7 @@ gcc -Wl,-init,init -Wl,-fini,fini  -fPIC -shared -ldl -o inspectio.so  inspectio
 gcc -o toto toto.c
 export LD_PRELOAD=./inspectio.so
 unset LD_PRELOAD
+
+
+unset LD_PRELOAD ; gcc -ggdb -O0 -Wl,-init,init -Wl,-fini,fini  -fPIC -shared -ldl -o inspectio2.so  inspectio2.c
+export LD_PRELOAD=./inspectio2.so ; cat /etc/passwd /tmp/toto
