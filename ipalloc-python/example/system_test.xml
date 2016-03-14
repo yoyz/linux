@@ -1,0 +1,97 @@
+<!DOCTYPE ip_allocation SYSTEM "ip_allocation.dtd">
+
+<ip_allocation>
+<!-- Tera100 system test -->
+
+<!-- ****************** -->
+<!--   admin networks   -->
+<!-- ****************** -->
+
+<!-- admin network -->
+<network name="admin" function="mn">
+  <logical_network name="admin" type="primary" subnet="A1.B1.88.0/23" gateway="A1.B1.89.254" vlan_id="188" >
+    <range first_ip="A1.B1.88.1" >
+      <member object="node" type="mngt"/>
+    </range>
+ </logical_network>
+
+<!-- compute network -->
+  <logical_network name="compute"  type="primary" subnet="A2.B2.88.0/23" gateway="A2.B2.89.254" vlan_id="188" >
+    <range first_ip="A2.B2.88.21" >
+      <member object="node" type="compute"/>
+    </range>
+  </logical_network>
+
+<!-- io network -->
+  <logical_network name="io"  type="primary" subnet="A3.B3.88.0/23" gateway="A3.B3.89.254" vlan_id="188" >
+    <range first_ip="A3.B3.88.3" >
+      <member object="node" type="io" />
+      <member object="node" type="mds" />
+      <member object="node" type="router"/>
+    </range>
+  </logical_network>
+
+<!-- equipment network -->
+  <logical_network name="equipement"  type="primary" subnet="A4.B4.88.0/23" gateway="A4.B4.89.254" vlan_id="188" >
+    <range first_ip="A4.B4.88.1" >
+      <member object="hwmanager" type="bmc[mngt]" />
+    </range>
+    <range first_ip="A4.B4.88.3" >
+      <member object="hwmanager" type="bmc[io]" />
+      <member object="hwmanager" type="bmc[mds]"/>
+      <member object="hwmanager" type="bmc[router]" />
+    </range>
+    <range first_ip="A4.B4.88.21" >
+      <member object="hwmanager" type="bmc[compute]"/>
+    </range>
+    <range first_ip="A4.B4.89.151" >
+      <member object="switch" />
+    </range>
+    <range first_ip="A4.B4.89.171" >
+      <member object="hwmanager" type="coldoor" />
+      <member object="disk_array"/>
+    </range>
+  </logical_network>
+</network>
+<!-- ************************* -->
+<!--   interconnect networks   -->
+<!-- ************************* -->
+
+<!-- ib_admin network -->
+<network name="interconnect" function="ic">
+  <logical_network name="interconnect"  type="primary" subnet="A5.B5.0.0/16" gateway="A5.B5.255.254" pkey="FFFF" >
+    <range first_ip="A5.B5.88.1" >
+      <member object="node" type="mngt" />
+    </range>
+    <range first_ip="A5.B5.88.3" >
+      <member object="node" type="io" interface_name="ib0"/>
+      <member object="node" type="mds" interface_name="ib0"/>
+      <member object="node" type="router" interface_name="ib0"/>
+    </range>
+<!--    <range first_ip="A5.B5.88.3" >
+      <member object="node" type="io"  interface_name="ib1"/>
+      <member object="node" type="mds"  interface_name="ib1"/>
+      <member object="node" type="router" interface_name="ib1"/>
+    </range> -->
+    <range first_ip="A5.B5.88.21" >
+      <member object="node" type="compute" />
+    </range>
+  </logical_network>
+
+<!-- ib_backbone network -->
+
+  <logical_network name="ib_backbone"  type="secondary" subnet="A6.B6.88.0/23" gateway="A6.B6.89.254" pkey="8188" >
+    <range first_ip="A6.B6.88.1" >
+      <member object="node" type="mngt" />
+    </range>
+    <range first_ip="A6.B6.88.3" >
+      <member object="node" type="io" />
+      <member object="node" type="mds"/>
+      <member object="node" type="router"/>
+    </range>
+    <range first_ip="A6.B6.88.21" >
+      <member object="node" type="compute"/>
+    </range>
+  </logical_network>
+</network>
+</ip_allocation>

@@ -1,0 +1,112 @@
+<!DOCTYPE ip_allocation SYSTEM "ip_allocation.dtd">
+ <ip_allocation>
+
+  <network name="admin" function="mn">
+   <logical_network name="admin" type="primary" subnet="10.11.0.0/16" gateway="10.11.255.254">
+    <range first_ip="10.11.0.1" >
+     <member object="node" type="mngt"/>
+     <member object="node" type="mws"/>
+     <member object="node" type="io"/>
+     <member object="node" type="nfs"/>
+     <member object="node" type="mds"/>
+     <member object="node" type="oss"/>
+     <member object="metaservice" type="alias"/>
+     <member object="metaservice" type="vm"/>
+   </range>
+   <range first_ip="10.11.1.1" >
+    <member object="node" type="compute"/>
+   </range>
+   <range first_ip="10.11.100.1" >
+    <member object="hwmanager" type="bmc[mngt]"/>
+    <member object="hwmanager" type="bmc[mws]"/>
+    <member object="hwmanager" type="bmc[io]"/>
+    <member object="hwmanager" type="bmc[nfs]"/>
+    <member object="hwmanager" type="bmc[mds]"/>
+    <member object="hwmanager" type="bmc[oss]"/>
+   </range>
+   <range first_ip="10.11.101.1" >
+    <member object="hwmanager" type="bmc[compute]"/>
+    <member object="hwmanager" type="cmc"/>
+   </range>
+   <range first_ip="10.11.200.1" >
+    <member object="switch"/>
+   </range>
+   <range first_ip="10.11.201.1" >
+    <member object="hwmanager" type="coldoor"/>
+   </range>
+   <range first_ip="10.11.202.1" >
+    <member object="disk_array"/>
+   </range>
+  </logical_network>
+ </network>
+
+ <network name="backbone" function="bb">
+  <logical_network name="backbone" type="primary" subnet="20.11.0.0/16" gateway="20.11.255.254" suffix="bone">
+   <range first_ip="20.11.0.10" >
+<!-- <member object="node" type="mngt"/> -->
+<!-- <member object="node" type="mws"/> -->
+    <member object="node" type="io"/>
+    <member object="node" type="nfs"/>
+    <member object="metaservice" type="alias"/>
+    <member object="metaservice" type="vm"/>
+   </range>
+   <range first_ip="20.11.1.1" >
+    <member object="node" type="compute"/>
+   </range>
+   <range first_ip="20.11.100.1" >
+    <member object="hwmanager" type="bmc[mngt]"/>
+    <member object="hwmanager" type="bmc[mws]"/>
+    <member object="hwmanager" type="bmc[io]"/>
+    <member object="hwmanager" type="bmc[nfs]"/>
+    <member object="hwmanager" type="bmc[mds]"/>
+    <member object="hwmanager" type="bmc[oss]"/>
+   </range>
+   <range first_ip="20.11.101.1" >
+    <member object="hwmanager" type="bmc[compute]"/>
+   </range>
+   <range first_ip="20.11.200.1" >
+    <member object="switch"/>
+   </range>
+  </logical_network>
+ </network>
+
+
+
+<network name="interconnect" function="ic">
+ <logical_network name="interconnect" type="primary" subnet="10.12.0.0/16" gateway="10.12.255.254" suffix="ib0">
+  <range first_ip="10.12.0.1" >
+   <member object="node" type="mngt" interface_name="ib0"/>
+   <member object="node" type="mws"  interface_name="ib0"/>
+   <member object="node" type="io"   interface_name="ib0"/>
+   <member object="node" type="nfs"  interface_name="ib0"/>
+   <member object="node" type="mds"  interface_name="ib0"/>
+   <member object="node" type="oss"  interface_name="ib0"/>
+  </range>
+
+  <range first_ip="10.12.1.1" >
+   <member object="node" type="compute" interface_name="ib0"/>
+  </range>
+
+  <range first_ip="10.12.200.1" >
+   <member object="switch"/>
+  </range>
+ </logical_network>
+
+
+ <logical_network name="interconnect2" type="primary" subnet="10.13.0.0/16" gateway="10.13.255.254" suffix="ib1">
+  <range first_ip="10.13.0.1" >
+   <member object="node" type="mngt" interface_name="ib1"/>
+   <member object="node" type="mws"  interface_name="ib1"/>
+   <member object="node" type="io"   interface_name="ib1"/>
+   <member object="node" type="nfs"  interface_name="ib1"/>
+   <member object="node" type="mds"  interface_name="ib1"/>
+   <member object="node" type="oss"  interface_name="ib1"/>
+  </range>
+  <range first_ip="10.13.1.1" >
+   <member object="node" type="compute" interface_name="ib1"/>
+  </range>
+ </logical_network> 
+</network>
+
+
+</ip_allocation>

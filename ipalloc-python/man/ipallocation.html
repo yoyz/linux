@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML><HEAD><TITLE>Man page of ipallocation</TITLE>
+</HEAD><BODY>
+<H1>ipallocation</H1>
+Section: Misc. Reference Manual Pages (FEB 29 2012)<BR>Updated: Linux<BR><A HREF="#index">Index</A>
+<A HREF="/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+ipallocation - This script allows the network administrator to set up a network map in the clusterDB database. 
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYPNOSIS</H2>
+
+<B>/usr/lib/clustmngt/clusterdb/bin/ipallocation [ command-line switches ]</B>
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<P>
+
+The ipallocation allows the network administrator to set up IP to network equipment in the clusterDB database.
+<P>
+The default database and their credentials are defined in the following configuration file:
+<P>
+<B>/BCM/conf/clusterdb/clusterdb.conf</B>
+
+<P>
+Mainly for testing purpose, you can change their values in using the following switches:
+<B>--dbname</B>
+
+,
+<B>--dbhost</B>
+
+,
+<B>--dbuser</B>
+
+,
+<B>--dbpass</B>
+
+<P>
+<P>
+This command has various operation modes, which are described below.
+<P>
+There are switches operation allowing to visualize what has been inserted in the clusterDB:
+<P>
+<B>--list-network</B>
+
+fetch the network from the clusterDB and print them on screen.
+<P>
+<B>--list-equipment</B>
+
+fetch network equipment from the clusterDB and print them on screen.
+The network name or subnet must be choosen.
+You can apply filter on the equipment fetched, see FILTER and EXAMPLES below.
+<P>
+<P>
+Other switches allows to make an action on the clusterDB:
+<P>
+<B>--apply &lt;networkmap.xml&gt;</B>
+
+apply the given XML networkmap to the clusterDB database.
+This switch can be used in combination with --saferange.
+<P>
+<B>--clean</B>
+
+fetch all network equipment from the clusterDB and set the 'ipaddr' field to Null. Used without extra switch, it removes on networks and ranges from the cluterDB. You can apply filter on the equipment fetched, in order to clean only a given member, see FILTER and EXAMPLES below.
+<P>
+<B>--extend</B>
+
+fetch network equipment from the clusterDB and apply an ip allocation.
+This is done by setting the 'ipaddr' field of the '*_port' table. If the IP address is already defined in the database, it will not be altered. You can apply a filter on the equipment fetched, see FILTER and EXAMPLES below. This switch can be used in combination with --saferange.
+<BR>&nbsp;
+<B>--change-network</B>
+
+fetch network equipment from network 
+<B>&lt;--src-net-name netsrc&gt;</B>
+
+and moves them to network 
+<B>&lt;--dst-net-name netdst&gt;</B>
+
+<P>
+<B>--create-logical-port</B>
+
+fetch network equipment from network
+<B>&lt;--src-net-name netsrc&gt;</B>
+
+and create logical interface in network
+<B>&lt;--dst-net-name netdst&gt;</B>
+
+This switch has the 
+<B>--remove-logical-port</B>
+
+counterpart.
+<P>
+<B>--create-logical-network</B>
+
+add a logical network on a physical network. This network could be a primary or a secondary network.
+This switch has the
+<B>--remove-logical-network</B>
+
+counterpart. Please note that the sub-components have to be removed/cleaned before its use.
+<P>
+<B>--create-range</B>
+
+add a range into a logical network. This range is used to store one or more members.
+This switch has the
+<B>--remove-range</B>
+
+counterpart. Please note that the sub-components have to be removed/cleaned before its use.
+<P>
+<B>--create-member</B>
+
+add a member into a logical network. This member could be composed with : obj,type,hwgroup,iname.
+This switch has the
+<B>--remove-member</B>
+
+counterpart. Please note that a clean of the related subset should be done before its use.
+<P>
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<P>
+<B>&lt;--subnet CIDR&gt;</B>
+
+Set/Match the network subnet.
+<P>
+<B>&lt;--first-ip IP&gt;</B>
+
+Set/Match the first IPv4 address in the subnet.
+<P>
+<P>
+<A NAME="lbAF">&nbsp;</A>
+<H2>FILTERS</H2>
+
+<P>
+<P>
+<B>[--obj &lt;object_type&gt;]</B>
+
+allows to choose an object type.
+Currently their is two different object :  &quot;node&quot; and &quot;hwmanager&quot;.
+<P>
+<B>[--type &lt;type|ftype&gt;]</B>
+
+allows to choose a predefined 'type' or 'ftype' name in the database.
+<P>
+<B>[--hwgroup &lt;hwgroup_name&gt;]</B>
+
+allows to choose a predefined 'hw_group' name in the database.
+<P>
+<B>[--iname &lt;eth0|eth1|ib0|ib1&gt;]</B>
+
+allows to choose an interface name from node_profile_device, in order to distinguish to NICs connected on the same physical network. This option is only useful for --obj node
+<P>
+<P>
+<P>
+<A NAME="lbAG">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<P>
+List all the network in the clusterdb located on host 10.5.0.1:
+<P>
+<B>ipallocation --list-network --dbname clusterdb --dbhost 10.5.0.1  </B>
+
+<P>
+<P>
+List all &quot;bmc&quot; equipment of a given database:
+<P>
+<B>ipallocation --dbname my_testing_clusterdb --dbhost 10.5.0.1 --list-equipment --type 'bmc'</B>
+
+<P>
+<P>
+Update the ipaddr of the compute node port on the admin subnet 172.16.0.0/16 and begin with the ip 172.16.60.1
+<P>
+<B>ipallocation --extend --dbhost 10.5.0.1 --dbname my_testing_clusterdb --net-name admin --first-ip 172.16.60.1 --obj node --type compute</B>
+
+<P>
+<P>
+Update the ipaddr of the non stacked eth switch mngt port on the network 'admin' in a range defined by its first-ip 10.12.0.1
+<P>
+<B>ipallocation --extend --net-name admin --first-ip 10.12.0.1 --obj switch --type eth</B>
+
+<P>
+<P>
+Move network interface of 'mds' 'nodes' of the group 'Mixte' from network 'admin' to network 'io'
+<P>
+<B>ipallocation --change-network --src-net-name 'admin' --dst-net-name 'io' --obj 'node' --type 'mds' --hwgroup 'Mixte'</B>
+
+<P>
+<P>
+Create logical port on 'compute' 'node' of the group 'Calcul' from network 'interconnect' to network 'backbone'
+<P>
+<B>ipallocation --create-logical-port --src-net-name 'interconnect' --dst-net-name 'backbone' --obj 'node' --type 'compute' --hwgroup 'Calcul-I'</B>
+
+<P>
+<P>
+<A NAME="lbAH">&nbsp;</A>
+<H2>KNOWN BUGS</H2>
+
+<DL COMPACT>
+<DT>The 'extend' procedure should fail if the given criteria doesn't match any equipment in the database.  You could list the equipment and see if there is any error, use '--list-equipment' procedure first.  The update should fail in the commit process if two ipaddr are equal in the database because of a trigger on ipaddr field. It can also fail if a logical network name.  The command could stale if the database or the host is not reachable, try to ping the host and check your configuration.<DD>
+<P>
+<P>
+</DL>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYPNOSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">OPTIONS</A><DD>
+<DT><A HREF="#lbAF">FILTERS</A><DD>
+<DT><A HREF="#lbAG">EXAMPLES</A><DD>
+<DT><A HREF="#lbAH">KNOWN BUGS</A><DD>
+</DL>
+<HR>
+
+</BODY>
+</HTML>

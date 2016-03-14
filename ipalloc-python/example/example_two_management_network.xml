@@ -1,0 +1,31 @@
+<!DOCTYPE ip_allocation SYSTEM "ip_allocation.dtd">
+<ip_allocation>
+<network name="admin" function="mn">
+  <logical_network name="admin" type="primary" subnet="13.1.0.0/16" gateway="13.1.255.254">
+    <range first_ip="13.1.80.2" >
+      <member object="node" type="mngt"/>
+    </range>
+    <range first_ip="13.1.80.99" >
+      <member object="node" type="compute"/>
+    </range>
+  </logical_network>
+
+  <logical_network name="admin_hwm" type="primary" subnet="15.1.0.0/16" gateway="15.1.255.254">
+    <range first_ip="15.1.80.101" >
+      <member object="hwmanager" type="bmc[mngt]"/>
+    </range>
+    <range first_ip="15.1.81.100" >
+     <member object="hwmanager" type="other"/>
+    </range>
+    <range first_ip="15.1.82.100" >
+      <member object="hwmanager" type="cmc"/>
+    </range>
+    <range first_ip="15.1.80.103" >
+      <member object="hwmanager" type="bmc[compute]"/>
+    </range>
+    <range first_ip="15.1.80.2" >
+      <member object="switch"/>
+    </range>
+  </logical_network>
+</network>
+</ip_allocation>

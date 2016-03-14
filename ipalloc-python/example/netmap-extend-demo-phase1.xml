@@ -1,0 +1,109 @@
+<!DOCTYPE ip_allocation SYSTEM "ip_allocation.dtd">
+<ip_allocation>
+
+<!--
+Some parts of this network map are comments.
+These parts will be useful later, to perform an extension:
+ - uncomment them ;
+ - then apply again your network map.
+-->
+
+<network name="admin" function="mn">
+	<logical_network name="admin" type="primary" subnet="172.16.0.0/16" >
+		<range first_ip="172.16.0.1" >
+			<member object="node" type="mngt" />
+			<member object="node" type="mws" />
+			<member object="node" type="login" />
+			<member object="node" type="io" />
+		</range>
+		<range first_ip="172.16.0.100" >
+			<member object="metaservice" type="vmgeneric"/>
+			<member object="metaservice" type="vm"/>
+			<member object="metaservice" type="alias"/>
+		</range>
+		<range first_ip="172.16.1.1" >
+			<member object="hwmanager" type="bmc[mngt]"/>
+			<member object="hwmanager" type="bmc[mws]"/>
+			<member object="hwmanager" type="bmc[login]"/>
+			<member object="hwmanager" type="bmc[io]"/>
+		</range>
+		<range first_ip="172.16.10.1" >
+			<member object="node" type="compute"/>
+		</range>
+		<range first_ip="172.16.20.1" >
+			<member object="hwmanager" type="bmc[compute]"/>
+		</range>
+		<range first_ip="172.16.30.1" >
+			<member object="hwmanager" type="cmc"/>
+		</range>
+		<range first_ip="172.16.100.1" >
+			<member object="switch" type="eth" />
+			<member object="switch" type="talim" />
+		</range>
+		<range first_ip="172.16.110.1" >
+			<member object="disk_array"/>
+		</range>
+ </logical_network>
+</network>
+
+<network name="interconnect1" function="ic">
+	<logical_network name="interconnect1"	type="primary" subnet="172.17.0.0/16" suffix="ic1" >
+		<range first_ip="172.17.0.1" >
+			<member object="node" type="mngt" interface_name="ib0" />
+			<member object="node" type="mws" interface_name="ib0" />
+			<member object="node" type="login" interface_name="ib0" />
+			<member object="node" type="io" interface_name="ib0" />
+		</range>
+		<range first_ip="172.17.10.1" >
+			<member object="node" type="compute" interface_name="ib0" />
+		</range>
+	</logical_network>
+</network>
+
+<!--
+Extension 1: you need to add a 2nd interconnect network.
+Note: the primary network "interconnect2" has to be defined 
+in your preload at first.
+-->
+<!--
+<network name="interconnect2" function="ic">
+	<logical_network name="interconnect2"	type="primary" subnet="172.18.0.0/16" suffix="ic2" >
+		<range first_ip="172.18.0.1" >
+			<member object="node" type="io" interface_name="ib1" />
+		</range>
+		<range first_ip="172.18.10.1" >
+			<member object="node" type="compute" interface_name="ib1" />
+		</range>
+	</logical_network>
+</network>
+-->
+
+<network name="backbone" function="bb">
+	<logical_network name="backbone"	type="primary" subnet="10.0.0.0/16" gateway="10.0.0.1" suffix="bb" >
+		<range first_ip="10.0.0.1" >
+			<member object="node" type="mngt" />
+			<member object="node" type="mws" />
+			<member object="node" type="login" />
+			<member object="node" type="io" />
+		</range>
+
+		<!--
+		Extension 2: you "forgot" to define your metaservice aliases on 
+		the backbone network.
+		-->
+		<!--
+		<range first_ip="10.0.0.100" >
+			<member object="metaservice" type="alias"/>
+		</range>
+		-->
+
+		<range first_ip="10.0.10.1" >
+			<member object="node" type="compute"/>
+		</range>
+		<range first_ip="10.0.100.1" >
+			<member object="switch" type="eth" />
+		</range>
+	</logical_network>
+</network>
+
+</ip_allocation>

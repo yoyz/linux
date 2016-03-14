@@ -1,0 +1,32 @@
+<!ELEMENT ip_allocation (network)*> 
+
+<!ELEMENT network (logical_network)*> 
+<!ATTLIST  network 
+   name CDATA #REQUIRED 
+   function (bb|mn|ic|nfs|serial|power|other) #REQUIRED
+   techno CDATA #IMPLIED
+> 
+
+<!ELEMENT logical_network ((member| range)*)> 
+<!ATTLIST  logical_network 
+    name CDATA #REQUIRED
+    type (primary|secondary) #IMPLIED
+    function (bb|mn|ic|nfs|serial|power|other) #IMPLIED
+    subnet CDATA #REQUIRED
+    gateway CDATA #IMPLIED
+    vlan_id CDATA #IMPLIED
+    pkey CDATA #IMPLIED
+> 
+<!ELEMENT range (member)*> 
+<!ATTLIST  range 
+    first_ip CDATA #REQUIRED 
+>  
+<!ELEMENT member EMPTY> 
+<!ATTLIST  member 
+    object (node|switch|hwmanager|disk_array|metaservice) #IMPLIED 
+    type CDATA #IMPLIED
+    group CDATA #IMPLIED 
+    interface_name CDATA #IMPLIED 
+    logical_interface_name CDATA #IMPLIED 
+> 
+

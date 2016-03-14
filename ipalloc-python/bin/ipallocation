@@ -1,0 +1,556 @@
+#!/usr/bin/python -W ignore:Skipped unsupported reflection:::
+#
+#
+# "Skipped unsupported reflection" need to be set because we import sqlalchemy library.
+#
+# sqlalchemy library CAN NOT SUPPORT some kind of sql constraint, for example : 
+# "i_hwmanager_port_hwaddr" UNIQUE, btree (lower(hwaddr::text))
+# TO BE CLEAR : a upper case string set in hwmanager_port.hwaddr is stored in lower case
+# So what you write is not what you read => sqlalchemy does not work this way.
+#
+# It does not matter because no hwaddr are used in ipalloc, it is just
+# needed to suppress annoying warnings.
+
+import sys,getopt,re,os
+from   xml.etree.ElementTree import ElementTree,Element,SubElement
+
+from   CLM.DB.ipallocation.clusterdb_sqlalchemy		import clusterdb_alchemy,Cluster,Network,Node,Node_port,Hwmanager,Hwmanager_port,Node_ftype,Ftype,Hw_group,Hw_group_member,Switch,Node_profile,Node_profile_device,Disk_array
+
+from   CLM.DB.ipallocation.alloc_engine                   import alloc_engine
+from   CLM.DB.ipallocation.cmd_line_argument              import command_line_argument,engine_argument
+from   CLM.DB.ipallocation.apply_xml                      import alloc_xml
+    
+
+class alloc_cmd_line:
+    def __init__(self):
+
+        self.something_to_do_from_command_line=False
+        self.alloc_engine=None                               # engine call from the command line
+        self.cla=None                                        # command line argument object
+        self.ea=None                                         # object created by command line argument
+        self.msg=""
+
+        self.msg_not_enough_argument_create_logical_network=(
+            "\nArgument list : \n\n"+
+            "< --parent-net-name   PhysicalNetworkName   >\n"+
+            "< --net-name          LogicalNetworkname    >\n"+
+            "< --net-type        [ primary | secondary ] >\n"+
+            "< --function    [ mn | bb | ic | lk | lkn ] >\n"+
+            "< --subnet  CIDR                            >\n"+
+            "[ --vpartition        VlanNumber            ]\n"+
+            "[ --gateway IPv4                            ]\n"+
+            "[ --suffix            suffix                ]\n"
+            )
+
+        self.msg_not_enough_argument_create_logical_port=(
+            "\nArgument list : \n\n"+
+            "< --src-net-name  SourceLogicalNetwork      >\n"+
+            "< --dst-net-name  DestLogicalNetwork        >\n"+
+            "[ --obj     [ node | hwmanager | switch ... ]\n"+
+            "[ --type    [ mngt | compute   | ...        ]\n"+
+            "[ --hwgroup       hwGroupName               ]\n"
+            )
+
+        self.msg_not_enough_argument_change_network=(
+            "\nArgument list : \n\n"+
+            "< --src-net-name  SourceLogicalNetwork      >\n"+
+            "< --dst-net-name  DestLogicalNetwork        >\n"+
+            "[ --obj     [ node | hwmanager | switch ... ]\n"+
+            "[ --type    [ mngt | compute   | ...        ]\n"+
+            "[ --hwgroup       hwGroupName               ]\n"
+            )
+
+        self.msg_not_enough_argument_remove_network=(
+            "\nArgument list : \n\n"+
+            "< --net-name      NetworkName               >\n"
+            )
+
+        self.msg_not_enough_argument_create_range=(
+            "\nArgument list : \n\n"+
+            "< --net-name      NetworkName               >\n"+
+            "< --first-ip      IPv4                      >\n"
+            )
+
+        self.msg_not_enough_argument_extend_ip=(
+            "\nArgument list : \n\n"+
+            "< --net-name      NetworkName               >\n"+
+            "< --first-ip      IPv4                      >\n"+
+            "[ --obj     < node | hwmanager ...  >       ]\n"+
+            "[ --type    < mngt | compute ...    >       ]\n"+
+            "[ --hwgroup       hwGroupName               ]\n"
+            )
+
+        self.msg_not_enough_argument_clean_ip=(
+            "\nArgument list : \n\n"+
+            "< --net-name      NetworkName               >\n"+
+            "< --first-ip      IPv4                      >\n"+
+            "[ --obj     < node | hwmanager ...  >       ]\n"+
+            "[ --type    < mngt | compute ...    >       ]\n"+
+            "[ --hwgroup       hwGroupName               ]\n"
+            )
+
+        self.msg_not_enough_argument_remove_range=(
+            "\nArgument list : \n\n"+
+            "< --net-name      NetworkName               >\n"+
+            "< --first-ip      IPv4                      >\n"
+            )
+
+        self.msg_not_enough_argument_create_member=(
+            "\nArgument list : \n\n"+
+            "< --net-name      NetworkName               >\n"+
+            "< --first-ip      IPv4                      >\n"+
+            "[ --obj     < node | hwmanager ...  >       ]\n"+
+            "[ --type    < mngt | compute ...    >       ]\n"+
+            "[ --hwgroup       hwGroupName               ]\n"
+            )
+
+        self.msg_not_enough_argument_remove_member=(
+            "\nArgument list : \n\n"+
+            "< --net-name      NetworkName               >\n"+
+            "< --first-ip      IPv4                      >\n"+
+            "[ --obj     [ node | hwmanager | switch ... ]\n"+
+            "[ --type    [ mngt | compute   | ...        ]\n"+
+            "[ --hwgroup       hwGroupName               ]\n"
+            )
+
+        self.prg_name                                =    "ipallocation"
+
+	self.str_action_apply			     =	  "--apply"
+        self.str_action_extend                       =    "--extend"
+        self.str_action_clean                        =    "--clean"
+        self.str_action_list_network                 =    "--list-network"
+        self.str_action_list_equipment               =    "--list-equipment"
+        self.str_action_create_logical_network       =    "--create-logical-network"
+        self.str_action_remove_logical_network       =    "--remove-logical-network"
+        self.str_action_create_logical_port          =    "--create-logical-port"
+        self.str_action_remove_logical_port          =    "--remove-logical-port"
+        self.str_action_create_range                 =    "--create-range"
+        self.str_action_remove_range                 =    "--remove-range"
+        self.str_action_create_member                =    "--create-member"
+        self.str_action_remove_member                =    "--remove-member"
+        self.str_action_change_network               =    "--change-network"
+        self.str_action_help                         =    "--help"
+        self.str_action_full_help                    =    "--full-help"
+        
+        self.str_obj                                 =    "[ --obj <object_type>      ]"
+        self.str_hwgroup                             =    "[ --hwgroup <hwgroup_name> ]"
+        self.str_type                                =    "[ --type <type|ftype>      ]"
+        
+        self.str_cidr                                =    "< --subnet CIDR            >"
+        self.str_nwn                                 =    "< --net-name networkName   >"
+        self.str_firstip                             =    "< --first-ip ipv4          >"
+
+        self.str_lastip                              =    "[ --last-ip ipv4           ]"
+        self.str_dbname                              =    "[ --dbname dbname          ]"
+        self.str_dbhost                              =    "[ --dbhost hostname        ]"
+        self.str_dbuser                              =    "[ --dbuser username        ]"
+        self.str_dbpass                              =    "[ --dbpasswd passwd        ]"
+        self.str_saferange                           =    "[ --saferange              ]"
+        self.str_regex                               =    "[ --regex <regex_string>   ]"
+
+        self.str_help_action_help                    =    (" => Display help about this program")
+	self.str_help_action_apply		     =	  (" => Apply an XML network map")
+        self.str_help_action_list_network            =    (" => List all physical and logical network in the database")
+        self.str_help_action_list_equipment          =    (" => List all equipment in the database matching the object, type, hwgroup, network, regex")
+        self.str_help_action_clean                   =    (" => Clean all network interfaces in the database matching the object, type, hwgroup, network name. Without extra arguments, it will clean *all* the network map")
+
+        self.str_help_action_extend                  =    (" => Extend all network interfaces in the database matching the object, type, hwgroup, network name")
+
+        self.str_help_action_create_logical_network  =    (" => Add a logical network on a physical network\n"+
+                                                           "    This network could be a primary or a secondary network")
+
+        self.str_help_action_remove_logical_network  =    (" => Remove a logical network from a physical network\n"+
+                                                           "    This logical network was previously created")
+
+        self.str_help_action_create_logical_port     =    (" => Create logical network interface from physical network interface\n"+
+                                                           "    This logical interface are created on a secondary logical network")
+
+        self.str_help_action_remove_logical_port     =    (" => Remove a logical network interface from physical network interface\n"+
+                                                           "    This logical interface was created on a secondary logical network")
+
+        self.str_help_action_create_range            =    (" => Add a range for a logical network\n"+
+                                                           "    This range is used to store member")
+
+        self.str_help_action_remove_range            =    (" => Remove a range for a logical network")
+
+        self.str_help_action_create_member           =    (" => Add a member to a range\n"+
+                                                           "    This member could be composed with : obj,type,hwgroup,iname")
+
+        self.str_help_action_remove_member           =    (" => Remove a member from a range")
+
+        self.str_help_action_change_network          =    (" => change the logical network of the interface of a subset\n"+
+                                                           "    you have to specify the same kind of subset that is described by create-member ")
+        
+        self.str_db=self.str_dbname+" "+self.str_dbhost+" "+self.str_dbuser+" "+self.str_dbpass        
+
+
+    def usage_full(self):
+        print ""
+        print self.prg_name+" "+self.str_action_help+"\n"+self.str_help_action_help+"\n"
+	print self.prg_name+" "+self.str_action_apply+"\n"+self.str_help_action_apply+"\n"
+        print self.prg_name+" "+self.str_action_extend+"\n"+self.str_help_action_extend+"\n"
+        print self.prg_name+" "+self.str_action_clean+"\n"+self.str_help_action_clean+"\n"
+        print self.prg_name+" "+self.str_action_list_network+"\n"+self.str_help_action_list_network+"\n"
+        print self.prg_name+" "+self.str_action_list_equipment+"\n"+self.str_help_action_list_equipment+"\n"
+        print self.prg_name+" "+self.str_action_create_logical_network+"\n"+self.str_help_action_create_logical_network+"\n"
+        print self.prg_name+" "+self.str_action_remove_logical_network+"\n"+self.str_help_action_remove_logical_network+"\n"
+        print self.prg_name+" "+self.str_action_create_logical_port+"\n"+self.str_help_action_create_logical_port+"\n"
+        print self.prg_name+" "+self.str_action_remove_logical_port+"\n"+self.str_help_action_remove_logical_port+"\n"
+        print self.prg_name+" "+self.str_action_create_range+"\n"+self.str_help_action_create_range+"\n"
+        print self.prg_name+" "+self.str_action_remove_range+"\n"+self.str_help_action_remove_range+"\n"
+        print self.prg_name+" "+self.str_action_create_member+"\n"+self.str_help_action_create_member+"\n"
+        print self.prg_name+" "+self.str_action_remove_member+"\n"+self.str_help_action_remove_member+"\n"
+        print self.prg_name+" "+self.str_action_change_network+"\n"+self.str_help_action_change_network+"\n"
+
+
+    def usage(self):
+        print ""
+        print self.prg_name+" "+self.str_action_help
+        print self.prg_name+" "+self.str_action_full_help
+        print ""
+        print self.prg_name+" "+self.str_action_apply
+	print ""
+        print self.prg_name+" "+self.str_action_extend
+        print self.prg_name+" "+self.str_action_clean
+        print ""
+
+        print self.prg_name+" "+self.str_action_list_network
+        print self.prg_name+" "+self.str_action_list_equipment
+        print ""
+
+        print self.prg_name+" "+self.str_action_create_logical_network
+        print self.prg_name+" "+self.str_action_remove_logical_network
+        print ""
+        print self.prg_name+" "+self.str_action_create_logical_port
+        print self.prg_name+" "+self.str_action_remove_logical_port
+        print ""
+        print self.prg_name+" "+self.str_action_create_range
+        print self.prg_name+" "+self.str_action_remove_range
+        print ""
+        print self.prg_name+" "+self.str_action_create_member
+        print self.prg_name+" "+self.str_action_remove_member
+        print ""
+        print self.prg_name+" "+self.str_action_change_network
+        print ""
+
+        
+    def try_help(self):
+        if (self.ea.get_help()):
+            self.something_to_do_from_command_line=True
+            return self.usage()
+
+
+    def try_full_help(self):
+        if (self.ea.get_full_help()):
+            self.something_to_do_from_command_line=True
+            return self.usage_full()
+
+
+    def try_list_network(self):
+        if (self.ea.get_list_network()):
+            print ""
+            print "=> list-network"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.list_network()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+
+    def try_list_equipment(self):
+        if (self.ea.get_list_equipment()):
+            print ""
+            print "=> list-equipment"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.list_equipment()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+
+    def try_extend_ip(self):
+        if (self.ea.get_extend_ip() and
+            self.ea.get_first_ip()  and
+            (self.ea.get_network_name() or
+             self.ea.get_subnet())):
+            print ""
+            print "=> extend-ip"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.extend_ip()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+        elif (self.ea.get_extend_ip()):
+            self.msg=self.str_help_action_extend+" "+self.msg_not_enough_argument_extend_ip
+            print self.msg
+            return False
+
+
+    def try_clean_ip(self):
+        #print self.ea.print_string()
+        if (self.ea.get_clean_ip()    and
+            self.ea.get_object_type() and
+            (self.ea.get_network_name() or
+             self.ea.get_subnet())):
+            print ""
+            print "=> clean-ip"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.clean_ip()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+	# Without args, it is a *full* clean
+        elif (not self.ea.get_full_help() and not self.ea.get_help() and self.ea.get_clean_ip()):
+	    self.something_to_do_from_command_line=True
+	    self.alloc_engine.full_clean()
+	elif (self.ea.get_help() and self.ea.get_clean_ip()):
+	    self.msg=self.str_help_action_clean+" "+self.msg_not_enough_argument_clean_ip
+	    print(self.msg)
+	    self.something_to_do_from_command_line=True
+
+        return False
+
+
+    def try_change_network(self):
+        if (self.ea.get_change_network() and
+            self.ea.get_network_source_name() and
+            self.ea.get_network_dest_name()):
+            print ""
+            print "=> change-network"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.move_network_interface()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+        elif (self.ea.get_change_network()):
+            if (self.ea.get_change_network()):
+                self.msg=self.msg_not_enough_argument_change_network
+                print self.msg
+            return False
+
+
+    def try_create_logical_port(self):
+        if (self.ea.get_create_logical_port() and
+            self.ea.get_network_source_name() and
+            self.ea.get_network_dest_name()):
+            print ""
+            print "=> create-logical-port"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.create_logical_network_interface()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+        elif (self.ea.get_create_logical_port()):
+            if (self.ea.get_create_logical_port()):
+                self.msg=self.msg_not_enough_argument_create_logical_port
+                print self.msg
+            return False
+
+
+    def try_create_logical_network(self):        
+        if (self.ea.get_create_logical_network() and
+            self.ea.get_network_parent_name()    and
+            self.ea.get_network_name()           and
+            self.ea.get_network_type()           and
+            self.ea.get_network_function()       and
+            self.ea.get_subnet()):
+            print ""
+            print "=> create-logical-network"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.create_logical_network()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+        elif (self.ea.get_create_logical_network()):
+            self.msg=self.str_help_action_create_logical_network+"\n\n"+self.msg_not_enough_argument_create_logical_network                          
+            print self.msg
+        return False
+
+    def try_remove_logical_network(self):                
+        if (self.ea.get_remove_logical_network() and
+            self.ea.get_network_name()):
+            print ""
+            print "=> remove-logical-network"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.remove_logical_network()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+        elif (self.ea.get_remove_logical_network()):
+            self.msg=self.str_help_action_remove_logical_network+"\n\n"+self.msg_not_enough_argument_remove_network
+            print self.msg
+        return False
+
+
+    def try_create_range(self):        
+        if (self.ea.get_create_range()           and
+            self.ea.get_network_name()           and
+            self.ea.get_first_ip()):
+            print ""
+            print "=> create-range"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.create_range()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+        elif (self.ea.get_create_range()):
+            self.msg=self.str_help_action_create_range+"\n\n"+self.msg_not_enough_argument_create_range
+            print self.msg
+        return False
+
+
+    def try_remove_range(self):        
+        if (self.ea.get_remove_range()           and
+            self.ea.get_network_name()           and
+            self.ea.get_first_ip()):
+            print ""
+            print "=> remove-range"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.remove_range()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+        elif (self.ea.get_remove_range()):
+            self.msg=self.str_help_action_remove_range+"\n\n"+self.msg_not_enough_argument_remove_range
+            print self.msg
+        return False
+
+
+    def try_create_member(self):        
+        if (self.ea.get_create_member()           and
+            self.ea.get_first_ip()                and
+            self.ea.get_network_name()            and
+            (
+                self.ea.get_object_type()    or
+                self.ea.get_object_subtype() or
+                self.ea.get_object_hwgroup()
+                )
+            ):
+            print ""
+            print "=> create-member"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.create_member()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+        elif (self.ea.get_create_member()):
+                self.msg=self.str_help_action_create_member+"\n\n"+self.msg_not_enough_argument_create_member
+                print self.msg
+        return False
+
+
+    def try_remove_member(self):        
+        if (self.ea.get_remove_member()           and
+            self.ea.get_first_ip()):
+            print ""
+            print "=> remove-member"
+            print ""
+            self.something_to_do_from_command_line=True
+            if self.alloc_engine.remove_member()==False:
+                print "Failed"
+                sys.exit(1)
+            else:
+                print "Success"
+
+        elif (self.ea.get_remove_member()):
+            self.msg=self.str_help_action_remove_member+"\n\n"+self.msg_not_enough_argument_remove_member
+            print self.msg
+        return False
+
+
+    def try_apply_xml(self):        
+        pass
+        if (self.ea.get_apply_xml()):
+            print ""
+            print "=> apply_xml"
+            print ""
+            self.something_to_do_from_command_line=True
+            return self.alloc_engine.apply_xml()
+
+
+    def try_extract_xml(self):
+        pass
+
+
+
+    def main(self):
+        if (len(sys.argv)==1):
+            self.usage()
+            sys.exit(0)
+
+        self.cla=command_line_argument()
+        self.cla.parse_command_line()
+        self.ea=self.cla.get_engine_argument()
+
+        self.alloc_engine=alloc_engine()
+        self.alloc_engine.set_engine_argument(self.ea)        
+        self.alloc_engine.connect_db()
+        self.alloc_engine.prepare_alloc_object()
+
+        #self.ea.print_string()
+
+        self.try_help()
+        self.try_full_help()
+        self.try_list_network()
+        self.try_list_equipment()
+        self.try_extend_ip()
+        self.try_clean_ip()
+        self.try_change_network()
+        self.try_create_logical_port()
+        self.try_create_logical_network()
+        self.try_create_range()
+        self.try_remove_range()
+        self.try_create_member()
+        self.try_remove_member()
+        self.try_remove_logical_network()
+        self.try_extract_xml()
+        self.try_apply_xml()
+
+        if self.something_to_do_from_command_line==False:
+            print "Not enough argument ..."
+            sys.exit(1)
+
+
+if __name__ == '__main__':
+    myalloc=alloc_cmd_line()
+
+    try:
+        myalloc.main()
+    except KeyboardInterrupt:
+        print ""
+        print "Killed by user"
+        print ""
+        sys.exit(1)
+        
+

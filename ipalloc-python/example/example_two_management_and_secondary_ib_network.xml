@@ -1,0 +1,65 @@
+<!DOCTYPE ip_allocation SYSTEM "ip_allocation.dtd">
+<ip_allocation>
+<network name="admin" function="mn">
+
+  <logical_network name="admin" type="primary" subnet="10.0.32.0/23" gateway="10.0.33.254" vlan_id="32" >
+    <range first_ip="10.0.32.1" >
+      <member object="node" type="mngt" group="Service" />
+      <member object="node" type="mws" group="Service" />
+    </range>
+    <range first_ip="10.0.32.181" >
+      <member object="metaservice" type="alias" />
+    </range>
+    <range first_ip="10.0.32.201" >
+      <member object="metaservice" type="mvm" />
+    </range>
+ </logical_network>
+
+  <logical_network name="compute"  type="primary" subnet="10.1.32.0/23" gateway="10.1.33.254" vlan_id="31" >
+    <range first_ip="10.1.32.121" >
+      <member object="node" type="compute" group="Compute" />
+    </range>
+  </logical_network>
+
+
+
+
+
+
+
+
+
+<network name="interconnect" function="ic">
+
+  <logical_network name="interconnect"  type="primary" subnet="10.2.0.0/16" gateway="10.2.255.254" pkey="FFFF" >
+    <range first_ip="10.2.32.1" >
+      <member object="node" type="mngt" group="Service" />
+      <member object="node" type="mws" group="Service" />
+    </range>
+    <range first_ip="10.2.32.7" >
+      <member object="node" type="mds" group="Service" interface_name="ib0" />
+    </range>
+    <range first_ip="10.2.33.7" >
+      <member object="node" type="mds" group="Service" interface_name="ib1" />
+    </range>
+    <range first_ip="10.2.32.121" >
+      <member object="node" type="compute" group="Compute" />
+    </range>
+ </logical_network>
+
+  <logical_network name="backbone"  type="secondary" subnet="14.1.32.0/23" gateway="14.1.33.254" pkey="8132" >
+    <range first_ip="14.1.32.1" >
+      <member object="node" type="mngt" group="Service" />
+      <member object="node" type="mws" group="Service" />
+    </range>
+    <range first_ip="14.1.32.7" >
+      <member object="node" type="io" group="Service" />
+    </range>
+    <range first_ip="14.1.32.121" >
+      <member object="node" type="compute" group="Compute" />
+    </range>
+    <range first_ip="14.1.33.231" >
+      <member object="node" type="nfs"/>
+    </range>
+  </logical_network>
+</network>

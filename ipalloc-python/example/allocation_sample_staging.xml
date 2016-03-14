@@ -1,0 +1,230 @@
+<!DOCTYPE ip_allocation SYSTEM "ip_allocation.dtd">
+
+<ip_allocation>
+<!-- Stagging CLM -->
+
+<!-- ****************** -->
+<!--   admin networks   -->
+<!-- ****************** -->
+
+<!-- admin network -->
+<network name="admin" function="mn">
+  <logical_network name="admin" type="primary" subnet="11.1.88.0/23" gateway="11.1.89.254" vlan_id="188" >
+    <range first_ip="11.1.88.1" >
+      <member object="node" type="mngt"/>
+      <member object="node" type="msw"/>
+    </range>
+    <range first_ip="11.1.88.21" >
+      <member object="metaservice" type="vm"/>
+      <member object="metaservice" type="alias"/>
+    </range>
+ </logical_network>
+
+<!-- compute network -->
+  <logical_network name="compute"  type="primary" subnet="11.2.88.0/23" gateway="11.2.89.254" vlan_id="188" >
+    <range first_ip="11.2.88.101" >
+      <member object="node" type="compute"/>
+    </range>
+    <range first_ip="11.2.89.221" >
+      <member object="node" type="router" />
+    </range>
+  </logical_network>
+
+<!-- io network -->
+  <logical_network name="io"  type="primary" subnet="11.3.88.0/23" gateway="11.3.89.254" vlan_id="188" >
+    <range first_ip="11.3.88.3" >
+      <member object="node" type="io" />
+      <member object="node" type="mds" />
+    </range>
+  </logical_network>
+
+<!-- equipment network -->
+  <logical_network name="equipement"  type="primary" subnet="11.4.88.0/23" gateway="11.4.89.254" vlan_id="188" >
+    <range first_ip="11.4.88.1" >
+      <member object="hwmanager" type="bmc[mngt]" />
+      <member object="hwmanager" type="bmc[mws]" />
+    </range>
+    <range first_ip="11.4.88.3" >
+      <member object="hwmanager" type="bmc[io]" />
+      <member object="hwmanager" type="bmc[mds]"/>
+    </range>
+    <range first_ip="11.4.88.101" >
+      <member object="hwmanager" type="bmc[compute]"/>
+    </range>
+    <range first_ip="11.4.89.151" >
+      <member object="switch" />
+    </range>
+    <range first_ip="11.4.89.171" >
+      <member object="hwmanager" type="coldoor" />
+      <member object="disk_array"/>
+    </range>
+    <range first_ip="11.4.89.221" >
+      <member object="hwmanager" type="bmc[router]" />
+    </range>
+  </logical_network>
+</network>
+<!-- ************************* -->
+<!--   interconnect networks   -->
+<!-- ************************* -->
+
+<!-- ib_admin network -->
+<network name="interconnect" function="ic">
+  <logical_network name="interconnect"  type="primary" subnet="12.1.0.0/16" gateway="12.1.255.254" pkey="FFFF" >
+    <range first_ip="12.1.88.1" >
+      <member object="node" type="mngt" />
+    </range>
+    <range first_ip="12.1.88.3" >
+      <member object="node" type="io" interface_name="ib0"/>
+      <member object="node" type="mds" interface_name="ib0"/>
+    </range>
+    <range first_ip="12.1.88.21" >
+      <member object="metaservice" type="vm" />
+      <member object="metaservice" type="alias" />
+    </range>
+    <range first_ip="12.1.88.101" >
+      <member object="node" type="compute" />
+    </range>
+    <range first_ip="12.1.89.221" >
+      <member object="node" type="router" />
+    </range>
+   </logical_network>
+
+<!-- ib_backbone network -->
+
+  <logical_network name="ib_backbone"  type="secondary" subnet="12.2.88.0/23" gateway="12.2.89.254" pkey="8188" >
+    <range first_ip="12.2.88.1" >
+      <member object="node" type="mngt" />
+    </range>
+    <range first_ip="12.2.88.3" >
+      <member object="node" type="io" />
+      <member object="node" type="mds"/>
+    </range>
+    <range first_ip="12.2.88.21" >
+      <member object="metaservice" type="vm" />
+      <member object="metaservice" type="alias" />
+    </range>
+    <range first_ip="12.2.88.101" >
+      <member object="node" type="compute"/>
+    </range>
+    <range first_ip="12.2.89.221" >
+      <member object="node" type="router" />
+    </range>
+  </logical_network>
+</network>
+</ip_allocation>
+You have new mail in /var/spool/mail/root
+[root@tamago1 ~]# cat /usr/lib/clustmngt/clusterdb/install/staggingclm.xml
+<!DOCTYPE ip_allocation SYSTEM "ip_allocation.dtd">
+
+<ip_allocation>
+<!-- Stagging CLM -->
+
+<!-- ****************** -->
+<!--   admin networks   -->
+<!-- ****************** -->
+
+<!-- admin network -->
+<network name="admin" function="mn">
+  <logical_network name="admin" type="primary" subnet="11.1.88.0/23" gateway="11.1.89.254" vlan_id="188" >
+    <range first_ip="11.1.88.1" >
+      <member object="node" type="mngt"/>
+      <member object="node" type="msw"/>
+    </range>
+    <range first_ip="11.1.88.21" >
+      <member object="metaservice" type="vm"/>
+      <member object="metaservice" type="alias"/>
+    </range>
+ </logical_network>
+
+<!-- compute network -->
+  <logical_network name="compute"  type="primary" subnet="11.2.88.0/23" gateway="11.2.89.254" vlan_id="188" >
+    <range first_ip="11.2.88.101" >
+      <member object="node" type="compute"/>
+    </range>
+    <range first_ip="11.2.89.221" >
+      <member object="node" type="router" />
+    </range>
+  </logical_network>
+
+<!-- io network -->
+  <logical_network name="io"  type="primary" subnet="11.3.88.0/23" gateway="11.3.89.254" vlan_id="188" >
+    <range first_ip="11.3.88.3" >
+      <member object="node" type="io" />
+      <member object="node" type="mds" />
+    </range>
+  </logical_network>
+
+<!-- equipment network -->
+  <logical_network name="equipement"  type="primary" subnet="11.4.88.0/23" gateway="11.4.89.254" vlan_id="188" >
+    <range first_ip="11.4.88.1" >
+      <member object="hwmanager" type="bmc[mngt]" />
+      <member object="hwmanager" type="bmc[mws]" />
+    </range>
+    <range first_ip="11.4.88.3" >
+      <member object="hwmanager" type="bmc[io]" />
+      <member object="hwmanager" type="bmc[mds]"/>
+    </range>
+    <range first_ip="11.4.88.101" >
+      <member object="hwmanager" type="bmc[compute]"/>
+    </range>
+    <range first_ip="11.4.89.151" >
+      <member object="switch" />
+    </range>
+    <range first_ip="11.4.89.171" >
+      <member object="hwmanager" type="coldoor" />
+      <member object="disk_array"/>
+    </range>
+    <range first_ip="11.4.89.221" >
+      <member object="hwmanager" type="bmc[router]" />
+    </range>
+  </logical_network>
+</network>
+<!-- ************************* -->
+<!--   interconnect networks   -->
+<!-- ************************* -->
+
+<!-- ib_admin network -->
+<network name="interconnect" function="ic">
+  <logical_network name="interconnect"  type="primary" subnet="12.1.0.0/16" gateway="12.1.255.254" pkey="FFFF" >
+    <range first_ip="12.1.88.1" >
+      <member object="node" type="mngt" />
+    </range>
+    <range first_ip="12.1.88.3" >
+      <member object="node" type="io" interface_name="ib0"/>
+      <member object="node" type="mds" interface_name="ib0"/>
+    </range>
+    <range first_ip="12.1.88.21" >
+      <member object="metaservice" type="vm" />
+      <member object="metaservice" type="alias" />
+    </range>
+    <range first_ip="12.1.88.101" >
+      <member object="node" type="compute" />
+    </range>
+    <range first_ip="12.1.89.221" >
+      <member object="node" type="router" />
+    </range>
+   </logical_network>
+
+<!-- ib_backbone network -->
+
+  <logical_network name="ib_backbone"  type="secondary" subnet="12.2.88.0/23" gateway="12.2.89.254" pkey="8188" >
+    <range first_ip="12.2.88.1" >
+      <member object="node" type="mngt" />
+    </range>
+    <range first_ip="12.2.88.3" >
+      <member object="node" type="io" />
+      <member object="node" type="mds"/>
+    </range>
+    <range first_ip="12.2.88.21" >
+      <member object="metaservice" type="vm" />
+      <member object="metaservice" type="alias" />
+    </range>
+    <range first_ip="12.2.88.101" >
+      <member object="node" type="compute"/>
+    </range>
+    <range first_ip="12.2.89.221" >
+      <member object="node" type="router" />
+    </range>
+  </logical_network>
+</network>
+</ip_allocation>

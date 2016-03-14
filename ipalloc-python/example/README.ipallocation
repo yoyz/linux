@@ -1,0 +1,44 @@
+ipallocation
+============
+
+This command apply a network map to your clusterdb.
+It takes a xml file as input and output a script file to execute.
+This script is self removed after being executed.
+
+
+Two different network map are given in this package, for example : isolable.xml
+
+1) Backup your clusterdb
+------------------------
+
+As root, become the postgres user and dump the clusterdb.
+
+# su - postgres
+# pg_dump --inserts clusterdb > /var/lib/pgsql/backups/clusterdb.sql
+# exit
+
+
+Copy your database elsewhere on postgres with this command
+
+# /usr/lib/clustmngt/clusterdb/bin/ipallocation --copydb --dbsrc clusterdb --dbdst clusterdb_backup
+
+Check the xml file and set the confidential IP, with sed for example : 
+
+# cp /usr/lib/clustmngt/clusterdb/install/isolable.xml /tmp/networkmap.xml
+# sed -i 's/B6/6/g' /tmp/networkmap.xml
+# vim /tmp/networkmap.xml
+
+Apply the xml file to your database
+
+# /usr/lib/clustmngt/clusterdb/bin/ipallocation --apply /tmp/networkmap.xml
+
+If everething is fine, now execute this command
+
+# /bin/sh /tmp/ipallocation.sh
+
+Your database is updated with this network map.
+If something goes wrong, you can safely restore your database.
+
+
+
+
