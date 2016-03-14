@@ -1,0 +1,631 @@
+#!/usr/bin/perl -w 
+###############################################################################
+# Copyright (C) 2009  Bull S. A. S.  -  All rights reserved
+# Bull, Rue Jean Jaures, B.P.68, 78340, Les Clayes-sous-Bois
+# This is not Free or Open Source software.
+# Please contact Bull S. A. S. for details about its license.
+###############################################################################
+
+##=============================================================================
+##
+## extractHosts: Example of perl script using Bull::CLM basic modules
+##
+##=============================================================================
+# HISTORY
+# Created June 2009
+# XXXXXX : defect or feature description
+
+# @(#) $Id: extractHosts,v 1.31.2.2 2011/04/15 15:54:52 peyrardj Exp $
+
+
+
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Copy;
+use File::Basename;
+use Bull::CLM::Usage;
+use Bull::CLM::Trace;
+use Bull::CLM::Config;
+use Bull::CLM::History;
+use Bull::CLM::DB::ClusterDB;
+use Bull::CLM::BCMPath;
+use Net::Ping;
+
+#@INC=(@INC,".");
+use Bull::CLM::DB::NetworkEquipment;
+#use Net::ZoneParse;
+use Bull::CLM::DB::ClusterDBEquipment;
+
+
+# [#317928] Tera100: VM could be copy a nfs reference of /etc/hosts 
+# during the bootstrap time
+use constant BCM_CONF_VM => "/BCM/conf/vm/conf/all";
+
+# get command basename and parameters
+my $program = basename($0);
+my @programParams = @ARGV;
+
+# standard option variables for outputs
+my $opt_verbose;
+my $opt_Debug;
+my $opt_quiet;
+# other example option variables
+my $opt_file;
+my $opt_dir;
+my $opt_Action;
+my $opt_Force;
+my $opt_include_shadow = 0;
+my $opt_timeout;
+my $opt_allhosts = 0;
+
+##################################################
+
+my $bcmpath = Bull::CLM::BCMPath->new();
+my $clusterdb_conf=$bcmpath->getBCMPath()."/conf/clusterdb/clusterdb.conf";
+
+##################################################
+
+use constant SLASH_ETC                            => '/etc/';
+use constant DEFAULT_OUTPUT_DIRECTORY             => '/';
+use constant HOSTS_TPL                            => SLASH_ETC."hosts-tpl";
+use constant HOSTS                                => SLASH_ETC."hosts";
+
+my $outputDirectory;
+
+
+my %configHash;
+my %clusterdbHash;
+
+
+my $regex_ipv4_network=qr!(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\/[0-9]|[0-9][0-9])!;
+
+my $regex_ipv4=qr!(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)!;
+
+my $regex_name=qr!^[a-zA-Z0-9-_]+!;
+
+my $regex_mac=qr!^[a-fA-f0-9][a-fA-f0-9]:.+!;
+
+
+
+#my $regex_ipv4="(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+#my $regex_ipv4_network="(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\/[0-9]|[0-9][0-9])";
+#my $regex_name="[a-zA-Z0-9-_]+";
+
+my $default_localhost_host_entry="127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4";
+my $tag_named_begin        ="# TO ADD SOME LINES, EDIT TEMPLATE FILE: /etc/named-tpl\n";
+
+
+
+
+my $tag             ="###################";
+my $tag_begin       ="BEGIN";
+my $tag_end         ="END";
+
+
+my $tag_node        ="Nodes";
+my $tag_bk          ="Backbone";
+my $tag_cold        ="Cold door";
+my $tag_icb         ="Interconnect Board Nodes";
+my $tag_hwm         ="Hwmanager";
+my $tag_ibsw        ="Infiniband switch";
+my $tag_ethsw       ="Ethernet switch";
+my $tag_talim       ="manageable PDU";
+my $tag_fibsw       ="Fiber switch";
+my $tag_stor        ="Storage";
+my $tag_ps          ="Portserver";
+my $tag_vm          ="VM";
+
+my $tag_begin_cold  ="$tag $tag_begin $tag_cold $tag\n";
+my $tag_begin_node  ="$tag $tag_begin $tag_node $tag\n";
+my $tag_begin_bk    ="$tag $tag_begin $tag_bk $tag\n";
+my $tag_begin_icbn  ="$tag $tag_begin $tag_icb $tag\n"; 
+my $tag_begin_hwm   ="$tag $tag_begin $tag_hwm $tag\n"; 
+my $tag_begin_ibsw  ="$tag $tag_begin $tag_ibsw $tag\n"; 
+my $tag_begin_ethsw ="$tag $tag_begin $tag_ethsw $tag\n"; 
+my $tag_begin_talim ="$tag $tag_begin $tag_talim $tag\n"; 
+my $tag_begin_fibsw ="$tag $tag_begin $tag_fibsw $tag\n"; 
+my $tag_begin_stor  ="$tag $tag_begin $tag_stor $tag\n"; 
+my $tag_begin_ps    ="$tag $tag_begin $tag_ps $tag\n"; 
+my $tag_begin_vm    ="$tag $tag_begin $tag_vm $tag\n"; 
+
+my $tag_end_cold  ="$tag $tag_end $tag_cold $tag\n";
+my $tag_end_node  ="$tag $tag_end $tag_node $tag\n";
+my $tag_end_bk    ="$tag $tag_end $tag_bk $tag\n";
+my $tag_end_icbn  ="$tag $tag_end $tag_icb $tag\n"; 
+my $tag_end_hwm   ="$tag $tag_end $tag_hwm $tag\n"; 
+my $tag_end_ibsw  ="$tag $tag_end $tag_ibsw $tag\n"; 
+my $tag_end_ethsw ="$tag $tag_end $tag_ethsw $tag\n"; 
+my $tag_end_talim ="$tag $tag_end $tag_talim $tag\n"; 
+my $tag_end_fibsw ="$tag $tag_end $tag_fibsw $tag\n"; 
+my $tag_end_stor  ="$tag $tag_end $tag_stor $tag\n"; 
+my $tag_end_ps    ="$tag $tag_end $tag_ps $tag\n"; 
+my $tag_end_vm    ="$tag $tag_end $tag_vm $tag\n"; 
+
+my $str_unknow="";
+my $str_cold="";
+my $str_node="";
+my $str_bk="";
+my $str_icbn="";
+my $str_hwm="";
+my $str_tal="";
+my $str_ics="";
+my $str_ethsw="";
+my $str_ibsw="";
+my $str_talim="";
+my $str_fibsw="";
+my $str_stor="";
+my $str_ps="";
+my $str_vm="";
+
+my $str_host="";
+
+
+
+
+
+
+my $clusterdb;
+my $dbname="";
+my $dbhost="";
+my $help=undef;
+##################################################
+
+
+# Bull::CLM::Trace : initialization
+#   By default :
+#   clmInitTrace() is equivalent to : clmInitTrace(undef,undef);
+#   - trace configuration file = /etc/clm/clmtrace.conf
+#   - trace directory = /tmp
+#   Example using local trace configuration file and specific trace directory :
+#   clmInitTrace("./localtrace.conf","/tmp/mydir");
+clmInitTrace();
+
+#my $action = clmGetAction();
+#my $actionParams = clmGetActionParams();
+my $action='exec';
+my $actionParams='';
+my $group;
+my $fqdn=0;
+
+# Bull::CLM::Usage is not usable in this case, 
+# extractCmd -d directory -g group -g group
+# Replaced by 'GetOptions'
+
+GetOptions( "d=s"=>\$opt_dir,
+            "dir=s"=>\$opt_dir,
+            "g=s"=>\$group,
+            "group=s"=>\$group,
+	    # output options
+	    "verbose" => \$opt_verbose,
+	    "Debug"   => \$opt_Debug,
+	    "debug"   => \$opt_Debug,
+	    "quiet"   => \$opt_quiet,
+	    "include-shadow" => \$opt_include_shadow,
+	    "include-cluster-out" => \$opt_include_shadow,
+	    "all" => \$opt_allhosts,
+	    "dbname=s"  => \$dbname,
+	    "dbhost=s"  => \$dbhost,
+#	    "fqdn"      => \$fqdn,
+	    "h!"        => \$help,
+	    "help"     =>  \$help,
+    );
+
+my $fct = (caller(0))[3];
+# Bull::CLM::Trace : initialize output options
+clmOutputOptions($opt_verbose,$opt_Debug,$opt_quiet);
+
+#if ( ! $opt_dir ) { actionUsage(); exit 0; }
+
+if ($help)
+{
+    clmOutput ($fct, "
+$0 
+    [--dbname databaseName]  
+    [--dbhost hostname]
+    [-d outputDirectory]
+    [--all]
+    [-v]
+
+");
+    exit 0;
+}
+
+if ($help) { $action='usage'; }
+# Execute action
+if ($action eq 'usage') {
+    actionUsage();
+} elsif ($action eq 'config') {
+    actionConfig($opt_file);
+} elsif ($action eq 'exec') {
+    actionExec($opt_Action, $opt_Force, $opt_include_shadow, $opt_timeout, $opt_allhosts, $actionParams);
+}
+else 
+{
+    actionExec($opt_Action, $opt_Force, $opt_include_shadow, $opt_timeout, $opt_allhosts, $actionParams);
+}
+
+
+exit(0);
+
+
+##-----------------------------------------------------------------------------
+## actionUsage()
+##     Show the list of standard CLM options.
+## Parameters
+##     none
+##-----------------------------------------------------------------------------
+sub actionUsage {
+    my $fct = (caller(0))[3];
+    clmOutput($fct,"$0 [-d directory] ");
+}
+
+
+
+
+
+##-----------------------------------------------------------------------------
+## actionConfig()
+##     Bull::CLM::Config : example of reading a configuration file
+## Parameters
+##     $confFile : configuration file name
+##-----------------------------------------------------------------------------
+sub actionConfig {
+    my $fct = (caller(0))[3];
+    my ($confFile) = @_;
+
+    if (!defined $confFile) {
+        clmUsage(1,"Missing configuration file name"); # display usage and exit 1
+    }
+
+    # read the configuration file in a hash table
+    my %configHash = clmLoadConfig($opt_file);
+ 
+    my $variable;
+    clmoutput($fct,"Configuration variables defined in $confFile :\n");
+    foreach $variable (keys %configHash) {
+        clmOutput($fct,"Name = '$variable' => Value = '$configHash{$variable}'");
+    }
+
+    # read a single configuration parameter :
+    # my $paramValue = clmConfig($opt_file,$paramName);
+}
+
+
+
+sub createWorkingSpace()
+{
+    my $fct = (caller(0))[3];
+    
+    if ($opt_verbose) {
+		clmOutput($fct,"Create directory $outputDirectory");
+    }
+    
+    if (! -d $outputDirectory)
+    { if (!(mkdir $outputDirectory))           { clmOutput($fct,"Can not create dir $outputDirectory"); exit 1; } }
+
+    if (! -d $outputDirectory.SLASH_ETC )
+    { if (!(mkdir $outputDirectory.SLASH_ETC)) { clmOutput($fct,"Can not create dir $outputDirectory".SLASH_ETC); exit 1; } }
+    
+}
+
+
+sub headerHostsFile()
+{
+    return "#Host file\n";
+}
+
+#Create the beginning of /etc/hosts
+sub importEtcHoststpl()
+{
+    my $fct = (caller(0))[3];     
+    my $hoststpl=HOSTS_TPL;
+    my $hosts="$outputDirectory/".HOSTS;
+    my $err_str="";
+    my $line="";
+    my $cur_hostname = `hostname`;
+    chomp($cur_hostname);
+
+    if ( ! -f HOSTS_TPL)
+    {
+        $err_str="The file ".HOSTS_TPL." does not exist";
+        clmOutput($fct,$err_str);
+        clmHistoryMsg($err_str);
+        $err_str="The current /etc/hosts file will be used as a template for ".HOSTS_TPL." file";
+        clmOutput($fct,$err_str);
+        clmHistoryMsg($err_str);
+        $err_str="Copying file ".HOSTS." to ".HOSTS_TPL;
+        clmOutput($fct,$err_str);
+        clmHistoryMsg($err_str);
+        #copy(HOSTS,HOSTS_TPL) or die "can not copy file ".HOSTS;
+        open(FH_HOSTS,HOSTS) or die "can not read ".HOSTS."\n";
+        open(FH_HOSTS_TPL,">$hoststpl") or die "can not write $hoststpl\n";
+        print FH_HOSTS_TPL headerHostsFile();
+        while (my $line=<FH_HOSTS>)
+	{
+	    if ($line=~/^::1/) { clmHistoryMsg("Remove IPv6 localhost entry"); next; }
+
+	    # Remove the assigned hostname from the tpl
+	    if (length($cur_hostname) and $line =~ /$cur_hostname/) {
+		print("Skipping $cur_hostname entry in $hoststpl\n");
+		next;
+	    }
+
+	    if ($line=~/^127/) 
+	    { 
+		clmOutput($fct,"Replace localhost default entry");
+		print FH_HOSTS_TPL $default_localhost_host_entry."\n";
+		next; 
+	    }
+	    print FH_HOSTS_TPL $line;
+	}
+        close(FH_HOSTS);
+        close(FH_HOSTS_TPL);
+        #exit 1;
+    }
+    
+    
+    clmHistoryMsg("Create file $hosts");
+    open (FH_HOSTS,">$hosts") or die "can not open $hosts";
+    open(FH_HOSTS_TPL,"<$hoststpl") or die "can not open ".HOSTS_TPL;
+    
+    while ($line=<FH_HOSTS_TPL>) 
+    { 
+#	print "$line";
+	if ($line=~/^127/) 
+	{ 
+	    clmOutput($fct,"Replace localhost default entry");
+	    print FH_HOSTS $default_localhost_host_entry."\n";
+	    next; 
+	}
+	print FH_HOSTS $line or die "can not write";
+    }
+    close(FH_HOSTS_TPL);
+    close(FH_HOSTS);	   
+}
+
+
+sub appendHostsFile($$$)
+{
+    my $fct = (caller(0))[3];
+    my $networkObject=shift;
+    my $hostsFilePath=shift;
+    my $allhosts = shift;
+    my $equipmentObject;
+    my $file;
+
+    my $name;
+    my $cname;
+    my $ip;
+    my $type;
+    my $port_number;
+    my $rank_number;
+    my $vip;
+    my @vip_detected=();
+    my $network_function="";
+    my $number=0;
+    my $dnsdomain=$networkObject->get_dnsdomain();
+
+
+    # Print one 'ip name' by line
+    for (my $i=0; $i<$networkObject->number_of_equipment() ; $i++ )
+    {
+	$equipmentObject=$networkObject->get_equipment($i);
+	$network_function=$networkObject->get_function();
+	$type=$equipmentObject->get_type();
+
+	if ($type eq "HOST")
+	{ $name=$equipmentObject->get("equipment_name"); } #  print "YES $name ".$equipmentObject->isa()."\n";	}
+	else
+	{ $name=$equipmentObject->get_name(); 	}
+
+
+
+	#$name=$equipmentObject->get_name();
+	$ip=$equipmentObject->get_ip();
+	$type=$equipmentObject->get_type();
+	$port_number=$equipmentObject->get("rank_number");
+	$rank_number=$equipmentObject->get("port_number");
+	$vip=$equipmentObject->get("vip");
+
+	#print("DEBUG: $ip $name $network_function\n");
+	
+
+	my $ipname="$ip"."\t"."$name"."."."$dnsdomain"."\t"."$name"."\n";
+#	my $gwipname="$ip"."\t"."gw-"."$name"."."."$dnsdomain"."\t"."gw-"."$name"."\n";
+
+	if ($type eq "DISKARRAY")        { $str_stor .=$ipname;   }
+	if ($type eq "GATEWAY")          { $str_ethsw.=$ipname  }
+	if ($type eq "VM")               { $str_vm   .=$ipname;   }
+
+	if ($type eq "SWITCH")          
+	{
+	    my $port_type=$equipmentObject->get("port_type");
+	    if ($port_type eq 'switch_ib')       { $str_ibsw.=$ipname    }
+	    elsif ($port_type eq 'switch_eth')   { $str_ethsw.=$ipname;  }
+	    elsif ($port_type eq 'switch_power') { $str_talim.=$ipname;  }
+	    else                          { $str_ethsw.=$ipname;  }
+	}
+
+
+	if ($type eq "HARDWAREMANAGER") 
+	{
+	    my $port_type=$equipmentObject->get("port_type");
+	    if ($port_type eq 'colddoor') 
+	    { $str_cold.=$ipname;   }
+	    elsif (($port_type eq 'bmc') or ($port_type eq 'cmc'))    
+	    { $str_hwm  .=$ipname;  }
+	    else
+	    { $str_hwm  .=$ipname;  } 	    	    
+	}
+	
+        if ($type eq "HOST")
+        {
+	    if (!$allhosts and $network_function=~/^mgmt|^mn/) {
+		$str_node .=$ipname;
+	    } elsif ($allhosts) {
+		$str_node .= $ipname;
+	    }
+#	    else
+#	    {
+#		if ($network_function=~/^bb|^bk|^bone/)
+#		{ $str_bk .=$ipname; }
+#		if ($network_function=~/^ic|^ib|^infin/)
+#		{ $str_icbn .=$ipname; }		
+#	    }
+        }	
+    }#for end
+}
+
+
+
+sub createHost($$)
+{
+    my $fct = (caller(0))[3];
+    my $networkList=shift;
+    my $allhosts = shift;
+    my $ref_networkList=$networkList->get_ref();
+    my @nwList=@$ref_networkList;
+    my $network;
+    my $hostsFilePath="$outputDirectory/".SLASH_ETC."/hosts";
+    my $ref_networkHash;
+    
+    clmOutput($fct,"Creating Host file");
+
+    importEtcHoststpl();
+
+    
+    foreach $network (@nwList)
+    {
+	if (!$allhosts and !($network->get_function() eq "mn")) { next; }
+	appendHostsFile($network,$hostsFilePath,$allhosts);
+    }
+
+    open(FH,">>$hostsFilePath") or die "can not open $hostsFilePath";
+    $str_host=
+	$tag_begin_node .$str_node  .$tag_end_node.
+	$tag_begin_icbn .$str_icbn  .$tag_end_icbn.
+	$tag_begin_bk   .$str_bk    .$tag_end_bk.
+	$tag_begin_hwm  .$str_hwm   .$tag_end_hwm.
+	$tag_begin_vm   .$str_vm    .$tag_end_vm.
+	$tag_begin_ethsw.$str_ethsw .$tag_end_ethsw.
+	$tag_begin_ibsw .$str_ibsw  .$tag_end_ibsw.
+	$tag_begin_talim.$str_talim .$tag_end_talim.
+	$tag_begin_stor .$str_stor  .$tag_end_stor.
+	$tag_begin_cold .$str_cold  .$tag_end_cold;
+    
+    print FH $str_host;
+    close FH;
+    
+    clmOutput($fct,"Hosts file created");
+}
+
+sub connectClusterDB()
+{
+    my $fct = (caller(0))[3]; 
+    my $p;
+    my $dbhandler=undef;
+
+    if (!defined($dbhost) or !$dbhost)
+    { 
+	$dbhost="127.0.0.1"; 
+    }
+    else
+    {
+	$p = Net::Ping->new();    
+	if (!($p->ping($dbhost,1))) { $dbhost="127.0.0.1"; }
+	$p->close();
+    }
+    
+    clmOutput($fct,"Connecting to ClusterDB on host : $dbhost");
+    
+    
+    if ($dbname)
+    {
+	$dbhandler=connectDB Bull::CLM::DB::ClusterDB({db_name=>$dbname,db_host=>$dbhost});
+    }    
+    else
+    {   
+	$dbhandler=connectDB Bull::CLM::DB::ClusterDB({db_host=>$dbhost});
+    }
+    if (!defined($dbhandler)) 
+    {
+	clmHistoryMsg("Connection to ClusterDB on host : $dbhost failed");
+	die "Connection to ClusterDB on host : $dbhost failed";
+    }
+    return $dbhandler;
+}
+
+sub loadConfig()
+{
+    if (!defined($dbhost))
+    {
+	%clusterdbHash=clmLoadConfig($clusterdb_conf);
+	foreach my $variable (keys %clusterdbHash)
+	{
+	    if ($variable =~ "host")
+	    { 
+		$dbhost=$clusterdbHash{"host"}; 
+	    }
+	}	
+    }
+}
+
+sub copyHostsRefForVM {
+	return if (not -d BCM_CONF_VM);
+	system("/bin/cp -f /etc/hosts ".BCM_CONF_VM."/");
+}
+
+
+sub actionExec {
+    my $fct = (caller(0))[3];
+    my ($action, $force, $include_shadow, $timeout, $allhosts, $nodes) = @_;    
+    my $zoneFileName;
+    my $networkList;
+    my $clusterDBEquipment;
+    my $equipmentNetwork;
+
+
+    loadConfig();
+
+    $clusterDBEquipment=Bull::CLM::DB::ClusterDBEquipment::new();
+    $equipmentNetwork=Bull::CLM::DB::EquipmentNetwork::new();
+
+    $clusterdb=connectClusterDB();
+    $clusterDBEquipment->set_dbhandler($clusterdb);
+    $clusterDBEquipment->set_equipmentNetwork($equipmentNetwork);
+
+
+    if ($opt_dir) { $outputDirectory=$opt_dir; }
+    else          { $outputDirectory=DEFAULT_OUTPUT_DIRECTORY; }
+
+    clmHistoryStart();
+#    if (!loadConfig()) { clmOutput($fct."loadConfig failed in file : ".CLM_NAMED_CONF); exit 1; }
+    
+    
+
+    createWorkingSpace();
+
+
+    $clusterDBEquipment->import_network();
+    $clusterDBEquipment->import_host($include_shadow);
+    $clusterDBEquipment->import_hardwareManager($include_shadow);
+    $clusterDBEquipment->import_diskArray($include_shadow);
+    $clusterDBEquipment->import_switch($include_shadow);
+    $clusterDBEquipment->import_gateway();
+    $clusterDBEquipment->import_VM(); 
+#    $clusterDBEquipment->importHostVIP();
+    if ($opt_verbose) 
+    { 
+	$clusterDBEquipment->print_network(); 
+	$clusterDBEquipment->print_equipment();
+    }
+
+    $networkList=$clusterDBEquipment->get_networkList();
+    createHost($networkList, $allhosts);
+
+    copyHostsRefForVM();
+
+    clmHistoryEnd(0);
+    
+}
