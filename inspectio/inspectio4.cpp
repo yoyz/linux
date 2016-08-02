@@ -1,4 +1,6 @@
 #include <string>
+#include <sstream>
+#include <iostream>
 #include <vector>
 #include <sys/time.h>
 #include <dlfcn.h>
@@ -57,7 +59,26 @@ enum ioByFileState {
 };
 
 
+class Logger
+{
+public:
+  Logger();
+  void add(std::string str);
+  std::vector<std::string> logstr;
+};
 
+//Logger::Logger() : logstr(1,std::string())
+Logger::Logger() 
+{
+  
+}
+
+void Logger::add(std::string str)
+{
+  logstr.push_back(str);
+}
+
+Logger  log;
 
 class Iaccess
 {
@@ -300,12 +321,21 @@ void Iio::dump()
 	      iiof[i].iac.readcall,
 	      iiof[i].iac.readsize);
     }
+  for (i=0;i<log.logstr.size();i++)
+    {
+      if (i==0)
+	fprintf(FD,"LOG\n");
+      fprintf(FD,log.logstr[i].c_str());
+    }
+
   //chainlist_head->printList(chainlist_head,FD); 
   orig_fclose(FD); 
 
 }
 
-Iio myiio;
+//################################################################################
+
+Iio     myiio;
 
 //################################################################################
 
@@ -516,6 +546,10 @@ int close(int fd)
   struct timeval tv1;
   struct timezone tz;
 
+  std::string str;
+  std::ostringstream oss;
+  oss << "close("<<fd<<")\n"; 
+  log.add(oss.str());
   
   orig_close = (void*)dlsym(RTLD_NEXT,"close");
 
@@ -555,6 +589,12 @@ int fclose(FILE * FD)
   
   orig_fclose_f_type orig_fclose;
   orig_fclose = (void*)dlsym(RTLD_NEXT,"fclose");
+
+  std::string str;
+  std::ostringstream oss;
+  oss << "fclose("<<fd<<")\n"; 
+  log.add(oss.str());
+
 
   gettimeofday(&tv0,&tz);
   retcode=orig_fclose(FD);
