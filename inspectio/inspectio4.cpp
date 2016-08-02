@@ -58,51 +58,88 @@ class Iaccess
 public:
   Iaccess();
   ~Iaccess();
-  long long   readcall;
-  long long   writecall;
+  int   readcall;
+  int   writecall;
 
-  long long   readtime_seconds;
-  long long   writetime_seconds;
+  int   readtime_seconds;
+  int   writetime_seconds;
 
-  long long   readtime_useconds;
-  long long   writetime_useconds;
+  int   readtime_useconds;
+  int   writetime_useconds;
 
-  long long   readcall4k;
-  long long   readcall8k;
-  long long   readcall16k;
-  long long   readcall32k;
-  long long   readcall64k;
-  long long   readcall128k;
-  long long   readcall256k;
-  long long   readcall512k;
-  long long   readcall1024k;
-  long long   readcall2048k;
-  long long   readcall4096k;  
-  
-  long long   writecall4k;
-  long long   writecall8k;
-  long long   writecall16k;
-  long long   writecall32k;
-  long long   writecall64k;
-  long long   writecall128k;
-  long long   writecall256k;
-  long long   writecall512k;
-  long long   writecall1024k;
-  long long   writecall2048k;
-  long long   writecall4096k;
+  int   readcall4k;
+  int   readcall8k;
+  int   readcall16k;
+  int   readcall32k;
+  int   readcall64k;
+  int   readcall128k;
+  int   readcall256k;
+  int   readcall512k;
+  int   readcall1024k;
+  int   readcall2048k;
+  int   readcall4096k;  
 
+  int   readsize;
+
+  int   writecall4k;
+  int   writecall8k;
+  int   writecall16k;
+  int   writecall32k;
+  int   writecall64k;
+  int   writecall128k;
+  int   writecall256k;
+  int   writecall512k;
+  int   writecall1024k;
+  int   writecall2048k;
+  int   writecall4096k;
+  int   writesize;
 };
 
 Iaccess::Iaccess()
 {  
-  readcall=0;
+   readcall=0;
+   writecall=0;
+
+   readtime_seconds=0;
+   writetime_seconds=0;
+
+   readtime_useconds=0;
+   writetime_useconds=0;
+
+   readcall4k=0;
+   readcall8k=0;
+   readcall16k=0;
+   readcall32k=0;
+   readcall64k=0;
+   readcall128k=0;
+   readcall256k=0;
+   readcall512k=0;
+   readcall1024k=0;
+   readcall2048k=0;
+   readcall4096k=0;  
+
+   readsize=0;
+
+   writecall4k=0;
+   writecall8k=0;
+   writecall16k=0;
+   writecall32k=0;
+   writecall64k=0;
+   writecall128k=0;
+   writecall256k=0;
+   writecall512k=0;
+   writecall1024k=0;
+   writecall2048k=0;
+   writecall4096k=0;
+   writesize=0;
+
 }
 
 Iaccess::~Iaccess()
 {
 }
 
-class Ifile
+class Ifile 
 {
 public:
   Ifile();
@@ -243,7 +280,14 @@ void Iio::dump()
   FD=orig_fopen(logfile,"a"); 
   for (i=0;i<iiof.size();i++)
     {
-      fprintf(FD,"%d %s\n",iiof[i].fd,iiof[i].name.c_str());
+      fprintf(FD,"[%d %s %d] [%d %d] [%d %d] \n",
+	      iiof[i].fd,
+	      iiof[i].name.c_str(),
+	      iiof[i].state,
+	      iiof[i].iac.writecall,
+	      iiof[i].iac.writesize,
+	      iiof[i].iac.readcall,
+	      iiof[i].iac.readsize);
     }
   //chainlist_head->printList(chainlist_head,FD); 
   orig_fclose(FD); 
@@ -256,6 +300,15 @@ Iio myiio;
 
 void add_write_count(int fd,int count)
 {
+  //exit(1);
+  if (myiio.existFd(fd)==-1)
+    {
+      Ifile ifi;
+      ifi.setFd(fd);
+      myiio.iiof.push_back(ifi);
+    }
+  myiio.getFd(fd).iac.writecall++;
+  myiio.getFd(fd).iac.writesize+=count;
 }
 
 
@@ -285,12 +338,17 @@ size_t write(int fd, void *buf, size_t count)
   size=orig_write(fd,buf,count);
   gettimeofday(&tv1,&tz);
 
-  // if (donothing)
-  //   return size;
 
-  
   if (size>=0)
     {
+      if (myiio.existFd(fd)==-1)
+	{
+	  Ifile ifi;
+	  ifi.setFd(fd);
+	  ifi.setName(std::string("UNKNOWN"));
+	  ifi.setState(IOBYFILE_WRITE);
+	  myiio.iiof.push_back(ifi);
+	}
       add_write_count(fd,size);
       add_write_time(fd,tv0,tv1);
     }
@@ -332,14 +390,7 @@ int    open(const char *pathname, int flags,...)
 	  ifi.setName(std::string(pathname));
 	  ifi.setState(IOBYFILE_OPEN);
 	  myiio.iiof.push_back(ifi);
-	  //myiio.getFd(retcode).setFd(retcode);
-	  //my
 	}
-      // struct ioByFileChainlist * chainlist_elem;
-      // chainlist_elem=chainlist_head->new(chainlist_head);
-      // chainlist_elem->iobfo->fd=retcode;
-      // chainlist_elem->iobfo->state=IOBYFILE_OPEN;
-      // strcpy(chainlist_elem->iobfo->tab_fd_to_name,pathname);
     }
 
   return retcode;
@@ -364,5 +415,5 @@ static void des() __attribute__((destructor));
 
 void des()
 {
-  printf("bye\n");
+  //printf("bye\n");
 }
