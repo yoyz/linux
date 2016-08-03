@@ -6,3 +6,7 @@ unset LD_PRELOAD
 
 unset LD_PRELOAD ; gcc -ggdb -O0 -Wl,-init,init -Wl,-fini,fini  -fPIC -shared -ldl -o inspectio2.so  inspectio2.c
 export LD_PRELOAD=./inspectio2.so ; cat /etc/passwd /tmp/toto
+
+
+unset LD_PRELOAD ; gcc -fPIC -shared -ldl -lstdc++ -o inspectio4.so  inspectio4.cpp  -fpermissive
+unset LD_PRELOAD ; rm /tmp/log*; gcc -fPIC -shared -ldl -lstdc++ -o inspectio4.so  inspectio4.cpp  -fpermissive ; export LD_PRELOAD=./inspectio4.so
