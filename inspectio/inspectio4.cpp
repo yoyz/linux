@@ -11,7 +11,7 @@
 #include <sys/types.h>  //getpid
 #include <sys/stat.h>
 #include <sys/time.h> // gettimeofday
-#include <fcntl.h>
+#include <fcntl.h>    // openat
 #include <stdarg.h> // va_arg
 
 
@@ -24,6 +24,8 @@ typedef void     (*orig_fini_f_type)();
 
 
 typedef int     (*orig_open_f_type)(const char *pathname, int flags,...);
+typedef int     (*orig_openat_f_type  )(int dirfd,const char *pathname, int flags,...);
+typedef int     (*orig_openat64_f_type)(int dirfd,const char *pathname, int flags,...);
 typedef int     (*orig_open64_f_type)(const char *pathname, int flags,...);
 typedef FILE *  (*orig_fopen_f_type)(const char *path, const char *mode);
 typedef FILE *  (*orig_fdopen_f_type)(int fd, const char *mode);
@@ -214,8 +216,21 @@ void Ifile::setName(std::string newname) { name = newname; }
 
 std::string Ifile::dump()
 {
-  std::ostringstream oss;
+  char str[2048];
 
+  //std::ostringstream oss;
+  //std::string 
+  sprintf(str,"write[%8lld %8lld] read[%8lld %8lld] [%d %d %s %d] \n",
+	      iac.writecall,
+	      iac.writesize,
+	      iac.readcall,
+	      iac.readsize,
+	      fd,
+	      oldfd,
+	      name.c_str(),
+	      state
+	      );
+  /*
   oss
     << "["
     << iac.writecall    << " " 
@@ -228,8 +243,9 @@ std::string Ifile::dump()
     << oldfd            << " "
     << name.c_str()     << " "
     << state            << "]\n";
-      
-    return oss.str();
+  */
+  return std::string(str);
+  //return oss.str();
 }
 
 
@@ -702,7 +718,102 @@ FILE *fdopen64(int fd, const char *mode)
   return fdopen(fd,mode);
 }
 
-int    open(const char *pathname, int flags,...)
+
+extern int openat(int dirfd, const char *pathname, int flags,...)
+{
+  int retcode;
+  int mode = 0;
+  int fd;
+
+  orig_openat_f_type orig_openat;
+  orig_openat  = (orig_openat_f_type)dlsym(RTLD_NEXT,"openat");
+  
+  if (flags & O_CREAT)
+    { 
+      va_list arg; 
+      va_start(arg, flags); 
+      mode = va_arg(arg, int); 
+      va_end(arg); 
+      retcode=orig_openat(dirfd,pathname,flags,mode); 
+    } 
+  else
+    {
+      retcode=orig_openat(dirfd,pathname,flags);      
+    }
+
+  if (retcode>=0)
+    {
+      fd=retcode;
+      if (myiio.existFd(fd)==-1)
+	{
+	  Ifile ifi;
+	  ifi.setFd(fd);
+	  ifi.setName(std::string(pathname));
+	  ifi.setState(IOBYFILE_OPEN);
+	  myiio.iiof.push_back(ifi);
+	}
+      else
+	{
+	  myiio.getFd(fd).setState(IOBYFILE_OPEN);
+	  myiio.getFd(fd).setName(std::string(pathname));
+	}
+    }
+
+  std::string str;
+  std::ostringstream oss;
+  oss << "openat("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
+  log.add(oss.str());
+  return retcode;
+}
+
+extern int openat64(int dirfd, const char *pathname, int flags,...)
+{
+  int retcode;
+  int mode = 0;
+  int fd;
+
+  orig_openat64_f_type orig_openat64;
+  orig_openat64  = (orig_openat64_f_type)dlsym(RTLD_NEXT,"openat64");
+  
+  if (flags & O_CREAT)
+    { 
+      va_list arg; 
+      va_start(arg, flags); 
+      mode = va_arg(arg, int); 
+      va_end(arg); 
+      retcode=orig_openat64(dirfd,pathname,flags,mode); 
+    } 
+  else
+    {
+      retcode=orig_openat64(dirfd,pathname,flags);      
+    }
+
+  if (retcode>=0)
+    {
+      fd=retcode;
+      if (myiio.existFd(fd)==-1)
+	{
+	  Ifile ifi;
+	  ifi.setFd(fd);
+	  ifi.setName(std::string(pathname));
+	  ifi.setState(IOBYFILE_OPEN);
+	  myiio.iiof.push_back(ifi);
+	}
+      else
+	{
+	  myiio.getFd(fd).setState(IOBYFILE_OPEN);
+	  myiio.getFd(fd).setName(std::string(pathname));
+	}
+    }
+
+  std::string str;
+  std::ostringstream oss;
+  oss << "openat64("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
+  log.add(oss.str());
+  return retcode;
+}
+
+extern int    open(const char *pathname, int flags,...)
 {
   int retcode;
   int mode = 0;
@@ -738,8 +849,6 @@ int    open(const char *pathname, int flags,...)
       else
 	{
 	  myiio.getFd(fd).setState(IOBYFILE_OPEN);
-	  //myiio.getFd(fd).setFd(fd);
-	  //myiio.getFd(fd).setOldFd(fd);
 	}
     }
 
@@ -750,7 +859,7 @@ int    open(const char *pathname, int flags,...)
   return retcode;
 }
 
-int open64(const char *pathname, int flags,...)
+extern int open64(const char *pathname, int flags,...)
 {
   int retcode;
   int mode=0;
@@ -763,7 +872,7 @@ int open64(const char *pathname, int flags,...)
       mode = va_arg(arg, int); 
       va_end(arg); 
       retcode=open(pathname,flags,mode); 
-    } 
+    }
   else
     {
       retcode=open(pathname,flags);      
@@ -782,6 +891,7 @@ int open64(const char *pathname, int flags,...)
       else
 	{
 	  myiio.getFd(fd).setState(IOBYFILE_OPEN);
+	  myiio.getFd(fd).setName(std::string(pathname));
 	}
     }
 
