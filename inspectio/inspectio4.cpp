@@ -1,4 +1,5 @@
 #include <string>
+#include <string.h> // memset
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -36,8 +37,8 @@ typedef int     (*orig_dup_f_type)(int oldfd);
 
 typedef size_t (*orig_read_f_type)(int fd, void *buf, size_t count);
 
-typedef size_t  (*orig_write_f_type)(int fd, void *buf, size_t count);
-typedef size_t  (*orig_write64_f_type)(int fd, void *buf, size_t count);
+typedef ssize_t (*orig_write_f_type)(int fd, const void *buf, size_t count);
+typedef ssize_t (*orig_write64_f_type)(int fd, const void *buf, size_t count);
 typedef ssize_t (*orig_writev_f_type)(int fd, const struct iovec *iov, int iovcnt);
 typedef ssize_t (*orig_pwrite_f_type)(int fd, const void *buf, size_t count, off_t offset);
 typedef ssize_t (*orig_pwrite64_f_type)(int fd, const void *buf, size_t count, off_t offset);
@@ -350,7 +351,20 @@ Iio     myiio;
 
 //################################################################################
 
-
+std::string getStrFDInfo( long fd )
+{
+  int size=1024;
+  char buf[1024];
+  std::string str;
+ 
+  char path[1024];
+  sprintf( path, "/proc/self/fd/%d", fd );
+ 
+  memset( &buf[0], 0, size );
+  ssize_t s = readlink( path, &buf[0], size );
+  str=std::string(buf);
+  return str;
+}
 
 
 void add_write_count(int fd,int count)
@@ -421,7 +435,8 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb,FILE *stream)
 	{
 	  Ifile ifi;
 	  ifi.setFd(fd);
-	  ifi.setName(std::string("UNKNOWN-FWRITE"));
+	  //ifi.setName(std::string("UNKNOWN-FWRITE"));
+	  ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_WRITE);
 	  myiio.iiof.push_back(ifi);
 	}
@@ -436,7 +451,7 @@ size_t fwrite64(const void *ptr, size_t size, size_t nmemb,FILE *stream)
   return fwrite(ptr,size,nmemb,stream);
 }
 
-size_t write(int fd, void *buf, size_t count)
+ssize_t write(int fd, const void *buf, size_t count)
 {
   int size;
   int size_t_count=count;
@@ -474,7 +489,7 @@ size_t write(int fd, void *buf, size_t count)
   return size;
 }
 
-size_t write64(int fd, void *buf, size_t count)
+ssize_t write64(int fd, void *buf, size_t count)
 {
   return write(fd,buf,count);
 }
@@ -654,7 +669,10 @@ FILE *fdopen(int fd, const char *mode)
   return file;  
 }
 
-
+FILE *fdopen64(int fd, const char *mode)
+{
+  return fdopen(fd,mode);
+}
 
 int    open(const char *pathname, int flags,...)
 {
@@ -775,7 +793,8 @@ int close(int fd)
 	  Ifile ifi;
 	  ifi.setOldFd(fd);
 	  ifi.setFd(-1);
-	  ifi.setName(std::string("UNKNOWN-CLOSE"));
+	  //ifi.setName(std::string("UNKNOWN-CLOSE"));
+	  ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_CLOSE);
 	  myiio.iiof.push_back(ifi);
 	}
@@ -818,7 +837,8 @@ int fclose(FILE * FD)
 	  Ifile ifi;
 	  ifi.setOldFd(fd);
 	  ifi.setFd(-1);
-	  ifi.setName(std::string("UNKNOWN-FCLOSE"));
+	  //ifi.setName(std::string("UNKNOWN-FCLOSE"));
+	  ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_CLOSE);
 	  myiio.iiof.push_back(ifi);
 	}
