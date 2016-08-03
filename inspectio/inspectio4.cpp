@@ -186,6 +186,7 @@ public:
   void setOldFd(int oldfd);
   void setName(std::string newname);
   void setState(int newstate);
+  std::string dump();
   int fd;
   int oldfd;
   std::string name;
@@ -205,10 +206,31 @@ Ifile::~Ifile()
 {
 }
 
-void Ifile::setFd(int newfd)             {   fd = newfd; }
-void Ifile::setOldFd(int oldfd)          {   fd = oldfd; }
+void Ifile::setFd(int fdparam)                {      fd = fdparam; }
+void Ifile::setOldFd(int fdparam)             {   oldfd = fdparam; }
 void Ifile::setState(int newstate)       {   state = newstate; }
-void Ifile::setName(std::string newname) { name = newname; } 
+void Ifile::setName(std::string newname) { name = newname; }
+
+
+std::string Ifile::dump()
+{
+  std::ostringstream oss;
+
+  oss
+    << "["
+    << iac.writecall    << " " 
+    << iac.writesize    << ""  
+    <<  "] ["           << ""
+    << iac.readcall     << " " 
+    << iac.readsize     << " " 
+    << "]   ["          << ""
+    << fd               << " "
+    << oldfd            << " "
+    << name.c_str()     << " "
+    << state            << "]\n";
+      
+    return oss.str();
+}
 
 
 class Iio
@@ -301,6 +323,9 @@ Iio::~Iio()
 
 }
 
+
+
+
 void Iio::dump()
 {
   FILE * FD;
@@ -322,6 +347,7 @@ void Iio::dump()
   FD=orig_fopen(logfile,"a"); 
   for (i=0;i<iiof.size();i++)
     {
+      /*
       fprintf(FD,"write[%lld %lld] read[%lld %lld] [%d %d %s %d] \n",
 	      iiof[i].iac.writecall,
 	      iiof[i].iac.writesize,
@@ -332,6 +358,8 @@ void Iio::dump()
 	      iiof[i].name.c_str(),
 	      iiof[i].state
 	      );
+      */
+      fprintf(FD,iiof[i].dump().c_str());
     }
   for (i=0;i<log.logstr.size();i++)
     {
@@ -793,7 +821,6 @@ int close(int fd)
 	  Ifile ifi;
 	  ifi.setOldFd(fd);
 	  ifi.setFd(-1);
-	  //ifi.setName(std::string("UNKNOWN-CLOSE"));
 	  ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_CLOSE);
 	  myiio.iiof.push_back(ifi);
@@ -889,10 +916,10 @@ int dup(int oldfd)
 
 
 
-int dup2(int oldfd, int newfd)
+extern int dup2(int oldfd, int newfd)
 {
   int retcode;
-
+  std::string str;
   orig_dup2_f_type orig_dup2;
   orig_dup2 = (orig_dup2_f_type)dlsym(RTLD_NEXT,"dup2");
   retcode=orig_dup2(oldfd,newfd);
@@ -913,8 +940,16 @@ int dup2(int oldfd, int newfd)
 	  myiio.getFd(oldfd).setFd(newfd);
 	  myiio.getFd(newfd).setState(IOBYFILE_DUP2);
 	  myiio.getFd(newfd).setOldFd(oldfd);
+	  //str=myiio.getFd(newfd).dump();
 	}
     }
+
+
+  std::ostringstream oss;
+  oss << "dup2("<< oldfd << "," << newfd << ")=" << retcode << "\n";
+  //oss << "dup2("<< oldfd << "," << newfd << ")=" << retcode << str << "\n";
+  log.add(oss.str());
+
   
   return retcode;
 }
