@@ -1,0 +1,1 @@
+gcc  -O3  cos_fftw.c -o cos_fftw -I/home/yoyz/local/fftw-3.3.5/include/ -L/home/yoyz/local/fftw-3.3.5/lib/ -lfftw3 -lm
