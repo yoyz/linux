@@ -26,7 +26,7 @@ sub getFabric()
 
 
 ################################################################################
-package ibswitchParser;
+package MellanoxIBswitchParser;
 sub new()
 {
     my $class=shift;
@@ -273,51 +273,59 @@ my $fabric1;
 my $fabric2;
 my $ibswParser;
 
+$ibswParser=MellanoxIBswitchParser::new();
 
-$fabric1=IBFabric::new();
-$fabric2=IBFabric::new();
-$ibswParser=ibswitchParser::new();
+if (0)
+{
+    $fabric1=IBFabric::new();
+    $fabric2=IBFabric::new();
+    #$ibswParser=MellanoxIBswitchParser::new();
+    
+    $sw1=IBSwitch::new();
+    $sw1->setguid("08003800013b0489");
+    $sw1->setlid(12);
+    $sw1->setdesc("sw1");
+    
+    
+    $sw2=IBSwitch::new();
+    $sw2->setguid("08003800013b0490");
+    $sw2->setlid(13);
+    $sw2->setdesc("sw2");
+    
+    $sw3=IBSwitch::new();
+    $sw3->setguid("08003800013b0491");
+    $sw3->setlid(14);
+    $sw3->setdesc("sw3");
+    
+    $sw4=IBSwitch::new();
+    $sw4->setguid("08003800013b0492");
+    $sw4->setlid(15);
+    $sw4->setdesc("sw4");
+    #print $sw1->equal($sw2);
+    #exit(0);
+    $fabric1->addSwitch($sw1);
+    $fabric1->addSwitch($sw2);
+    
+    $fabric2->addSwitch($sw3);
+    $fabric2->addSwitch($sw4);
+    
 
-$sw1=IBSwitch::new();
-$sw1->setguid("08003800013b0489");
-$sw1->setlid(12);
-$sw1->setdesc("sw1");
+    print "fab1\n";
+    $fabric1->printMe();
+    
+    print "fab2\n";
+    $fabric2->printMe();
+    
+    print "fabmerge\n";
+    $fabric1->mergeFabric($fabric2);
+    $fabric1->printMe();
+}
 
-
-$sw2=IBSwitch::new();
-$sw2->setguid("08003800013b0490");
-$sw2->setlid(13);
-$sw2->setdesc("sw2");
-
-$sw3=IBSwitch::new();
-$sw3->setguid("08003800013b0491");
-$sw3->setlid(14);
-$sw3->setdesc("sw3");
-
-$sw4=IBSwitch::new();
-$sw4->setguid("08003800013b0492");
-$sw4->setlid(15);
-$sw4->setdesc("sw4");
-#print $sw1->equal($sw2);
-#exit(0);
-$fabric1->addSwitch($sw1);
-$fabric1->addSwitch($sw2);
-
-$fabric2->addSwitch($sw3);
-$fabric2->addSwitch($sw4);
-
-
-print "fab1\n";
-$fabric1->printMe();
-
-print "fab2\n";
-$fabric2->printMe();
-
-print "fabmerge\n";
-$fabric1->mergeFabric($fabric2);
-$fabric1->printMe();
-
-#$ibswParser->openAndParse();
+if (1)
+{
+    $ibswParser->openAndParse();
+    $ibswParser->{ibfab}->printMe();
+}
 #$fabric2=$ibswParser->getFabric();
 #print $fabric2->getSwitch(2)->getStr();
 
