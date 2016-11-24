@@ -360,8 +360,10 @@ Iio::Iio()
 
   fprintf(FD,"Launching init()\n");
   status=IIO_RUNNING;
-  orig_fclose(FD);
+  fclose(FD);
   closedir(procselffd);
+  //orig_fclose(FD);
+  //closedir(procselffd);
   
   mtx.unlock();
 
@@ -1269,7 +1271,8 @@ extern int dup2(int oldfd, int newfd)
       // close virtually the newFD because dup(2) manual
       if (myiio.existFd(newfd))
 	{
-	  myiio.getFd(oldfd).setFd(-1);
+	  myiio.getFd(newfd).setOldFd(newfd);
+	  myiio.getFd(newfd).setFd(-1);
 	}
       
       if (myiio.existFd(oldfd)==-1)
