@@ -16,10 +16,12 @@
 #include <mutex>          // std::mutex
 
 #include <unistd.h>
-
+#include <dirent.h>  // opendir/closedir
 #define MAX_FILEDESC 1024
 
 std::mutex mtx;  
+
+std::string getStrFDInfo( long fd );
 
 typedef void     (*orig_init_f_type)();
 typedef void     (*orig_fini_f_type)();
@@ -312,6 +314,12 @@ Iio::Iio()
   FILE * FD;
   int    pid=1;
   char    logfile[1024];
+  DIR   * procselffd;
+  struct dirent *myfile_in_procselfd;
+  struct stat mystat;
+  std::string strStarDot(".");
+  std::string strStarDotdot("..");
+
   //printf("loading\n");
   orig_fopen_f_type orig_fopen;
   orig_fclose_f_type orig_fclose;
@@ -319,12 +327,40 @@ Iio::Iio()
   mtx.lock();
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
-  
+
   pid=getpid();
   sprintf(logfile,"/tmp/log.%d",pid);
+  FD=orig_fopen(logfile,"w");    
+  
+  // open the /proc/self/fd/ and find the filename and open descriptor of the current process
+  // to understand what is the current state of the file descriptor of this process  
+  procselffd = opendir("/proc/self/fd");
+  while((myfile_in_procselfd = readdir(procselffd)) != NULL)
+    {
+      Ifile ifi;
+      std::string str_myfile_in_procselfd(myfile_in_procselfd->d_name);
 
-  FD=orig_fopen(logfile,"w");  
-  fprintf(FD,"Launching init()\n"); 
+      // we don't want . and .. , just the file 0, 1, 2, etc...
+      if (str_myfile_in_procselfd != strStarDot &&
+	  str_myfile_in_procselfd != strStarDotdot)
+	{
+	  ifi.setFd(atoi(str_myfile_in_procselfd.c_str()));
+	  ifi.setName(getStrFDInfo(atoi(str_myfile_in_procselfd.c_str())));
+	  ifi.setState(IOBYFILE_OPEN);
+	  iiof.push_back(ifi);
+	  //stat(myfile_in_procselfd->d_name, &mystat);
+
+	  fprintf(FD,"%s %s\n",myfile_in_procselfd->d_name,getStrFDInfo(atoi(str_myfile_in_procselfd.c_str())).c_str());
+	}
+      
+      
+      
+      //ifi.setName(getStrFDInfo(atoi(
+    }
+  closedir(procselffd);
+
+
+  fprintf(FD,"Launching init()\n");
   orig_fclose(FD);
   status=IIO_RUNNING;
   mtx.unlock();
@@ -503,6 +539,8 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb,FILE *stream)
   retsize=orig_fwrite(ptr,size,nmemb,stream);
   gettimeofday(&tv1,&tz);
 
+  if (myiio.getStatus()!=IIO_RUNNING) { return retsize; }
+  
   std::string str;
   std::ostringstream oss;
   oss << "fwrite(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
@@ -978,7 +1016,7 @@ extern int    open(const char *pathname, int flags,...)
       retcode=orig_open(pathname,flags);      
     }
   
-  if (retcode>=0)
+  if (retcode>=0 && myiio.getStatus()==IIO_RUNNING)
     {
       fd=retcode;
       if (myiio.existFd(fd)==-1)
@@ -1071,7 +1109,7 @@ int close(int fd)
   retcode=orig_close(fd);
   gettimeofday(&tv1,&tz);
 
-  if (myiio.getStatus()==IIO_ENDING) { return retcode; }
+  if (myiio.getStatus()!=IIO_RUNNING) { return retcode; }
   
   if (retcode==0)
     {
@@ -1080,7 +1118,7 @@ int close(int fd)
 	  Ifile ifi;
 	  ifi.setOldFd(fd);
 	  ifi.setFd(-1);
-	  ifi.setName(getStrFDInfo(fd));
+	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_CLOSE);
 	  myiio.iiof.push_back(ifi);
 	}
@@ -1128,7 +1166,7 @@ int fclose(FILE * FD)
 	  ifi.setOldFd(fd);
 	  ifi.setFd(-1);
 	  //ifi.setName(std::string("UNKNOWN-FCLOSE"));
-	  ifi.setName(getStrFDInfo(fd));
+	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_CLOSE);
 	  myiio.iiof.push_back(ifi);
 	}
@@ -1197,7 +1235,8 @@ extern int dup2(int oldfd, int newfd)
 	  Ifile ifi;
 	  ifi.setFd(newfd);
 	  ifi.setOldFd(oldfd);
-	  ifi.setName(std::string("UNKNOWN-DUP2"));
+	  //ifi.setName(std::string("UNKNOWN-DUP2"));
+	  ifi.setName(getStrFDInfo(newfd));
 	  ifi.setState(IOBYFILE_DUP2);
 	  myiio.iiof.push_back(ifi);
 	}
