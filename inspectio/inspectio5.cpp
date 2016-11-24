@@ -66,16 +66,16 @@ typedef int     (*orig_fprintf_f_type)(FILE *stream, const char *format, ...);
 
 enum ioByFileState
   {
-    IOBYFILE_UNKNOW_ASSUME_CLOSED,
-    IOBYFILE_NEW,
-    IOBYFILE_OPEN,
-    IOBYFILE_READ,
-    IOBYFILE_WRITE,
-    IOBYFILE_CLOSE,
-    IOBYFILE_SEEK,
-    IOBYFILE_DUP,
-    IOBYFILE_DUP2,
-    IOBYFILE_DUP3,
+    IOBYFILE_UNKNOW_ASSUME_CLOSED,    // 0
+    IOBYFILE_NEW,                     // 1
+    IOBYFILE_OPEN,                    // 2
+    IOBYFILE_READ,                    // 3
+    IOBYFILE_WRITE,                   // 4
+    IOBYFILE_CLOSE,                   // 5
+    IOBYFILE_SEEK,                    // 6
+    IOBYFILE_DUP,                     // 7
+    IOBYFILE_DUP2,                    // 8
+    IOBYFILE_DUP3,                    // 9
   };
 
 enum iioStatus
@@ -202,6 +202,7 @@ public:
   void setName(std::string newname);
   void setState(int newstate);
   std::string dump();
+  std::string dumpHeader();
   int fd;
   int oldfd;
   std::string name;
@@ -227,38 +228,34 @@ void Ifile::setState(int newstate)       {   state = newstate; }
 void Ifile::setName(std::string newname) { name = newname; }
 
 
+std::string Ifile::dumpHeader()
+{
+  char str[2048];
+
+  //std::ostringstream oss;
+  //std::string
+//sprintf(str,"WRITE[%8lld %8lld] READ[%8lld %8lld] [%d %d %s %d] \n")
+  sprintf(str,"SUMAR[    CALL     BYTE           CALL     BYTE      FD OLDFD STATE NAME\n");
+  return std::string(str);
+}
+
 std::string Ifile::dump()
 {
   char str[2048];
 
   //std::ostringstream oss;
   //std::string 
-  sprintf(str,"WRITE[%8lld %8lld] READ[%8lld %8lld] [%d %d %s %d] \n",
-	      iac.writecall,
-	      iac.writesize,
-	      iac.readcall,
-	      iac.readsize,
-	      fd,
-	      oldfd,
-	      name.c_str(),
-	      state
-	      );
-  /*
-  oss
-    << "["
-    << iac.writecall    << " " 
-    << iac.writesize    << ""  
-    <<  "] ["           << ""
-    << iac.readcall     << " " 
-    << iac.readsize     << " " 
-    << "]   ["          << ""
-    << fd               << " "
-    << oldfd            << " "
-    << name.c_str()     << " "
-    << state            << "]\n";
-  */
+  sprintf(str,"WRITE[%8lld %8lld] READ[%8lld %8lld] [%5d %5d %5d %s] \n",
+	  iac.writecall,
+	  iac.writesize,
+	  iac.readcall,
+	  iac.readsize,
+	  fd,
+	  oldfd,
+	  state,
+	  name.c_str()
+	  );
   return std::string(str);
-  //return oss.str();
 }
 
 
@@ -357,12 +354,13 @@ Iio::Iio()
       
       //ifi.setName(getStrFDInfo(atoi(
     }
-  closedir(procselffd);
 
 
   fprintf(FD,"Launching init()\n");
-  orig_fclose(FD);
   status=IIO_RUNNING;
+  orig_fclose(FD);
+  closedir(procselffd);
+  
   mtx.unlock();
 
 }
@@ -415,7 +413,8 @@ void Iio::dump()
   
   sprintf(logfile,"/tmp/log.%d",pid);
 
-  FD=orig_fopen(logfile,"a"); 
+  FD=orig_fopen(logfile,"a");
+  fprintf(FD,iiof[0].dumpHeader().c_str());
   for (i=0;i<iiof.size();i++)
     {
       /*
@@ -681,6 +680,7 @@ ssize_t read(int fd, void *buf, size_t count)
   oss << "read(" << fd << "," << buf << "," << count << ")\n"; 
   log.add(oss.str());
 
+  if (myiio.getStatus()!=IIO_RUNNING) { return size; }
 
   if (size>=0)
     {
@@ -819,7 +819,7 @@ FILE *fopen(const char *pathname, const char *mode)
   orig_fopen  = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   FP=orig_fopen(pathname,mode);
   
-
+  if (myiio.getStatus()!=IIO_RUNNING) { return FP; } 
 
   if (FP!=0)
   {
@@ -1015,8 +1015,10 @@ extern int    open(const char *pathname, int flags,...)
     {
       retcode=orig_open(pathname,flags);      
     }
+
+  if (myiio.getStatus()!=IIO_RUNNING) { return retcode; } 
   
-  if (retcode>=0 && myiio.getStatus()==IIO_RUNNING)
+  if (retcode>=0)
     {
       fd=retcode;
       if (myiio.existFd(fd)==-1)
@@ -1157,7 +1159,9 @@ int fclose(FILE * FD)
   gettimeofday(&tv0,&tz);
   retcode=orig_fclose(FD);
   gettimeofday(&tv1,&tz);
-
+  
+  if (myiio.getStatus()!=IIO_RUNNING) { return retcode; }
+  
   if (retcode==0)
     {
       if (myiio.existFd(fd)==-1)
@@ -1230,6 +1234,12 @@ extern int dup2(int oldfd, int newfd)
 
   if (retcode>=0)
     {
+      // close virtually the newFD because dup(2) manual
+      if (myiio.existFd(newfd))
+	{
+	  myiio.getFd(oldfd).setFd(-1);
+	}
+      
       if (myiio.existFd(oldfd)==-1)
 	{
 	  Ifile ifi;
