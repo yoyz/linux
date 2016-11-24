@@ -1,3 +1,10 @@
+/*
+  AUTHOR   :   johann peyrard 2016/11/24
+  TO BUILD : $ unset LD_PRELOAD ; rm /tmp/log*; gcc -std=c++11 -fPIC -shared -ldl -lstdc++ -o inspectio5.so  inspectio5.cpp
+  TO TEST  : $ rm /tmp/log* ; export LD_PRELOAD=./inspectio5.so ; dd if=/dev/zero of=/dev/null bs=100M count=50 ; cat /tmp/log*
+  DEBUGON  : $ export INSPECTIO_ALL=vbla
+ */
+
 #include <string>
 #include <string.h> // memset
 #include <sstream>
@@ -244,9 +251,8 @@ std::string Ifile::dumpHeader()
 std::string Ifile::dump()
 {
   char str[2048];
-
-  //std::ostringstream oss;
-  //std::string 
+  char * genv;
+  genv=getenv("INSPECTIO_ALL");
   sprintf(str,"WRITE[%8lld %8lld %8lld] READ[%8lld %8lld %8lld] [%5d %5d %5d %s] \n",
 	  iac.writecall,
 	  iac.writesize/1000/1000,
@@ -259,6 +265,10 @@ std::string Ifile::dump()
 	  state,
 	  name.c_str()
 	  );
+
+  if (genv==NULL && iac.writecall==0 && iac.readcall==0)
+    sprintf(str,"");
+
   return std::string(str);
 }
 
@@ -351,7 +361,7 @@ Iio::Iio()
 	  iiof.push_back(ifi);
 	  //stat(myfile_in_procselfd->d_name, &mystat);
 
-	  fprintf(FD,"%s %s\n",myfile_in_procselfd->d_name,getStrFDInfo(atoi(str_myfile_in_procselfd.c_str())).c_str());
+	  //fprintf(FD,"%s %s\n",myfile_in_procselfd->d_name,getStrFDInfo(atoi(str_myfile_in_procselfd.c_str())).c_str());
 	}
       
       
@@ -406,6 +416,8 @@ void Iio::dump()
   char logfile[1024];
   //int pid=1;
   int i;
+  char * genv;
+  genv=getenv("INSPECTIO_ALL");
 
   orig_fopen_f_type  orig_fopen;
   orig_fclose_f_type orig_fclose;
@@ -439,9 +451,10 @@ void Iio::dump()
     }
   for (i=0;i<log.logstr.size();i++)
     {
-      if (i==0)
-	fprintf(FD,"LOG\n");
-      fprintf(FD,log.logstr[i].c_str());
+      //if (i==0)
+      //fprintf(FD,"LOG\n");
+      if (genv!=NULL)
+	fprintf(FD,log.logstr[i].c_str());
     }
 
   //chainlist_head->printList(chainlist_head,FD); 
