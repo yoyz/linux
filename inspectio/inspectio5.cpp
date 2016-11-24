@@ -116,8 +116,8 @@ public:
   unsigned long long   readcall;
   unsigned long long   writecall;
 
-  unsigned long long   readtime_seconds;
-  unsigned long long   writetime_seconds;
+  //unsigned long long   readtime_seconds;
+  //unsigned long long   writetime_seconds;
 
   unsigned long long   readtime_useconds;
   unsigned long long   writetime_useconds;
@@ -155,8 +155,8 @@ Iaccess::Iaccess()
    readcall=0;
    writecall=0;
 
-   readtime_seconds=0;
-   writetime_seconds=0;
+   //readtime_seconds=0;
+   //writetime_seconds=0;
 
    readtime_useconds=0;
    writetime_useconds=0;
@@ -237,7 +237,7 @@ std::string Ifile::dumpHeader()
   //std::ostringstream oss;
   //std::string
 //sprintf(str,"WRITE[%8lld %8lld] READ[%8lld %8lld] [%d %d %s %d] \n")
-  sprintf(str,"SUMAR[    CALL     BYTE           CALL     BYTE      FD OLDFD STATE NAME\n");
+  sprintf(str,"SUMAR[    CALL    MBYTE      SEC           CALL    MBYTE      SEC      FD OLDFD STATE NAME\n");
   return std::string(str);
 }
 
@@ -247,11 +247,13 @@ std::string Ifile::dump()
 
   //std::ostringstream oss;
   //std::string 
-  sprintf(str,"WRITE[%8lld %8lld] READ[%8lld %8lld] [%5d %5d %5d %s] \n",
+  sprintf(str,"WRITE[%8lld %8lld %8lld] READ[%8lld %8lld %8lld] [%5d %5d %5d %s] \n",
 	  iac.writecall,
-	  iac.writesize,
+	  iac.writesize/1000/1000,
+	  iac.writetime_useconds/1000/1000,
 	  iac.readcall,
-	  iac.readsize,
+	  iac.readsize/1000/1000,
+	  iac.readtime_useconds/1000/1000,
 	  fd,
 	  oldfd,
 	  state,
@@ -498,10 +500,26 @@ void add_read_count(int fd,int count)
 
 void add_write_time(int fd,  struct timeval tv0,  struct timeval tv1)
 {
+  if (myiio.existFd(fd)==-1)
+    {
+      Ifile ifi;
+      ifi.setFd(fd);
+      myiio.iiof.push_back(ifi);
+    }
+  myiio.getFd(fd).iac.writetime_useconds+=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
+
 }
 
 void add_read_time(int fd,  struct timeval tv0,  struct timeval tv1)
 {
+  if (myiio.existFd(fd)==-1)
+    {
+      Ifile ifi;
+      ifi.setFd(fd);
+      myiio.iiof.push_back(ifi);
+    }
+  myiio.getFd(fd).iac.readtime_useconds+=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
+
 }
 /*
 int fprintf(FILE *stream, const char *format, ...)
