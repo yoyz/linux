@@ -1,5 +1,5 @@
 /*
-  AUTHOR   :   johann peyrard 2016/11/24
+  AUTHOR   :   johann peyrard 2016/11/24n
   TO BUILD : $ unset LD_PRELOAD ; rm /tmp/log*; gcc -std=c++11 -fPIC -shared -ldl -lstdc++ -o inspectio5.so  inspectio5.cpp
   TO TEST  : $ rm /tmp/log* ; export LD_PRELOAD=./inspectio5.so ; dd if=/dev/zero of=/dev/null bs=100M count=50 ; cat /tmp/log*
   DEBUGON  : $ export INSPECTIO_ALL=vbla
@@ -23,10 +23,12 @@
 #include <mutex>          // std::mutex
 
 #include <unistd.h>
-#include <dirent.h>  // opendir/closedir
+#include <dirent.h>   // opendir/closedir
+#include <execinfo.h> // backtrace
 #define MAX_FILEDESC 1024
 
 std::mutex mtx;  
+std::string str_log;
 
 std::string getStrFDInfo( long fd );
 
@@ -93,6 +95,23 @@ enum iioStatus
     IIO_RUNNING,
     IIO_ENDING,
   };
+
+
+void backtrace_handler()
+{
+  void *array[30];
+  size_t size;
+  
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 30);
+  
+  // print out all the frames to stderr
+  fprintf(stderr, "Error\n");
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
+
+
 
 class Logger
 {
@@ -297,7 +316,9 @@ Ifile & Iio::getFd(int fdtoseek)
       if (iiof[i].fd==fdtoseek)
 	return iiof[i];
     }
-  printf("ERROR Iio::getFd(%d) not found\nexistFd(%d)=%d",fdtoseek,fdtoseek,existFd(fdtoseek));
+  printf("ERROR Iio::getFd(%d) not found existFd(%d)=%d iiof.size()=%d",fdtoseek,fdtoseek,existFd(fdtoseek),iiof.size());
+  //exit(1);
+  backtrace_handler();
   exit(1);
 }
 
@@ -324,7 +345,9 @@ Iio::Iio()
 {
   FILE * FD;
   int    pid=1;
-  char    logfile[1024];
+  //char    logfile[1024];
+  //std::string str_logfile;
+  std::ostringstream stream_logfile;
   DIR   * procselffd;
   struct dirent *myfile_in_procselfd;
   struct stat mystat;
@@ -339,9 +362,14 @@ Iio::Iio()
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
 
-  pid=getpid();
-  sprintf(logfile,"/tmp/log.%d",pid);
-  FD=orig_fopen(logfile,"w");    
+  if (getenv("OMPI_MCA_initial_wdir")!=NULL)
+    stream_logfile << getenv("OMPI_MCA_initial_wdir") << "/" << "inspectiolog." << getpid() ;
+  else if (getenv("PWD")!=NULL)
+    stream_logfile << getenv("PWD") << "/" << "inspectiolog." << getpid() ;
+  else
+    stream_logfile << "/tmp/inspectiolog." << getpid();
+
+  FD=orig_fopen(stream_logfile.str().c_str(),"w");
   
   // open the /proc/self/fd/ and find the filename and open descriptor of the current process
   // to understand what is the current state of the file descriptor of this process  
@@ -389,6 +417,7 @@ Iio::~Iio()
 
   orig_fopen_f_type  orig_fopen;
   orig_fclose_f_type orig_fclose;
+  std::ostringstream stream_logfile;
   status=IIO_ENDING;
   //mtx.lock();
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
@@ -396,10 +425,17 @@ Iio::~Iio()
   
   pid=getpid();
   
-  sprintf(logfile,"/tmp/log.%d",pid);
-  dump();
-  FD=orig_fopen(logfile,"a");
+  //sprintf(logfile,"/tmp/log.%d",pid);
+  if (getenv("OMPI_MCA_initial_wdir")!=NULL)
+    stream_logfile << getenv("OMPI_MCA_initial_wdir") << "/" << "inspectiolog." << getpid() ;
+  else if (getenv("PWD")!=NULL)
+    stream_logfile << getenv("PWD") << "/" << "inspectiolog." << getpid() ;
+  else
+    stream_logfile << "/tmp/inspectiolog." << getpid();
   
+  dump();
+  //FD=orig_fopen(logfile,"a");
+  FD=orig_fopen(stream_logfile.str().c_str(),"a");
   fprintf(FD,"Launching fini()\n"); 
   //chainlist_head->printList(chainlist_head,FD); 
   orig_fclose(FD); 
@@ -417,21 +453,24 @@ void Iio::dump()
   //int pid=1;
   int i;
   char * genv;
-  genv=getenv("INSPECTIO_ALL");
-
+  std::ostringstream stream_logfile;
   orig_fopen_f_type  orig_fopen;
   orig_fclose_f_type orig_fclose;
 
-
+  genv=getenv("INSPECTIO_ALL");
 
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
   
-  pid=getpid();
+  if (getenv("OMPI_MCA_initial_wdir")!=NULL)
+    stream_logfile << getenv("OMPI_MCA_initial_wdir") << "/" << "inspectiolog." << getpid() ;
+  else if (getenv("PWD")!=NULL)
+    stream_logfile << getenv("PWD") << "/" << "inspectiolog." << getpid() ;
+  else
+    stream_logfile << "/tmp/inspectiolog." << getpid();
   
-  sprintf(logfile,"/tmp/log.%d",pid);
+  FD=orig_fopen(stream_logfile.str().c_str(),"a");
 
-  FD=orig_fopen(logfile,"a");
   fprintf(FD,iiof[0].dumpHeader().c_str());
   for (i=0;i<iiof.size();i++)
     {
