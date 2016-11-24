@@ -26,6 +26,8 @@ std::string getStrFDInfo( long fd );
 typedef void     (*orig_init_f_type)();
 typedef void     (*orig_fini_f_type)();
 
+typedef int      (*orig_closedir_f_type)(DIR *dirp);
+
 
 typedef int     (*orig_open_f_type)(const char *pathname, int flags,...);
 typedef int     (*orig_openat_f_type  )(int dirfd,const char *pathname, int flags,...);
@@ -636,7 +638,7 @@ ssize_t write(int fd, const void *buf, size_t count)
 
   std::string str;
   std::ostringstream oss;
-  oss << "write(" << fd << "," << buf << "," << count << ")\n"; 
+  oss << "write(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
   log.add(oss.str());
 
 
@@ -677,7 +679,7 @@ ssize_t read(int fd, void *buf, size_t count)
 
   std::string str;
   std::ostringstream oss;
-  oss << "read(" << fd << "," << buf << "," << count << ")\n"; 
+  oss << "read(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
   log.add(oss.str());
 
   if (myiio.getStatus()!=IIO_RUNNING) { return size; }
@@ -1034,7 +1036,7 @@ extern int    open(const char *pathname, int flags,...)
 	  myiio.getFd(fd).setState(IOBYFILE_OPEN);
 	}
     }
-
+  //myiio.dump();
   std::string str;
   std::ostringstream oss;
   oss << "open("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
@@ -1088,6 +1090,35 @@ extern int open64(const char *pathname, int flags,...)
   return retcode;
 }
 
+int closedir(DIR *dirp)
+{
+    int retcode;
+    int fd;
+
+    orig_closedir_f_type orig_closedir;
+      
+    orig_closedir = (orig_closedir_f_type)dlsym(RTLD_NEXT,"closedir");
+    fd=dirfd(dirp);
+    retcode=orig_closedir(dirp);
+
+    if (myiio.existFd(fd)==-1)
+      {
+	Ifile ifi;
+	ifi.setFd(-1);
+	ifi.setState(IOBYFILE_CLOSE);
+	myiio.iiof.push_back(ifi);
+      }
+    else
+      {
+	myiio.getFd(fd).setState(IOBYFILE_CLOSE);
+	myiio.getFd(fd).setOldFd(fd);
+	myiio.getFd(fd).setFd(-1);
+	//myiio.getFd(fd).setOldFd(fd);
+      }    
+    
+    return retcode;
+}
+
 int close(int fd)
 {
   int retcode;
@@ -1131,6 +1162,7 @@ int close(int fd)
 	  myiio.getFd(fd).setFd(-1);
 	}
     }
+  //myiio.dump();
   //mtx.unlock();
   return retcode;
 }
