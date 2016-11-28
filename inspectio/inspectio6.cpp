@@ -1,12 +1,28 @@
 /*
   AUTHOR   :   johann peyrard 2016/11/24n
-  TO BUILD : $ unset LD_PRELOAD ; rm /tmp/log*; gcc -std=c++11 -fPIC -shared -ldl -lstdc++ -o inspectio5.so  inspectio5.cpp
+  TO BUILD : $ unset LD_PRELOAD ; rm /tmp/log*; gcc -std=c++11 -fPIC -shared -ldl -lstdc++ -o inspectio7.so  inspectio7.cpp
   TO TEST  : $ rm /tmp/log* ; export LD_PRELOAD=./inspectio5.so ; dd if=/dev/zero of=/dev/null bs=100M count=50 ; cat /tmp/log*
-  DEBUGON  : $ export INSPECTIO_ALL=vbla
+  DEBUGON          : $ export INSPECTIO_ALL=vbla
+  PATH TO OUTPUT   : $ export INSPECTIO_DUMP=/home_nfs/peyrardj/monapps/log
  */
 
+/*
+  DESIGN:
+   - Every meaningfull libc call should be trapped
+   - when the lib is loaded a IIo is created and a log file is created in $INSPECTIO_DUMP directory
+   - class Logger,  log every call with input parameter and return value, 
+     it is print only if INSPECTIO_ALL=something
+
+   - class Iaccess, should be aware of all access in a Ifile, 4k, 8k, seek...
+   - class Ifile,   track the file name, filedescriptor from born to death 
+                    contain an Iaccess object
+   - class IIo,     contain a vector of Ifile
+  
+ */
+
+
 #include <string>
-#include <string.h> // memset
+#include <string.h>    // memset
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -17,15 +33,15 @@
 
 #include <sys/types.h>  //getpid
 #include <sys/stat.h>
-#include <sys/time.h> // gettimeofday
-#include <fcntl.h>    // openat
-#include <stdarg.h> // va_arg
-#include <mutex>          // std::mutex
+#include <sys/time.h>   // gettimeofday
+#include <fcntl.h>      // openat
+#include <stdarg.h>     // va_arg
+#include <mutex>        // std::mutex
 
 #include <unistd.h>
-#include <dirent.h>   // opendir/closedir
-#include <execinfo.h> // backtrace
-#include <signal.h>   // signal
+#include <dirent.h>     // opendir/closedir
+#include <execinfo.h>   // backtrace
+#include <signal.h>     // signal
 
 #define MAX_FILEDESC 1024
 
@@ -70,12 +86,9 @@ typedef size_t  (*orig_fwrite_f_type)(const void *ptr, size_t size, size_t nmemb
 
 
 typedef int     (*orig_fprintf_f_type)(FILE *stream, const char *format, ...);
+
 //size_t fwrite(const void *ptr, size_t size, size_t nmemb,FILE *stream);
-
-
-
 //typedef ssize_t (*orig_fread_f_type)(void *ptr, size_t size, size_t nbemb, FILE *stream);
-
 //typedef FILE * (*orig_fopen_f_type)(const char *path, const char *mode);
 
 
@@ -96,9 +109,9 @@ enum ioByFileState
 
 enum iioStatus
   {
-    IIO_BEGIN,
-    IIO_RUNNING,
-    IIO_ENDING,
+    IIO_BEGIN,                        // 0
+    IIO_RUNNING,                      // 1
+    IIO_ENDING,                       // 2
   };
 
 
@@ -123,6 +136,7 @@ void sighandler(int signum)
   //exit(1);
 }
 
+//################################################################################
 
 class Logger
 {
@@ -132,7 +146,7 @@ public:
   std::vector<std::string> logstr;
 };
 
-//Logger::Logger() : logstr(1,std::string())
+
 Logger::Logger() 
 {
   
@@ -146,6 +160,8 @@ void Logger::add(std::string str)
 }
 
 Logger  inspectio_log;
+
+//################################################################################
 
 class Iaccess
 {
@@ -233,6 +249,8 @@ Iaccess::~Iaccess()
 {
 }
 
+//################################################################################
+
 class Ifile 
 {
 public:
@@ -273,9 +291,6 @@ std::string Ifile::dumpHeader()
 {
   char str[2048];
 
-  //std::ostringstream oss;
-  //std::string
-//sprintf(str,"WRITE[%8lld %8lld] READ[%8lld %8lld] [%d %d %s %d] \n")
   sprintf(str,"SUMAR[    CALL    MBYTE      SEC           CALL    MBYTE      SEC      FD OLDFD STATE NAME\n");
   return std::string(str);
 }
@@ -297,14 +312,15 @@ std::string Ifile::dump()
 	  state,
 	  name.c_str()
 	  );
-  // if we don't want all output and write below 1MB and read below 1MB
-  // we don't ouput the line
+  // if we don't want all output : $ unset INSPECTIO_ALL
+  // We don't display write and read under 1MB of working set, to reduce line noize
   if (genv==NULL && iac.writesize/1000/1000 == 0 && iac.readsize/1000/1000 == 0)
     sprintf(str,"");
 
   return std::string(str);
 }
 
+//################################################################################
 
 class Iio
 {
@@ -355,13 +371,12 @@ void Iio::noop()
   a=1;
 }
 
-//Iio::Iio() : iiof(MAX_FILEDESC,Ifile())
+
 Iio::Iio()
 {
   FILE * FD;
   int    pid=1;
-  //char    logfile[1024];
-  //std::string str_logfile;
+  char   hostname[1024];
   std::ostringstream stream_logfile;
   DIR   * procselffd;
   struct dirent *myfile_in_procselfd;
@@ -376,18 +391,16 @@ Iio::Iio()
   //mtx.lock();
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
+  gethostname(hostname, 1024);
 
-  if (getenv("HOME")!=NULL)
-    stream_logfile << getenv("HOME") << "/" << "inspectiolog." << getpid();
 
-  /*
-  if (getenv("OMPI_MCA_initial_wdir")!=NULL)
-    stream_logfile << getenv("OMPI_MCA_initial_wdir") << "/" << "inspectiolog." << getpid() ;
-  else if (getenv("PWD")!=NULL)
-    stream_logfile << getenv("PWD") << "/" << "inspectiolog." << getpid() ;
+  if (getenv("INSPECTIO_DUMP")!=NULL)
+    stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." <<getpid() ;
   else
-    stream_logfile << "/tmp/inspectiolog." << getpid();
-  */
+    if (getenv("HOME")!=NULL)
+      stream_logfile << getenv("HOME") << "/" << "inspectiolog."<< hostname << "." << getpid();
+
+  
   FD=orig_fopen(stream_logfile.str().c_str(),"w");
   
   // open the /proc/self/fd/ and find the filename and open descriptor of the current process
@@ -406,27 +419,12 @@ Iio::Iio()
 	  ifi.setName(getStrFDInfo(atoi(str_myfile_in_procselfd.c_str())));
 	  ifi.setState(IOBYFILE_OPEN);
 	  iiof.push_back(ifi);
-	  //stat(myfile_in_procselfd->d_name, &mystat);
-
-	  //fprintf(FD,"%s %s\n",myfile_in_procselfd->d_name,getStrFDInfo(atoi(str_myfile_in_procselfd.c_str())).c_str());
-	}
-      
-      
-      
-      //ifi.setName(getStrFDInfo(atoi(
+	}                 
     }
 
-  //signal(SIGUSR2, sighandler);
-
-  //fprintf(FD,"Launching init()\n");
   status=IIO_RUNNING;
   fclose(FD);
   closedir(procselffd);
-  //orig_fclose(FD);
-  //closedir(procselffd);
-  
-  //mtx.unlock();
-
 }
 
 Iio::~Iio()
@@ -434,36 +432,28 @@ Iio::~Iio()
   FILE * FD;
   pid_t pid=1;
   char logfile[1024];
-
+  char   hostname[1024];
   orig_fopen_f_type  orig_fopen;
   orig_fclose_f_type orig_fclose;
   std::ostringstream stream_logfile;
+  gethostname(hostname, 1024);
+
   status=IIO_ENDING;
-  ////mtx.lock();
+
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
   
   pid=getpid();
   
-  //sprintf(logfile,"/tmp/log.%d",pid);
-  if (getenv("HOME")!=NULL)
-    stream_logfile << getenv("HOME") << "/" << "inspectiolog." << getpid();
-
-  /*
-  if (getenv("OMPI_MCA_initial_wdir")!=NULL)
-    stream_logfile << getenv("OMPI_MCA_initial_wdir") << "/" << "inspectiolog." << getpid() ;
-  else if (getenv("PWD")!=NULL)
-    stream_logfile << getenv("PWD") << "/" << "inspectiolog." << getpid() ;
+  if (getenv("INSPECTIO_DUMP")!=NULL)
+    stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." <<getpid();
   else
-    stream_logfile << "/tmp/inspectiolog." << getpid();
-  */
+    if (getenv("HOME")!=NULL)
+      stream_logfile << getenv("HOME") << "/" << "inspectiolog."<< hostname << "." << getpid();
+  
   dump();
-  //FD=orig_fopen(logfile,"a");
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
-  //fprintf(FD,"Launching fini()\n"); 
-  //chainlist_head->printList(chainlist_head,FD); 
   orig_fclose(FD); 
-  //////mtx.unlock();
 }
 
 
@@ -474,6 +464,7 @@ void Iio::dump()
   FILE * FD;
   pid_t pid=1;
   char logfile[1024];
+  char   hostname[1024];
   //int pid=1;
   int i;
   char * genv;
@@ -481,51 +472,32 @@ void Iio::dump()
   orig_fopen_f_type  orig_fopen;
   orig_fclose_f_type orig_fclose;
 
+  gethostname(hostname, 1024);
   genv=getenv("INSPECTIO_ALL");
 
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
 
-
-  if (getenv("HOME")!=NULL)
-    stream_logfile << getenv("HOME") << "/" << "inspectiolog." << getpid();
-  /*
-  if (getenv("OMPI_MCA_initial_wdir")!=NULL)
-    stream_logfile << getenv("OMPI_MCA_initial_wdir") << "/" << "inspectiolog." << getpid() ;
-  else if (getenv("PWD")!=NULL)
-    stream_logfile << getenv("PWD") << "/" << "inspectiolog." << getpid() ;
+  if (getenv("INSPECTIO_DUMP")!=NULL)
+    stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." <<getpid();
   else
-    stream_logfile << "/tmp/inspectiolog." << getpid();
-  */
+    if (getenv("HOME")!=NULL)
+      stream_logfile << getenv("HOME") << "/" << "inspectiolog."<< hostname << "." << getpid();
+  
   
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
 
   fprintf(FD,iiof[0].dumpHeader().c_str());
   for (i=0;i<iiof.size();i++)
     {
-      /*
-      fprintf(FD,"write[%lld %lld] read[%lld %lld] [%d %d %s %d] \n",
-	      iiof[i].iac.writecall,
-	      iiof[i].iac.writesize,
-	      iiof[i].iac.readcall,
-	      iiof[i].iac.readsize,
-	      iiof[i].fd,
-	      iiof[i].oldfd,
-	      iiof[i].name.c_str(),
-	      iiof[i].state
-	      );
-      */
       fprintf(FD,iiof[i].dump().c_str());
     }
   for (i=0;i<inspectio_log.logstr.size();i++)
     {
-      //if (i==0)
-      //fprintf(FD,"LOG\n");
       if (genv!=NULL)
 	fprintf(FD,inspectio_log.logstr[i].c_str());
     }
 
-  //chainlist_head->printList(chainlist_head,FD); 
   orig_fclose(FD); 
 }
 
