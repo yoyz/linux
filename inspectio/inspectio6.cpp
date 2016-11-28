@@ -1,7 +1,8 @@
 /*
   AUTHOR   :   johann peyrard 2016/11/24n
-  TO BUILD : $ unset LD_PRELOAD ; rm /tmp/log*; gcc -std=c++11 -fPIC -shared -ldl -lstdc++ -o inspectio7.so  inspectio7.cpp
-  TO TEST  : $ rm /tmp/log* ; export LD_PRELOAD=./inspectio5.so ; dd if=/dev/zero of=/dev/null bs=100M count=50 ; cat /tmp/log*
+  NOTE     : use a rhel7 gcc or a recent gcc above 4.4 with -sdc=c++11
+  TO BUILD : $ unset LD_PRELOAD ; rm /tmp/log*; gcc -std=c++11 -fPIC -shared -ldl -lstdc++ -o inspectio6.so  inspectio6.cpp
+  TO TEST  : $ rm /tmp/log* ; export LD_PRELOAD=./inspectio6.so ; dd if=/dev/zero of=/dev/null bs=100M count=50 ; cat /tmp/log*
   DEBUGON          : $ export INSPECTIO_ALL=vbla
   PATH TO OUTPUT   : $ export INSPECTIO_DUMP=/home_nfs/peyrardj/monapps/log
  */
