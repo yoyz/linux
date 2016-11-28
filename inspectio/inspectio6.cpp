@@ -370,17 +370,21 @@ Iio::Iio()
   orig_fopen_f_type orig_fopen;
   orig_fclose_f_type orig_fclose;
   status=IIO_BEGIN;
-  ////mtx.lock();
+  //mtx.lock();
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
 
+  if (getenv("HOME")!=NULL)
+    stream_logfile << getenv("HOME") << "/" << "inspectiolog." << getpid();
+
+  /*
   if (getenv("OMPI_MCA_initial_wdir")!=NULL)
     stream_logfile << getenv("OMPI_MCA_initial_wdir") << "/" << "inspectiolog." << getpid() ;
   else if (getenv("PWD")!=NULL)
     stream_logfile << getenv("PWD") << "/" << "inspectiolog." << getpid() ;
   else
     stream_logfile << "/tmp/inspectiolog." << getpid();
-
+  */
   FD=orig_fopen(stream_logfile.str().c_str(),"w");
   
   // open the /proc/self/fd/ and find the filename and open descriptor of the current process
@@ -409,7 +413,7 @@ Iio::Iio()
       //ifi.setName(getStrFDInfo(atoi(
     }
 
-  signal(SIGUSR2, sighandler);
+  //signal(SIGUSR2, sighandler);
 
   //fprintf(FD,"Launching init()\n");
   status=IIO_RUNNING;
@@ -418,7 +422,7 @@ Iio::Iio()
   //orig_fclose(FD);
   //closedir(procselffd);
   
-  ////mtx.unlock();
+  //mtx.unlock();
 
 }
 
@@ -439,13 +443,17 @@ Iio::~Iio()
   pid=getpid();
   
   //sprintf(logfile,"/tmp/log.%d",pid);
+  if (getenv("HOME")!=NULL)
+    stream_logfile << getenv("HOME") << "/" << "inspectiolog." << getpid();
+
+  /*
   if (getenv("OMPI_MCA_initial_wdir")!=NULL)
     stream_logfile << getenv("OMPI_MCA_initial_wdir") << "/" << "inspectiolog." << getpid() ;
   else if (getenv("PWD")!=NULL)
     stream_logfile << getenv("PWD") << "/" << "inspectiolog." << getpid() ;
   else
     stream_logfile << "/tmp/inspectiolog." << getpid();
-  
+  */
   dump();
   //FD=orig_fopen(logfile,"a");
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
@@ -474,13 +482,18 @@ void Iio::dump()
 
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
-  
+
+
+  if (getenv("HOME")!=NULL)
+    stream_logfile << getenv("HOME") << "/" << "inspectiolog." << getpid();
+  /*
   if (getenv("OMPI_MCA_initial_wdir")!=NULL)
     stream_logfile << getenv("OMPI_MCA_initial_wdir") << "/" << "inspectiolog." << getpid() ;
   else if (getenv("PWD")!=NULL)
     stream_logfile << getenv("PWD") << "/" << "inspectiolog." << getpid() ;
   else
     stream_logfile << "/tmp/inspectiolog." << getpid();
+  */
   
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
 
@@ -867,8 +880,8 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
   ////mtx.lock();
   orig_writev  = (orig_writev_f_type)dlsym(RTLD_NEXT,"writev");
 
-  mtx.lock();
   size=orig_writev(fd,iov,iovcnt);
+  mtx.lock();
   oss << "writev(" << fd << "," << iovcnt << ")\n"; 
   log.add(oss.str());
 
@@ -890,17 +903,17 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt,off_t offset)
   struct timeval tv0;
   struct timeval tv1;
   struct timezone tz;
-  ////mtx.lock();
-  orig_pwritev  = (orig_pwritev_f_type)dlsym(RTLD_NEXT,"pwritev");
-
-  
   std::string str;
   std::ostringstream oss;
+
+  ////mtx.lock();
+  orig_pwritev  = (orig_pwritev_f_type)dlsym(RTLD_NEXT,"pwritev");
+  size=orig_pwritev(fd,iov,iovcnt,offset);
+
+  mtx.lock();
   oss << "pwritev(" << fd << "," << iovcnt << ")\n"; 
   log.add(oss.str());
-
-  size=orig_pwritev(fd,iov,iovcnt,offset);
-  ////mtx.unlock();
+  mtx.unlock();
   return size;
 }
 
@@ -923,11 +936,14 @@ FILE *fopen(const char *pathname, const char *mode)
   orig_fopen  = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   FP=orig_fopen(pathname,mode);
   
-  if (myiio.getStatus()!=IIO_RUNNING) { return FP; } 
-  mtx.lock();
+  if (myiio.getStatus()!=IIO_RUNNING) { return FP; }
+  if (FP!=0)
+    fd=fileno(FP);
+  
+  mtx.lock();  
   if (FP!=0)
   {
-      fd=fileno(FP);
+
       if (myiio.existFd(fd)==-1)
 	{
 	  Ifile ifi;
@@ -964,9 +980,9 @@ FILE *fdopen(int fd, const char *mode)
 
   
   orig_fdopen  = (orig_fdopen_f_type)dlsym(RTLD_NEXT,"fdopen");
-  
-  
+   
   file=orig_fdopen(fd,mode);
+  
   mtx.lock();
   if (file!=NULL)
     {
@@ -1198,7 +1214,8 @@ int closedir(DIR *dirp)
     orig_closedir_f_type orig_closedir;
       
     orig_closedir = (orig_closedir_f_type)dlsym(RTLD_NEXT,"closedir");
-    fd=dirfd(dirp);
+    if (dirp!=NULL)
+      fd=dirfd(dirp);
     retcode=orig_closedir(dirp);
     mtx.lock();
     if (myiio.existFd(fd)==-1)
@@ -1291,9 +1308,9 @@ int fclose(FILE * FD)
   gettimeofday(&tv0,&tz);
   retcode=orig_fclose(FD);
   gettimeofday(&tv1,&tz);
-  mtx.lock();
-  if (myiio.getStatus()!=IIO_RUNNING) { return retcode; }
   
+  if (myiio.getStatus()!=IIO_RUNNING) { return retcode; }
+  mtx.lock();
   if (retcode==0)
     {
       if (myiio.existFd(fd)==-1)
@@ -1384,14 +1401,14 @@ extern int dup2(int oldfd, int newfd)
 	  Ifile ifi;
 	  ifi.setFd(newfd);
 	  ifi.setOldFd(oldfd);
-	  //ifi.setName(std::string("UNKNOWN-DUP2"));
-	  ifi.setName(getStrFDInfo(newfd));
+	  ifi.setName(std::string("UNKNOWN-DUP2"));
+	  //ifi.setName(getStrFDInfo(newfd));
 	  ifi.setState(IOBYFILE_DUP2);
 	  myiio.iiof.push_back(ifi);
 	}
       else
 	{
-	  printf("HERE");
+	  //printf("HERE");
 	  myiio.getFd(oldfd).setFd(newfd);
 	  myiio.getFd(newfd).setState(IOBYFILE_DUP2);
 	  myiio.getFd(newfd).setOldFd(oldfd);
