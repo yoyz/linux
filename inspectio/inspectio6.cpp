@@ -29,7 +29,8 @@
 
 #define MAX_FILEDESC 1024
 
-std::mutex mtx;  
+std::mutex mtx;
+std::mutex mtx_logger;  
 std::string str_log;
 
 std::string getStrFDInfo( long fd );
@@ -139,10 +140,12 @@ Logger::Logger()
 
 void Logger::add(std::string str)
 {
+  mtx_logger.lock();
   logstr.push_back(str);
+  mtx_logger.unlock();
 }
 
-Logger  log;
+Logger  inspectio_log;
 
 class Iaccess
 {
@@ -514,12 +517,12 @@ void Iio::dump()
       */
       fprintf(FD,iiof[i].dump().c_str());
     }
-  for (i=0;i<log.logstr.size();i++)
+  for (i=0;i<inspectio_log.logstr.size();i++)
     {
       //if (i==0)
       //fprintf(FD,"LOG\n");
       if (genv!=NULL)
-	fprintf(FD,log.logstr[i].c_str());
+	fprintf(FD,inspectio_log.logstr[i].c_str());
     }
 
   //chainlist_head->printList(chainlist_head,FD); 
@@ -662,7 +665,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb,FILE *stream)
     }
 
     oss << "fwrite(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
 
   mtx.unlock();
   return retsize;
@@ -710,7 +713,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb,FILE *stream)
       add_read_time(fd,tv0,tv1);
     }
   oss << "fread(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
 
   mtx.unlock();
   return retsize;
@@ -761,7 +764,7 @@ ssize_t write(int fd, const void *buf, size_t count)
       ////mtx.unlock();
     }
   oss << "write(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
 
   mtx.unlock();
   return size;   
@@ -805,7 +808,7 @@ ssize_t read(int fd, void *buf, size_t count)
       add_read_time(fd,tv0,tv1);
     }
   oss << "read(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
 
   mtx.unlock();
   return size;   
@@ -853,7 +856,7 @@ ssize_t pwrite(int fd, const void *buf, size_t count,off_t offset)
       add_write_time(fd,tv0,tv1);
     }
   oss << "pwrite(" << fd << "," << buf << "," << count << ")\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
 
   mtx.unlock();
   return size;
@@ -883,7 +886,7 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
   size=orig_writev(fd,iov,iovcnt);
   mtx.lock();
   oss << "writev(" << fd << "," << iovcnt << ")\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
 
   mtx.unlock();
   
@@ -912,7 +915,7 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt,off_t offset)
 
   mtx.lock();
   oss << "pwritev(" << fd << "," << iovcnt << ")\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
   mtx.unlock();
   return size;
 }
@@ -959,7 +962,7 @@ FILE *fopen(const char *pathname, const char *mode)
 	  //myiio.getFd(fd).setOldFd(fd);
 	}
       oss << "fopen("<<pathname<< mode << ")="<< FP<< "(" << fd << ")" << "\n"; 
-      log.add(oss.str());            
+      inspectio_log.add(oss.str());            
   }
   
   mtx.unlock();
@@ -1000,7 +1003,7 @@ FILE *fdopen(int fd, const char *mode)
     }
 
   oss << "fdopen("<<fd<< ","<< mode << ")=" << file << "\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
   mtx.unlock();
   return file;  
 }
@@ -1055,7 +1058,7 @@ extern int openat(int dirfd, const char *pathname, int flags,...)
     }
 
   oss << "openat("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
   mtx.unlock();
   return retcode;
 }
@@ -1104,7 +1107,7 @@ extern int openat64(int dirfd, const char *pathname, int flags,...)
     }
   
   oss << "openat64("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
   mtx.unlock();
   return retcode;
 }
@@ -1154,7 +1157,7 @@ extern int    open(const char *pathname, int flags,...)
     }
   //myiio.dump();
   oss << "open("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
   mtx.unlock();
   return retcode;
 }
@@ -1201,7 +1204,7 @@ extern int open64(const char *pathname, int flags,...)
     }
 
   oss << "open64("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
   mtx.unlock();
   return retcode;
 }
@@ -1280,7 +1283,7 @@ int close(int fd)
     }
   //myiio.dump();
   oss << "close("<<fd<<")\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
 
   mtx.unlock();
   return retcode;
@@ -1331,7 +1334,7 @@ int fclose(FILE * FD)
 	}
     }
   oss << "fclose("<<fd<<")\n"; 
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
 
   mtx.unlock();
   return retcode;
@@ -1419,7 +1422,7 @@ extern int dup2(int oldfd, int newfd)
 
   oss << "dup2("<< oldfd << "," << newfd << ")=" << retcode << "\n";
   //oss << "dup2("<< oldfd << "," << newfd << ")=" << retcode << str << "\n";
-  log.add(oss.str());
+  inspectio_log.add(oss.str());
 
   mtx.unlock();
   return retcode;
