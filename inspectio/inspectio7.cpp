@@ -3,7 +3,7 @@
   NOTE     : use a rhel7 gcc or a recent gcc above 4.4 with -sdc=c++11
   TO BUILD : $ unset LD_PRELOAD ; rm /tmp/log*; gcc -std=c++11 -fPIC -shared -ldl -lstdc++ -o inspectio6.so  inspectio6.cpp
   TO TEST  : $ rm /tmp/log* ; export LD_PRELOAD=./inspectio6.so ; dd if=/dev/zero of=/dev/null bs=100M count=50 ; cat /tmp/log*
-  DEBUGON          : $ export INSPECTIO_ALL=something
+  DEBUGON          : $ export INSPECTIO_ALL=vbla
   PATH TO OUTPUT   : $ export INSPECTIO_DUMP=/home_nfs/peyrardj/monapps/log
  */
 
@@ -309,18 +309,16 @@ std::string Ifile::dumpHeader()
 {
   char str[2048];
 
-  sprintf(str,"SUMARY[    CALL    MBYTE      SEC           CALL    MBYTE      SEC       FD OLDFD STATE NAME\n");
+  sprintf(str,"SUMAR[    CALL    MBYTE      SEC           CALL    MBYTE      SEC      FD OLDFD STATE NAME\n");
   return std::string(str);
 }
-
-
 
 std::string Ifile::dump()
 {
   char str[2048];
   char * genv;
   genv=getenv("INSPECTIO_ALL");
-  sprintf(str,"WRITE [%8lld %8lld %8lld] READ[%8lld %8lld %8lld]  [%5d %5d %5d %s] \n",
+  sprintf(str,"WRITE[%8lld %8lld %8lld] READ[%8lld %8lld %8lld] [%5d %5d %5d %s] \n",
 	  iac.writecall,
 	  iac.writesize/1000/1000,
 	  iac.writetime_useconds/1000/1000,
@@ -396,6 +394,7 @@ Iio::Iio()
 {
   FILE * FD;
   int    pid=1;
+  int    rank=-1;
   char   hostname[1024];
   std::ostringstream stream_logfile;
   DIR   * procselffd;
@@ -413,9 +412,9 @@ Iio::Iio()
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
   gethostname(hostname, 1024);
 
-  
+
   STREAMLOG();
-  
+
   
   FD=orig_fopen(stream_logfile.str().c_str(),"w");
   
@@ -447,6 +446,7 @@ Iio::~Iio()
 {
   FILE * FD;
   pid_t pid=1;
+  int   rank=-1;
   char logfile[1024];
   char   hostname[1024];
   orig_fopen_f_type  orig_fopen;
@@ -475,15 +475,11 @@ void Iio::dump()
 {
   FILE * FD;
   pid_t pid=1;
+  int   rank=-1;
   char logfile[1024];
   char   hostname[1024];
   //int pid=1;
   int i;
-  int64_t time_usec_read=0;
-  int64_t time_usec_write=0;
-  int64_t data_read=0;
-  int64_t data_write=0;
-
   char * genv;
   std::ostringstream stream_logfile;
   orig_fopen_f_type  orig_fopen;
@@ -497,33 +493,13 @@ void Iio::dump()
 
   STREAMLOG();
   
-  
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
 
-  // dump header only if there is logged data
-  if (inspectio_log.logstr.size()>0)
-    fprintf(FD,iiof[0].dumpHeader().c_str());
-
-  // dump the WRITE[ ... ]READ[.... ] line
+  fprintf(FD,iiof[0].dumpHeader().c_str());
   for (i=0;i<iiof.size();i++)
     {
       fprintf(FD,iiof[i].dump().c_str());
     }
-  // dump the IOTIME in second and in R+W MB
-  for (i=0;i<iiof.size();i++)
-    {
-      time_usec_read+=iiof[i].iac.readtime_useconds;
-      time_usec_write+=iiof[i].iac.writetime_useconds;
-      data_read+=iiof[i].iac.readsize;
-      data_write+=iiof[i].iac.writesize;      
-    }
-  fprintf(FD,"IOTIME[                  %8lld] R/W [         %8lld         ]BW[%8lld MB/s ]\n",
-	  ((time_usec_read+time_usec_write)/1000/1000),
-	  ((data_read+data_write)/1000/1000),
-	  (((data_read+data_write))/((time_usec_read+time_usec_write)))
-	  );
-
-  // dump the 'strace -e file'
   for (i=0;i<inspectio_log.logstr.size();i++)
     {
       if (genv!=NULL)
@@ -1284,7 +1260,6 @@ int close(int fd)
 	  myiio.getFd(fd).setOldFd(fd);
 	  myiio.getFd(fd).setFd(-1);
 	}
-      add_write_time(fd,tv0,tv1);
     }
   //myiio.dump();
   oss << "close("<<fd<<")\n"; 
