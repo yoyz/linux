@@ -21,6 +21,23 @@
   
  */
 
+#define STREAMLOG() do {						\
+    int rank=-1;							\
+    if (getenv("OMPI_COMM_WORLD_RANK")!=NULL)  rank=atoi(getenv("OMPI_COMM_WORLD_RANK")); \
+    if (getenv("PMI_RANK")!=NULL)              rank=atoi(getenv("PMI_RANK")); \
+    if (getenv("PMIX_RANK")!=NULL)             rank=atoi(getenv("PMIX_RANK")); \
+    if (getenv("INSPECTIO_DUMP")!=NULL)					\
+      {									\
+	if (rank==-1)							\
+	  stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." <<getpid(); \
+	else								\
+	  stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." << rank << "." <<getpid(); \
+      }									\
+    else								\
+      if (getenv("HOME")!=NULL)						\
+	stream_logfile << getenv("HOME") << "/" << "inspectiolog."<< hostname << "." << getpid(); \
+  } while(0) 
+
 
 #include <string>
 #include <string.h>    // memset
@@ -394,13 +411,9 @@ Iio::Iio()
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
   gethostname(hostname, 1024);
 
-
-  if (getenv("INSPECTIO_DUMP")!=NULL)
-    stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." <<getpid() ;
-  else
-    if (getenv("HOME")!=NULL)
-      stream_logfile << getenv("HOME") << "/" << "inspectiolog."<< hostname << "." << getpid();
-
+  
+  STREAMLOG();
+  
   
   FD=orig_fopen(stream_logfile.str().c_str(),"w");
   
@@ -446,11 +459,7 @@ Iio::~Iio()
   
   pid=getpid();
   
-  if (getenv("INSPECTIO_DUMP")!=NULL)
-    stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." <<getpid();
-  else
-    if (getenv("HOME")!=NULL)
-      stream_logfile << getenv("HOME") << "/" << "inspectiolog."<< hostname << "." << getpid();
+  STREAMLOG();
   
   dump();
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
@@ -479,16 +488,14 @@ void Iio::dump()
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
 
-  if (getenv("INSPECTIO_DUMP")!=NULL)
-    stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." <<getpid();
-  else
-    if (getenv("HOME")!=NULL)
-      stream_logfile << getenv("HOME") << "/" << "inspectiolog."<< hostname << "." << getpid();
+  STREAMLOG();
   
   
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
 
-  fprintf(FD,iiof[0].dumpHeader().c_str());
+  if (inspectio_log.logstr.size()>0)
+    fprintf(FD,iiof[0].dumpHeader().c_str());
+  
   for (i=0;i<iiof.size();i++)
     {
       fprintf(FD,iiof[i].dump().c_str());
