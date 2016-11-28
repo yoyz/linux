@@ -25,6 +25,8 @@
 #include <unistd.h>
 #include <dirent.h>   // opendir/closedir
 #include <execinfo.h> // backtrace
+#include <signal.h>   // signal
+
 #define MAX_FILEDESC 1024
 
 std::mutex mtx;  
@@ -75,6 +77,8 @@ typedef int     (*orig_fprintf_f_type)(FILE *stream, const char *format, ...);
 
 //typedef FILE * (*orig_fopen_f_type)(const char *path, const char *mode);
 
+
+
 enum ioByFileState
   {
     IOBYFILE_UNKNOW_ASSUME_CLOSED,    // 0
@@ -111,6 +115,12 @@ void backtrace_handler()
   exit(1);
 }
 
+void sighandler(int signum)
+{
+  backtrace_handler();
+  //printf("Caught signal %d, coming out...\n", signum);
+  //exit(1);
+}
 
 
 class Logger
@@ -284,8 +294,9 @@ std::string Ifile::dump()
 	  state,
 	  name.c_str()
 	  );
-
-  if (genv==NULL && iac.writecall==0 && iac.readcall==0)
+  // if we don't want all output and write below 1MB and read below 1MB
+  // we don't ouput the line
+  if (genv==NULL && iac.writesize/1000/1000 == 0 && iac.readsize/1000/1000 == 0)
     sprintf(str,"");
 
   return std::string(str);
@@ -317,9 +328,10 @@ Ifile & Iio::getFd(int fdtoseek)
 	return iiof[i];
     }
   printf("ERROR Iio::getFd(%d) not found existFd(%d)=%d iiof.size()=%d",fdtoseek,fdtoseek,existFd(fdtoseek),iiof.size());
-  //exit(1);
   backtrace_handler();
   exit(1);
+  //backtrace_handler();
+  //exit(1);
 }
 
 int Iio::existFd(int fdtoseek)
@@ -358,7 +370,7 @@ Iio::Iio()
   orig_fopen_f_type orig_fopen;
   orig_fclose_f_type orig_fclose;
   status=IIO_BEGIN;
-  mtx.lock();
+  ////mtx.lock();
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
 
@@ -397,15 +409,16 @@ Iio::Iio()
       //ifi.setName(getStrFDInfo(atoi(
     }
 
+  signal(SIGUSR2, sighandler);
 
-  fprintf(FD,"Launching init()\n");
+  //fprintf(FD,"Launching init()\n");
   status=IIO_RUNNING;
   fclose(FD);
   closedir(procselffd);
   //orig_fclose(FD);
   //closedir(procselffd);
   
-  mtx.unlock();
+  ////mtx.unlock();
 
 }
 
@@ -419,7 +432,7 @@ Iio::~Iio()
   orig_fclose_f_type orig_fclose;
   std::ostringstream stream_logfile;
   status=IIO_ENDING;
-  //mtx.lock();
+  ////mtx.lock();
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
   
@@ -436,10 +449,10 @@ Iio::~Iio()
   dump();
   //FD=orig_fopen(logfile,"a");
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
-  fprintf(FD,"Launching fini()\n"); 
+  //fprintf(FD,"Launching fini()\n"); 
   //chainlist_head->printList(chainlist_head,FD); 
   orig_fclose(FD); 
-  ////mtx.unlock();
+  //////mtx.unlock();
 }
 
 
@@ -552,7 +565,7 @@ void add_read_count(int fd,int count)
 
 void add_write_time(int fd,  struct timeval tv0,  struct timeval tv1)
 {
-  //mtx.lock();
+  ////mtx.lock();
   if (myiio.existFd(fd)==-1)
     {
       Ifile ifi;
@@ -560,12 +573,12 @@ void add_write_time(int fd,  struct timeval tv0,  struct timeval tv1)
       myiio.iiof.push_back(ifi);
     }
   myiio.getFd(fd).iac.writetime_useconds+=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
-  //mtx.unlock();
+  ////mtx.unlock();
 }
 
 void add_read_time(int fd,  struct timeval tv0,  struct timeval tv1)
 {
-  // mtx.lock();
+  // //mtx.lock();
   if (myiio.existFd(fd)==-1)
     {
       Ifile ifi;
@@ -573,7 +586,7 @@ void add_read_time(int fd,  struct timeval tv0,  struct timeval tv1)
       myiio.iiof.push_back(ifi);
     }
   myiio.getFd(fd).iac.readtime_useconds+=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
-  //mtx.unlock();
+  ////mtx.unlock();
 }
 /*
 int fprintf(FILE *stream, const char *format, ...)
@@ -602,7 +615,10 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb,FILE *stream)
   struct timeval tv1;
   struct timezone tz;
   int fd;
-  //mtx.lock();
+  std::string str;
+  std::ostringstream oss;
+
+  ////mtx.lock();
   
 
   fd=fileno(stream);
@@ -616,27 +632,26 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb,FILE *stream)
 
   if (myiio.getStatus()!=IIO_RUNNING) { return retsize; }
   
-  std::string str;
-  std::ostringstream oss;
-  oss << "fwrite(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
-  log.add(oss.str());
-
-
+  mtx.lock();
   if (size>=0)
     {
       if (myiio.existFd(fd)==-1)
 	{
 	  Ifile ifi;
 	  ifi.setFd(fd);
-	  //ifi.setName(std::string("UNKNOWN-FWRITE"));
-	  ifi.setName(getStrFDInfo(fd));
+	  ifi.setName(std::string("UNKNOWN-FWRITE"));
+	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_WRITE);
 	  myiio.iiof.push_back(ifi);
 	}
       add_write_count(fd,retsize);
       add_write_time(fd,tv0,tv1);
     }
-  //mtx.unlock();
+
+    oss << "fwrite(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
+  log.add(oss.str());
+
+  mtx.unlock();
   return retsize;
 }
 
@@ -650,7 +665,10 @@ size_t fread(void *ptr, size_t size, size_t nmemb,FILE *stream)
   struct timeval tv1;
   struct timezone tz;
   int fd;
-  //mtx.lock();
+  std::string str;
+  std::ostringstream oss;
+
+  ////mtx.lock();
   
 
   fd=fileno(stream);
@@ -662,27 +680,26 @@ size_t fread(void *ptr, size_t size, size_t nmemb,FILE *stream)
   retsize=orig_fread(ptr,size,nmemb,stream);
   gettimeofday(&tv1,&tz);
 
-  std::string str;
-  std::ostringstream oss;
-  oss << "fread(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
-  log.add(oss.str());
 
-
+  mtx.lock();
   if (size>=0)
     {
       if (myiio.existFd(fd)==-1)
 	{
 	  Ifile ifi;
 	  ifi.setFd(fd);
-	  //ifi.setName(std::string("UNKNOWN-FWRITE"));
-	  ifi.setName(getStrFDInfo(fd));
+	  ifi.setName(std::string("UNKNOWN-FWRITE"));
+	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_WRITE);
 	  myiio.iiof.push_back(ifi);
 	}
       add_read_count(fd,retsize);
       add_read_time(fd,tv0,tv1);
     }
-  //mtx.unlock();
+  oss << "fread(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
+  log.add(oss.str());
+
+  mtx.unlock();
   return retsize;
 }
 
@@ -702,37 +719,38 @@ ssize_t write(int fd, const void *buf, size_t count)
   struct timeval tv0;
   struct timeval tv1;
   struct timezone tz;
+  std::string str;
+  std::ostringstream oss;
 
-  //mtx.lock(); 
+  ////mtx.lock(); 
   orig_write  = (orig_write_f_type)dlsym(RTLD_NEXT,"write");
 
   gettimeofday(&tv0,&tz);
   size=orig_write(fd,buf,count);
   gettimeofday(&tv1,&tz);
 
-  std::string str;
-  std::ostringstream oss;
-  oss << "write(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
-  log.add(oss.str());
 
-
+  mtx.lock();
   if (size>=0)
     {
-      //mtx.lock();
+      ////mtx.lock();
       if (myiio.existFd(fd)==-1)
 	{
 	  Ifile ifi;
 	  ifi.setFd(fd);
-	  ifi.setName(getStrFDInfo(fd));
-	  //ifi.setName(std::string("UNKNOWN-WRITE"));
+	  //ifi.setName(getStrFDInfo(fd));
+	  ifi.setName(std::string("UNKNOWN-WRITE"));
 	  ifi.setState(IOBYFILE_WRITE);
 	  myiio.iiof.push_back(ifi);
 	}
       add_write_count(fd,size);
       add_write_time(fd,tv0,tv1);
-      //mtx.unlock();
+      ////mtx.unlock();
     }
-  //mtx.unlock();
+  oss << "write(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
+  log.add(oss.str());
+
+  mtx.unlock();
   return size;   
 }
 
@@ -745,36 +763,38 @@ ssize_t read(int fd, void *buf, size_t count)
   struct timeval tv0;
   struct timeval tv1;
   struct timezone tz;
+  std::string str;
+  std::ostringstream oss;
 
-  //mtx.lock(); 
+
+  ////mtx.lock(); 
   orig_read  = (orig_read_f_type)dlsym(RTLD_NEXT,"read");
 
   gettimeofday(&tv0,&tz);
   size=orig_read(fd,buf,count);
   gettimeofday(&tv1,&tz);
 
-  std::string str;
-  std::ostringstream oss;
-  oss << "read(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
-  log.add(oss.str());
 
   if (myiio.getStatus()!=IIO_RUNNING) { return size; }
-
+  mtx.lock();
   if (size>=0)
     {
       if (myiio.existFd(fd)==-1)
 	{
 	  Ifile ifi;
 	  ifi.setFd(fd);
-	  ifi.setName(getStrFDInfo(fd));
-	  //ifi.setName(std::string("UNKNOWN-WRITE"));
+	  //ifi.setName(getStrFDInfo(fd));
+	  ifi.setName(std::string("UNKNOWN-WRITE"));
 	  ifi.setState(IOBYFILE_READ);
 	  myiio.iiof.push_back(ifi);
 	}
       add_read_count(fd,size);
       add_read_time(fd,tv0,tv1);
     }
-  //mtx.unlock();
+  oss << "read(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
+  log.add(oss.str());
+
+  mtx.unlock();
   return size;   
 }
 
@@ -794,19 +814,18 @@ ssize_t pwrite(int fd, const void *buf, size_t count,off_t offset)
   struct timeval tv0;
   struct timeval tv1;
   struct timezone tz;
-  //mtx.lock();
+  std::string str;
+  std::ostringstream oss;
+
+  ////mtx.lock();
   orig_pwrite  = (orig_pwrite_f_type)dlsym(RTLD_NEXT,"pwrite");
 
   gettimeofday(&tv0,&tz);
   size=orig_pwrite(fd,buf,count,offset);
   gettimeofday(&tv1,&tz);
 
-  std::string str;
-  std::ostringstream oss;
-  oss << "pwrite(" << fd << "," << buf << "," << count << ")\n"; 
-  log.add(oss.str());
 
-
+  mtx.lock();
   if (size>=0)
     {
       if (myiio.existFd(fd)==-1)
@@ -820,7 +839,10 @@ ssize_t pwrite(int fd, const void *buf, size_t count,off_t offset)
       add_write_count(fd,size);
       add_write_time(fd,tv0,tv1);
     }
-  //mtx.unlock();
+  oss << "pwrite(" << fd << "," << buf << "," << count << ")\n"; 
+  log.add(oss.str());
+
+  mtx.unlock();
   return size;
 }
 
@@ -839,17 +861,19 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
   struct timeval tv0;
   struct timeval tv1;
   struct timezone tz;
-  //mtx.lock();
-  orig_writev  = (orig_writev_f_type)dlsym(RTLD_NEXT,"writev");
-
-  
   std::string str;
   std::ostringstream oss;
+
+  ////mtx.lock();
+  orig_writev  = (orig_writev_f_type)dlsym(RTLD_NEXT,"writev");
+
+  mtx.lock();
+  size=orig_writev(fd,iov,iovcnt);
   oss << "writev(" << fd << "," << iovcnt << ")\n"; 
   log.add(oss.str());
 
-  size=orig_writev(fd,iov,iovcnt);
-  //mtx.unlock();
+  mtx.unlock();
+  
   return size;
 }
 
@@ -866,7 +890,7 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt,off_t offset)
   struct timeval tv0;
   struct timeval tv1;
   struct timezone tz;
-  //mtx.lock();
+  ////mtx.lock();
   orig_pwritev  = (orig_pwritev_f_type)dlsym(RTLD_NEXT,"pwritev");
 
   
@@ -876,7 +900,7 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt,off_t offset)
   log.add(oss.str());
 
   size=orig_pwritev(fd,iov,iovcnt,offset);
-  //mtx.unlock();
+  ////mtx.unlock();
   return size;
 }
 
@@ -891,14 +915,16 @@ FILE *fopen(const char *pathname, const char *mode)
   FILE * FP;
   int    fd;
   orig_fopen_f_type orig_fopen;
+  std::string str;
+  std::ostringstream oss;
 
-  //mtx.lock();
+  
   
   orig_fopen  = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   FP=orig_fopen(pathname,mode);
   
   if (myiio.getStatus()!=IIO_RUNNING) { return FP; } 
-
+  mtx.lock();
   if (FP!=0)
   {
       fd=fileno(FP);
@@ -916,14 +942,11 @@ FILE *fopen(const char *pathname, const char *mode)
 	  myiio.getFd(fd).setFd(fd);
 	  //myiio.getFd(fd).setOldFd(fd);
 	}
-
-
-      std::string str;
-      std::ostringstream oss;
       oss << "fopen("<<pathname<< mode << ")="<< FP<< "(" << fd << ")" << "\n"; 
       log.add(oss.str());            
   }
-  //mtx.unlock();
+  
+  mtx.unlock();
   return(FP);
 }
 
@@ -936,14 +959,15 @@ FILE *fdopen(int fd, const char *mode)
 {
   FILE * file;
   orig_fdopen_f_type orig_fdopen;
+  std::string str;
+  std::ostringstream oss;
 
-  //mtx.lock();
   
   orig_fdopen  = (orig_fdopen_f_type)dlsym(RTLD_NEXT,"fdopen");
   
   
   file=orig_fdopen(fd,mode);
-  
+  mtx.lock();
   if (file!=NULL)
     {
       if (myiio.existFd(fd)==-1)
@@ -959,11 +983,9 @@ FILE *fdopen(int fd, const char *mode)
 	}
     }
 
-  std::string str;
-  std::ostringstream oss;
   oss << "fdopen("<<fd<< ","<< mode << ")=" << file << "\n"; 
   log.add(oss.str());
-  //mtx.unlock();
+  mtx.unlock();
   return file;  
 }
 
@@ -979,8 +1001,10 @@ extern int openat(int dirfd, const char *pathname, int flags,...)
   int mode = 0;
   int fd;
   orig_openat_f_type orig_openat;
+  std::string str;
+  std::ostringstream oss;
 
-  //mtx.lock();
+
   orig_openat  = (orig_openat_f_type)dlsym(RTLD_NEXT,"openat");
   
   if (flags & O_CREAT)
@@ -995,7 +1019,7 @@ extern int openat(int dirfd, const char *pathname, int flags,...)
     {
       retcode=orig_openat(dirfd,pathname,flags);      
     }
-
+  mtx.lock();
   if (retcode>=0)
     {
       fd=retcode;
@@ -1014,11 +1038,9 @@ extern int openat(int dirfd, const char *pathname, int flags,...)
 	}
     }
 
-  std::string str;
-  std::ostringstream oss;
   oss << "openat("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
   log.add(oss.str());
-  //mtx.unlock();
+  mtx.unlock();
   return retcode;
 }
 
@@ -1028,8 +1050,10 @@ extern int openat64(int dirfd, const char *pathname, int flags,...)
   int mode = 0;
   int fd;
   orig_openat64_f_type orig_openat64;
+  std::string str;
+  std::ostringstream oss;
 
-  //mtx.lock();
+  
   orig_openat64  = (orig_openat64_f_type)dlsym(RTLD_NEXT,"openat64");
   
   if (flags & O_CREAT)
@@ -1044,7 +1068,7 @@ extern int openat64(int dirfd, const char *pathname, int flags,...)
     {
       retcode=orig_openat64(dirfd,pathname,flags);      
     }
-
+  mtx.lock();
   if (retcode>=0)
     {
       fd=retcode;
@@ -1062,12 +1086,10 @@ extern int openat64(int dirfd, const char *pathname, int flags,...)
 	  myiio.getFd(fd).setName(std::string(pathname));
 	}
     }
-
-  std::string str;
-  std::ostringstream oss;
+  
   oss << "openat64("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
   log.add(oss.str());
-  //mtx.unlock();
+  mtx.unlock();
   return retcode;
 }
 
@@ -1077,8 +1099,10 @@ extern int    open(const char *pathname, int flags,...)
   int mode = 0;
   int fd;
   orig_open_f_type orig_open;
+  std::string str;
+  std::ostringstream oss;
 
-  //mtx.lock();
+  
   orig_open  = (orig_open_f_type)dlsym(RTLD_NEXT,"open");
   
   if (flags & O_CREAT)
@@ -1095,7 +1119,7 @@ extern int    open(const char *pathname, int flags,...)
     }
 
   if (myiio.getStatus()!=IIO_RUNNING) { return retcode; } 
-  
+  mtx.lock();
   if (retcode>=0)
     {
       fd=retcode;
@@ -1113,11 +1137,9 @@ extern int    open(const char *pathname, int flags,...)
 	}
     }
   //myiio.dump();
-  std::string str;
-  std::ostringstream oss;
   oss << "open("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
   log.add(oss.str());
-  //mtx.unlock();
+  mtx.unlock();
   return retcode;
 }
 
@@ -1126,8 +1148,10 @@ extern int open64(const char *pathname, int flags,...)
   int retcode;
   int mode=0;
   int fd;
+  std::string str;
+  std::ostringstream oss;
 
-  //mtx.lock();
+  
   if (flags & O_CREAT)
     { 
       va_list arg; 
@@ -1140,7 +1164,9 @@ extern int open64(const char *pathname, int flags,...)
     {
       retcode=open(pathname,flags);      
     }
-    if (retcode>=0)
+  
+  mtx.lock();
+  if (retcode>=0)
     {
       fd=retcode;
       if (myiio.existFd(fd)==-1)
@@ -1158,11 +1184,9 @@ extern int open64(const char *pathname, int flags,...)
 	}
     }
 
-  std::string str;
-  std::ostringstream oss;
   oss << "open64("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
   log.add(oss.str());
-  //mtx.unlock();
+  mtx.unlock();
   return retcode;
 }
 
@@ -1176,7 +1200,7 @@ int closedir(DIR *dirp)
     orig_closedir = (orig_closedir_f_type)dlsym(RTLD_NEXT,"closedir");
     fd=dirfd(dirp);
     retcode=orig_closedir(dirp);
-
+    mtx.lock();
     if (myiio.existFd(fd)==-1)
       {
 	Ifile ifi;
@@ -1191,7 +1215,7 @@ int closedir(DIR *dirp)
 	myiio.getFd(fd).setFd(-1);
 	//myiio.getFd(fd).setOldFd(fd);
       }    
-    
+    mtx.unlock();
     return retcode;
 }
 
@@ -1208,9 +1232,7 @@ int close(int fd)
   std::string str;
   std::ostringstream oss;
 
-  //mtx.lock();
-  oss << "close("<<fd<<")\n"; 
-  log.add(oss.str());
+  
   
   orig_close = (orig_close_f_type)dlsym(RTLD_NEXT,"close");
 
@@ -1219,7 +1241,8 @@ int close(int fd)
   gettimeofday(&tv1,&tz);
 
   if (myiio.getStatus()!=IIO_RUNNING) { return retcode; }
-  
+
+  mtx.lock();
   if (retcode==0)
     {
       if (myiio.existFd(fd)==-1)
@@ -1239,7 +1262,10 @@ int close(int fd)
 	}
     }
   //myiio.dump();
-  //mtx.unlock();
+  oss << "close("<<fd<<")\n"; 
+  log.add(oss.str());
+
+  mtx.unlock();
   return retcode;
 }
 
@@ -1251,23 +1277,21 @@ int fclose(FILE * FD)
   struct timeval tv0;
   struct timeval tv1;
   struct timezone tz;
+  std::string str;
+  std::ostringstream oss;
   
   orig_fclose_f_type orig_fclose;
 
-  //mtx.lock();
+  
   fd=fileno(FD);
   orig_fclose = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
 
-  std::string str;
-  std::ostringstream oss;
-  oss << "fclose("<<fd<<")\n"; 
-  log.add(oss.str());
 
 
   gettimeofday(&tv0,&tz);
   retcode=orig_fclose(FD);
   gettimeofday(&tv1,&tz);
-  
+  mtx.lock();
   if (myiio.getStatus()!=IIO_RUNNING) { return retcode; }
   
   if (retcode==0)
@@ -1289,7 +1313,10 @@ int fclose(FILE * FD)
 	  myiio.getFd(fd).setFd(-1);
 	}
     }
-  //mtx.unlock();
+  oss << "fclose("<<fd<<")\n"; 
+  log.add(oss.str());
+
+  mtx.unlock();
   return retcode;
 }
 
@@ -1301,11 +1328,11 @@ int dup(int oldfd)
   int newfd;
   
   orig_dup_f_type orig_dup;
-  //mtx.lock();
+  
   orig_dup = (orig_dup_f_type)dlsym(RTLD_NEXT,"dup");
   retcode=orig_dup(oldfd);
   newfd=retcode;
-
+  mtx.lock();
   if (retcode>=0)
     {
       if (myiio.existFd(oldfd)==-1)
@@ -1324,7 +1351,7 @@ int dup(int oldfd)
 	  myiio.getFd(newfd).setOldFd(oldfd);
 	}
     }
-  //mtx.unlock();
+  mtx.unlock();
   return retcode;
 }
 
@@ -1336,15 +1363,18 @@ extern int dup2(int oldfd, int newfd)
   int retcode;
   std::string str;
   orig_dup2_f_type orig_dup2;
-  //mtx.lock();
+  std::ostringstream oss;
+
   orig_dup2 = (orig_dup2_f_type)dlsym(RTLD_NEXT,"dup2");
   retcode=orig_dup2(oldfd,newfd);
 
+  mtx.lock();
   if (retcode>=0)
     {
       // close virtually the newFD because dup(2) manual
-      if (myiio.existFd(newfd))
+      if (myiio.existFd(newfd)!=-1)
 	{
+	  //printf("THERE %d ",myiio.existFd(newfd));
 	  myiio.getFd(newfd).setOldFd(newfd);
 	  myiio.getFd(newfd).setFd(-1);
 	}
@@ -1361,6 +1391,7 @@ extern int dup2(int oldfd, int newfd)
 	}
       else
 	{
+	  printf("HERE");
 	  myiio.getFd(oldfd).setFd(newfd);
 	  myiio.getFd(newfd).setState(IOBYFILE_DUP2);
 	  myiio.getFd(newfd).setOldFd(oldfd);
@@ -1369,12 +1400,11 @@ extern int dup2(int oldfd, int newfd)
     }
 
 
-  std::ostringstream oss;
   oss << "dup2("<< oldfd << "," << newfd << ")=" << retcode << "\n";
   //oss << "dup2("<< oldfd << "," << newfd << ")=" << retcode << str << "\n";
   log.add(oss.str());
 
-  //mtx.unlock();
+  mtx.unlock();
   return retcode;
 }
 
@@ -1384,10 +1414,11 @@ int dup3(int oldfd, int newfd, int flags)
   int retcode;
 
   orig_dup3_f_type orig_dup3;
-  //mtx.lock();
+  
   orig_dup3 = (orig_dup3_f_type)dlsym(RTLD_NEXT,"dup3");
   retcode=orig_dup3(oldfd,newfd,flags);
 
+  mtx.lock();
   if (retcode>=0)
     {
       if (myiio.existFd(oldfd)==-1)
@@ -1406,7 +1437,7 @@ int dup3(int oldfd, int newfd, int flags)
 	  myiio.getFd(newfd).setOldFd(oldfd);
 	}
     }
-  //mtx.unlock();
+  mtx.unlock();
   return retcode;
 }
 

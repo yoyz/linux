@@ -552,6 +552,7 @@ void add_read_count(int fd,int count)
 
 void add_write_time(int fd,  struct timeval tv0,  struct timeval tv1)
 {
+  //mtx.lock();
   if (myiio.existFd(fd)==-1)
     {
       Ifile ifi;
@@ -559,11 +560,12 @@ void add_write_time(int fd,  struct timeval tv0,  struct timeval tv1)
       myiio.iiof.push_back(ifi);
     }
   myiio.getFd(fd).iac.writetime_useconds+=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
-
+  //mtx.unlock();
 }
 
 void add_read_time(int fd,  struct timeval tv0,  struct timeval tv1)
 {
+  // mtx.lock();
   if (myiio.existFd(fd)==-1)
     {
       Ifile ifi;
@@ -571,7 +573,7 @@ void add_read_time(int fd,  struct timeval tv0,  struct timeval tv1)
       myiio.iiof.push_back(ifi);
     }
   myiio.getFd(fd).iac.readtime_useconds+=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
-
+  //mtx.unlock();
 }
 /*
 int fprintf(FILE *stream, const char *format, ...)
@@ -716,6 +718,7 @@ ssize_t write(int fd, const void *buf, size_t count)
 
   if (size>=0)
     {
+      //mtx.lock();
       if (myiio.existFd(fd)==-1)
 	{
 	  Ifile ifi;
@@ -727,6 +730,7 @@ ssize_t write(int fd, const void *buf, size_t count)
 	}
       add_write_count(fd,size);
       add_write_time(fd,tv0,tv1);
+      //mtx.unlock();
     }
   //mtx.unlock();
   return size;   
