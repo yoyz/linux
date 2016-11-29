@@ -1,8 +1,8 @@
 /*
-  AUTHOR   :   johann peyrard 2016/11/24n
-  NOTE     : use a rhel7 gcc or a recent gcc above 4.4 with -sdc=c++11
-  TO BUILD : $ unset LD_PRELOAD ; rm /tmp/log*; gcc -std=c++11 -fPIC -shared -ldl -lstdc++ -o inspectio6.so  inspectio6.cpp
-  TO TEST  : $ rm /tmp/log* ; export LD_PRELOAD=./inspectio6.so ; dd if=/dev/zero of=/dev/null bs=100M count=50 ; cat /tmp/log*
+  AUTHOR           : johann peyrard 2016/11/29
+  NOTE             : use a rhel6/7 gcc 4.4 which works fine 
+  TO BUILD         : $ g++ -fPIC -std=c++0x -ldl -shared inspectio7.cpp -o inspectio.so
+  TO TEST          : $ $ mkdir -p $PWD/LOG ; rm -f $PWD/LOG/* ; export INSPECTIO_DUMP=$PWD/LOG ; unset INSPECTIO_ALL ; export LD_PRELOAD=./inspectio.so ; dd if=/dev/zero of=/dev/null bs=100M count=50 ; cat $PWD/LOG/*
   DEBUGON          : $ export INSPECTIO_ALL=vbla
   PATH TO OUTPUT   : $ export INSPECTIO_DUMP=/home_nfs/peyrardj/monapps/log
  */
@@ -52,7 +52,7 @@
 #include <sys/types.h>  //getpid
 #include <sys/stat.h>
 #include <sys/time.h>   // gettimeofday
-#include <fcntl.h>      // openat
+#include <fcntl.h>      // openat pipe pipe2
 #include <stdarg.h>     // va_arg
 #include <mutex>        // std::mutex
 
@@ -60,6 +60,8 @@
 #include <dirent.h>     // opendir/closedir
 #include <execinfo.h>   // backtrace
 #include <signal.h>     // signal
+
+
 
 #define MAX_FILEDESC 1024
 
@@ -502,13 +504,8 @@ void Iio::dump()
   
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
 
-  fprintf(FD,iiof[0].dumpHeader().c_str());
-  // dump the WRITE[ ... ]READ[.... ] line
-  for (i=0;i<iiof.size();i++)
-    {
-      fprintf(FD,iiof[i].dump().c_str());
-    }
-  // dump the IOTIME in second and in R+W MB
+
+  // Calculate IOTIME in second and in R+W MB
   for (i=0;i<iiof.size();i++)
     {
       time_usec_read+=iiof[i].iac.readtime_useconds;
@@ -516,12 +513,27 @@ void Iio::dump()
       data_read+=iiof[i].iac.readsize;
       data_write+=iiof[i].iac.writesize;      
     }
-  fprintf(FD,"IOTIME[                  %8lld] R/W [         %8lld         ]BW[%8lld MB/s ]\n",
-	  ((time_usec_read+time_usec_write)/1000/1000),
-	  ((data_read+data_write)/1000/1000),
-	  (((data_read+data_write))/((time_usec_read+time_usec_write)))
-	  );
 
+  // if there is IOTime, dump the header and write each line
+  if (time_usec_read+time_usec_write)
+    {
+      fprintf(FD,iiof[0].dumpHeader().c_str());
+  
+      // dump the WRITE[ ... ]READ[.... ] line
+      for (i=0;i<iiof.size();i++)
+	{
+	  fprintf(FD,iiof[i].dump().c_str());
+	}
+      // if there is no catched time spent in IO, ok it's a lie, but should be easier to understand
+      // print BW=0 
+      if (time_usec_read+time_usec_write)
+	fprintf(FD,"IOTIME[                  %8lld] R/W [         %8lld         ]BW[%8lld MB/s ]\n",
+		((time_usec_read+time_usec_write)/1000/1000),
+		((data_read+data_write)/1000/1000),
+		(((data_read+data_write))/((time_usec_read+time_usec_write)))
+		);
+
+    }
   
   // dump the 'strace -e file'
   for (i=0;i<inspectio_log.logstr.size();i++)
