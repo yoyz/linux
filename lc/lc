@@ -1,0 +1,386 @@
+#!/usr/bin/env python
+############################################################################
+#
+# nodecalc.py:  
+#
+# Created : Nov 2005
+# Author  : Patrice Bouchand 
+#
+#############################################################################
+
+import sys
+import re
+import time
+import os
+import signal
+
+version="2.00"
+prg_name=os.path.basename(sys.argv[0])
+
+
+##############################################################################
+# Run a command and return the output and status.
+# stderr is sent to /dev/null, could use popen3 to
+# save it if necessary
+def runcmd(cmd):
+    f = os.popen(cmd + ' 2>&1')
+    out = f.readlines()
+    ret = f.close()
+    if ret:
+        ret = ret >> 8
+    else:
+        ret = 0
+    return (ret, out)
+
+##############################################################################
+##############################################################################
+#
+# pdn is a string with nodes list in pdsh syntax 
+# returns a list of nodes or None if pdn is not a correct nodes string
+# "ns[1,5-7]" --> [ns1,ns5,ns6,ns7]
+#
+def expand_pdsh(pdn):
+
+   rtn=[]
+
+   try:
+      s1=pdn.replace("["," [")
+      s2=s1.replace("]","] ")
+      l1=s2.split()
+   
+      out=""
+      for w in l1:
+         if "[" in w:
+            out=out+w.replace(",",";")
+         else:
+            out=out+w
+   
+      for i in out.split(","):
+         if i == "":
+            continue	#This avoid pbm with -n " "
+         w=i.split("[")
+         if len(w) == 1 :
+            rtn.append(i)
+            continue
+         hd=w[0]
+         qu=w[1].replace("]","")
+      
+         for n in qu.split(";"):
+            if "-" in n:
+               deb=int( n.split("-")[0] )
+               fin=int( n.split("-")[1] )
+               if deb > fin:
+                  tmp=deb
+                  deb=fin
+                  fin=tmp
+               fin+=1
+               for j in range(deb,fin):
+                  rtn.append(hd+str(j))
+            else:
+               int(n)
+               rtn.append(hd+n)
+      return rtn
+   except:
+      return None
+
+##############################################################################
+# Take a node name <header><num> and return a couple header,num
+# num is -2 if node name is only made of alpha 
+# if header is empty <num>,"" is returned
+
+def get_node_header_num(node_name):
+
+   header=""
+
+   try:
+      out=re.split("([0-9]*$)",node_name)
+      header=out[0]
+      num=int( out[1] )
+   except:
+      num=-2 
+      
+   return header,num
+
+##############################################################################
+#
+# Take a nodes list and return a string with nodes in pdsh syntax
+# [ns1,ns5,ns6,ns7] --> "ns1,ns[5-7]"
+
+def compact_nodes_list(nodes_uns):
+
+   rtn=""
+
+   if len(nodes_uns) == 0 :
+      return rtn
+   
+   if len(nodes_uns) == 1 :
+      return nodes_uns[0]
+
+   nodes=nodes_uns
+   
+   chead,beg=get_node_header_num(nodes[0])
+   cend=beg
+   
+   in_bra=[]
+   nodes.append("") #append a end of list
+   
+   for n in nodes[1:]:
+      head,num=get_node_header_num(n)
+
+      if ( head != chead ) or ( cend+1 != num ):
+         
+         if beg == cend:
+            if ( beg >= 0 ):
+               in_bra.append( str(beg) )
+         else:
+            in_bra.append(str( beg)+"-"+str(cend) )
+         if ( head != chead ):
+            to_store=chead
+            if len( in_bra ) > 0:
+               to_store+='['+in_bra[0]
+               if len( in_bra ) > 1:
+                  for w in in_bra[1:]:
+                     to_store+=','+w
+               to_store+=']'
+               in_bra=[]
+   
+            if rtn == "":
+               rtn=to_store
+            else:
+               rtn=rtn+","+to_store
+         
+         beg=num
+         cend=num
+         chead=head
+      else:
+         cend=num
+
+   nodes.pop() #remove end of list
+   
+   return rtn
+
+##############################################################################
+#
+# Sort nodes list taking care that ns11 is after ns9...
+# And make element unique
+#
+def sort_nodes_list(nodes):
+   out=[]
+
+   for n in nodes:
+      head,num=get_node_header_num(n)
+      if num >= 0:
+         out.append(head+"%6.6d"%(num))
+      else:
+         out.append(head)
+
+   out.sort()
+
+   nodes=[]
+   previous=""
+   next=""
+   for n in out:
+
+      head,num=get_node_header_num(n)
+      if num >= 0:
+         next=head+str(num)
+      else:
+         next=head
+
+      if ( next != previous):
+         nodes.append(next)
+         previous=next
+
+   return nodes
+
+#############################################################################
+def add_node(n1,n2):
+   out=[]
+   out.extend(n1)
+   out.extend(n2)
+   return out
+#############################################################################
+def sub_node(n1,n2):
+   out=[]
+   for n in n1:
+      if not n in n2:
+         out.append(n)
+   return out
+#############################################################################
+def common_node(n1,n2):
+   
+   out=[]
+   
+   for n in n2:
+      if n in n1:
+         out.append(n)
+   return out
+
+#############################################################################
+def not_common_node(n1,n2):
+   
+   out=[]
+   
+   for n in n2:
+      if not n in n1:
+         out.append(n)
+
+   for n in n1:
+      if not n in n2:
+         out.append(n)
+         
+   return out
+
+
+#############################################################################
+def help(rc=0):
+   print "Usage: "+prg_name+" '[ ( ] nodes operator nodes [ ) ] [ operator nodes ... ]'"
+   print "	Note that argument must be quoted for non shell interpretation"
+   print
+   print "         nodes    : nodes list in pdsh syntax <header>[x,y-z],<header>k,..."
+   print
+   print "         operator :  +   Add nodes list"
+   print "                     -   Remove nodes of right operand from left operand"
+   print "                     ^   Get nodes that are in left and right operands"
+   print "                     !   Get nodes that are in one and only one operand"
+   print "                     ( ) Parenthesis"
+   print
+   print "         Expression are evaluated from left to right, it means that an operator works"
+   print "         with the result of the left expression and the right operand."
+   print
+   print "         Sample:"+prg_name+" 'ns[1,3-7] - ns4 + ( ns[10-20] ^ ns[15-35]) '"
+   print "                  ns[1,3,5-7,15-20]"			   	
+   print "                echo 'ns[1,3-7] - ns4 + ( ns[10-20] ^ ns[15-35]) ' | "+prg_name
+   print "                  ns[1,3,5-7,15-20]"			   	
+   print
+   print "       "+prg_name+" -l : Expand nodes list"
+   print "       "+prg_name+" -v   : Print version and exit"
+   print "       "+prg_name+" -h   : Print help and exit"
+   sys.exit(rc)
+
+#############################################################################
+def pop_nodes(l):
+
+   if len(l) == 0:
+      return( [] )
+
+   n_str=l.pop(0)
+    
+   if n_str == "(":
+       return( eval(l) )
+   elif ope_dic.has_key(n_str):
+       print 'Error - "'+n_str+'" is an operator, before '+"".join(l)
+       sys.exit(1)
+   else:
+       n=expand_pdsh(n_str)
+          
+       if n == None:
+          print 'Error - Cannot compute "'+n_str+'", before '+"".join(l)
+          sys.exit(1)
+       else:
+          return n
+
+#############################################################################
+def eval(l,n1=[]):
+
+   if n1 == []:
+      n1=pop_nodes(l)
+
+   while ( True ):
+
+       if len(l) == 0:
+          break
+       
+       op=l.pop(0)
+       
+       if op == ")":
+          return n1
+
+       if op == "(":
+          print 'Error - unexpected "(", before '+"".join(l) 
+          sys.exit(1)
+          
+       if not ope_dic.has_key(op):
+          print 'Error - "'+op+'" is not an operator, before '+"".join(l) 
+          sys.exit(1)
+      	
+       if len(l) == 0:
+          print "Error - Bad syntax, nodes list awaited"  
+          sys.exit(1)
+      
+       n2=pop_nodes(l)
+    
+       n1=ope_dic[op](n1,n2)
+    
+   return n1
+   
+
+#############################################################################
+def ctrlc(signal,frame):
+   sys.exit(0)
+#############################################################################
+if __name__ == "__main__":
+   pass
+
+signal.signal( signal.SIGINT, ctrlc )
+
+dev_flag=False
+
+ope_dic=	{
+   		"+" : add_node,
+            "-" : sub_node,
+            "^" : common_node,
+            "!" : not_common_node,
+            "(" : None,
+            ")" : None
+            }
+sys.argv.pop(0)
+stdin_flag=False
+
+for first_arg in sys.argv:
+
+   if first_arg == "-v":
+      print version
+      sys.exit(0)
+   elif first_arg == "-h" or first_arg == "-help" or first_arg == "--help":
+      help(0)
+   elif first_arg == "-l":
+      dev_flag=True
+      sys.argv.pop(0)
+
+s="".join(sys.argv)
+if not s:
+   stdin_flag=True
+
+while ( 1 ):
+
+   if stdin_flag:
+      s=sys.stdin.readline()
+
+   if not s:
+      sys.exit(0)
+
+   if s == "quit\n":
+      sys.exit(0)
+   
+   if s.count("(") != s.count(")"):
+      print "Error - check parenthesis"
+      sys.exit(1)
+   
+   s=re.sub(r'([0-9])-([0-9])',r'\1~\2',s) # protect - in []
+   for k,v in ope_dic.iteritems():
+      s=s.replace(k," "+k+" ")
+   
+   s=s.replace("~","-")
+   lst=s.split()
+   lst=sort_nodes_list( eval(lst) )
+   
+   if dev_flag:
+      print ",".join( lst )
+   else:
+      print compact_nodes_list(lst)
+
+   if not stdin_flag:
+      sys.exit(0)
+
+
