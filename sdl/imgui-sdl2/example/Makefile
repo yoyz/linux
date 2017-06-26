@@ -12,9 +12,7 @@
 
 EXE = opengl2_example
 #OBJS = main.o imgui_impl_glfw.o
-OBJS = imgui_impl_sdl.o  main.o
-OBJS += imgui.o imgui_demo.o imgui_draw.o
-
+OBJS = ../imgui/imgui_impl_sdl.o  ../imgui/imgui.o ../imgui/imgui_demo.o ../imgui/imgui_draw.o main.o
 UNAME_S := $(shell uname -s)
 
 
@@ -22,7 +20,7 @@ ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
 	LIBS = -lGL `pkg-config --static --libs glfw3` `sdl2-config --libs`
 
-	CXXFLAGS = -I. `pkg-config --cflags glfw3` `sdl2-config --cflags`
+	CXXFLAGS = -I../imgui/ -I. `pkg-config --cflags glfw3` `sdl2-config --cflags`
 
 	CXXFLAGS += -Wall -Wformat
 	CFLAGS = $(CXXFLAGS)
