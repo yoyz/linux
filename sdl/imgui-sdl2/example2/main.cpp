@@ -24,26 +24,44 @@ int main(int, char**)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_DisplayMode current;
     SDL_GetCurrentDisplayMode(0, &current);
-    SDL_Window *window = SDL_CreateWindow("ImGui SDL2+OpenGL example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+    SDL_Window *window = SDL_CreateWindow("ImGui SDL2+OpenGL example",
+					  SDL_WINDOWPOS_CENTERED,
+					  SDL_WINDOWPOS_CENTERED,
+					  1280,
+					  720,
+					  SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
     SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 
     // Setup ImGui binding
     ImGui_ImplSdl_Init(window);
 
-    // Load Fonts
-    // (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
-    //ImGuiIO& io = ImGui::GetIO();
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("../../extra_fonts/Cousine-Regular.ttf", 15.0f);
-    //io.Fonts->AddFontFromFileTTF("../../extra_fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyClean.ttf", 13.0f);
-    //io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-
     bool show_first_window = true;
     bool show_test_window = true;
     bool show_another_window = false;
     ImVec4 clear_color = ImColor(114, 144, 154);
+
+    static bool cb_value[16] = { false };
+    static bool cb_inst_value[16] = { false };
+
+    static float wrap_width = 200.0f;
+    
+    static bool no_titlebar  = true;
+    static bool no_border    = true;
+    static bool no_resize    = true;
+    static bool no_move      = true;
+    static bool no_scrollbar = true;
+    static bool no_collapse  = true;
+    static bool no_menu      = true;
+    ImGuiWindowFlags window_flags = 0;
+    
+    if (no_titlebar)  window_flags |= ImGuiWindowFlags_NoTitleBar;
+    if (!no_border)   window_flags |= ImGuiWindowFlags_ShowBorders;
+    if (no_resize)    window_flags |= ImGuiWindowFlags_NoResize;
+    if (no_move)      window_flags |= ImGuiWindowFlags_NoMove;
+    if (no_scrollbar) window_flags |= ImGuiWindowFlags_NoScrollbar;
+    if (no_collapse)  window_flags |= ImGuiWindowFlags_NoCollapse;
+    if (!no_menu)     window_flags |= ImGuiWindowFlags_MenuBar;
+
 
     // Main loop
     bool done = false;
@@ -61,36 +79,36 @@ int main(int, char**)
         // 1. Show a simple window
         // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
         {
-            static float f = 0.0f;
-	    ImGui::Begin("First Window", &show_first_window);
+	  ImGui::Begin("First Window", &show_first_window,window_flags);
 
-            ImGui::Text("Hello, world!");
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float*)&clear_color);
-            //if (ImGui::Button("Test Window")) show_test_window ^= 1;
-            if (ImGui::Button("Another Window")) show_another_window ^= 1;
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	    ImGui::End();
+	  ImGui::SliderFloat("Wrap width", &wrap_width, -20, 600, "%.0f");
+	  ImGui::Text("instant value : %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+		      cb_inst_value[0], cb_inst_value[1], cb_inst_value[2], cb_inst_value[3],
+		      cb_inst_value[4], cb_inst_value[5], cb_inst_value[6], cb_inst_value[7],
+		      cb_inst_value[8], cb_inst_value[9], cb_inst_value[10], cb_inst_value[11],
+		      cb_inst_value[12], cb_inst_value[13], cb_inst_value[14], cb_inst_value[15]);
+		      
+	  cb_inst_value[0] =ImGui::Checkbox("A", &cb_value[0]);   ImGui::SameLine(50);
+	  cb_inst_value[1] =ImGui::Checkbox("B", &cb_value[1]);   ImGui::SameLine(100);
+	  cb_inst_value[2] =ImGui::Checkbox("C", &cb_value[2]);   ImGui::SameLine(150);
+	  cb_inst_value[3] =ImGui::Checkbox("D", &cb_value[3]);   ImGui::SameLine(200);
+	  cb_inst_value[4] =ImGui::Checkbox("E", &cb_value[4]);   ImGui::SameLine(250);
+	  cb_inst_value[5] =ImGui::Checkbox("F", &cb_value[5]);   ImGui::SameLine(300);
+	  cb_inst_value[6] =ImGui::Checkbox("G", &cb_value[6]);   ImGui::SameLine(350);
+	  cb_inst_value[7] =ImGui::Checkbox("H", &cb_value[7]);  
 
+	  cb_inst_value[8] =ImGui::Checkbox("I", &cb_value[8]);   ImGui::SameLine(50);
+	  cb_inst_value[9] =ImGui::Checkbox("J", &cb_value[9]);   ImGui::SameLine(100);
+	  cb_inst_value[10]=ImGui::Checkbox("K", &cb_value[10]);  ImGui::SameLine(150);
+	  cb_inst_value[11]=ImGui::Checkbox("L", &cb_value[11]);  ImGui::SameLine(200);
+	  cb_inst_value[12]=ImGui::Checkbox("M", &cb_value[12]);  ImGui::SameLine(250);
+	  cb_inst_value[13]=ImGui::Checkbox("N", &cb_value[13]);  ImGui::SameLine(300);
+	  cb_inst_value[14]=ImGui::Checkbox("O", &cb_value[14]);  ImGui::SameLine(350);
+	  cb_inst_value[15]=ImGui::Checkbox("P", &cb_value[15]);  
 
+	  ImGui::End();
+	  
         }
-
-        // 2. Show another simple window, this time using an explicit Begin/End pair
-        if (show_another_window)
-        {
-            ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("Another Window", &show_another_window);
-            ImGui::Text("Hello");
-            ImGui::End();
-        }
-
-        // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-        if (show_test_window)
-        {
-            ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-            ImGui::ShowTestWindow(&show_test_window);
-        }
-	
         // Rendering
         glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
