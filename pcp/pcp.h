@@ -74,8 +74,13 @@ int DirectoryPCP::read(std::string pth)
       std::string str(de->d_name);
       InodePCP ino;
 
-      if (de->d_type==DT_DIR)	ino.type=PCP_DT_DIR;
       if (de->d_type==DT_REG)   ino.type=PCP_DT_REG;
+      if (de->d_type==DT_DIR)
+	{
+	  ino.type=PCP_DT_DIR;
+	  ino.son=new(DirectoryPCP);
+	  ino.son->path=str;
+	}
       v_str.push_back(str);
       v_ino.push_back(ino);
 

@@ -6,7 +6,7 @@
 int main(int argc, char ** argv)
 {
   DirectoryStructure DS;
-  DS.root.read("/");
+  DS.root.read("/home/peyrardj/build");
   DS.root.print();
 }
 
