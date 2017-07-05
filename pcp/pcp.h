@@ -24,7 +24,7 @@ class InodePCP
 {
  public:
   int64_t size;
-  int64_t permission;
+  int32_t permission;
   int     type;
   DirectoryPCP * son;
 };
@@ -40,11 +40,12 @@ class DirectoryPCP
 {
 public:
   DirectoryPCP();
-  std::string path;
-  int read(std::string pth);
+  int  read(std::string pth);
   void print();
+
+  std::string path;
   std::vector <std::string>    v_str;
-  std::vector <InodePCP>  v_ino;
+  std::vector <InodePCP>       v_ino;
 };
 
 
@@ -73,13 +74,10 @@ int DirectoryPCP::read(std::string pth)
       std::string str(de->d_name);
       InodePCP ino;
 
-      if (de->d_type==DT_DIR)	  
-	  ino.type=PCP_DT_DIR;
-      if (de->d_type==DT_REG)
-	  ino.type=PCP_DT_REG;
+      if (de->d_type==DT_DIR)	ino.type=PCP_DT_DIR;
+      if (de->d_type==DT_REG)   ino.type=PCP_DT_REG;
       v_str.push_back(str);
       v_ino.push_back(ino);
-
 
       printf("%d %s\n",de->d_type, de->d_name);
     }
