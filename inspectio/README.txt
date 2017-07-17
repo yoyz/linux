@@ -12,12 +12,14 @@ filename.
 Exemple
 =======
 
+$ cd ~/lib/inspectio/							# directory where the source code is
 $ g++ -fPIC -std=c++0x -ldl -shared inspectio11.cpp -o inspectio.so   	# compilation
+$ export    INSPECTIO_PATH=~/lib/inspectio				# set the inspectiolib path
 $ export    INSPECTIO_DUMP=$PWD/LOG.${SLURM_JOBID}                   	# tell where is the DUMP directory
 $ rm -f    $INSPECTIO_DUMP/*                                         	# remove this DUMP Directory
 $ mkdir -p $INSPECTIO_DUMP                                           	# then recreate it to be clean
 $ unset     INSPECTIO_ALL                                            	# don't want the "strace" like output
-$ export LD_PRELOAD=$(pwd)/inspectio.so                              	# tell ld to link the library
+$ export LD_PRELOAD=$INSPECTIO_PATH/inspectio.so:$LD_PRELOAD          	# tell ld to link the library
 $ time mpirun -n 4 dd if=/dev/zero of=/tmp/toto bs=1M count=1000	# launch a mpi job
 $ unset LD_PRELOAD							# deactivate the library
 $ grep ^ LOG.${SLURM_JOBID}/*|grep -v nompi				# show the log of inspectio
