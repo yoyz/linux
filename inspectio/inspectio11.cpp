@@ -104,7 +104,7 @@ typedef ssize_t (*orig_pwrite_f_type)(int fd, const void *buf, size_t count, off
 typedef ssize_t (*orig_pwrite64_f_type)(int fd, const void *buf, size_t count, off_t offset);
 typedef ssize_t (*orig_pwritev_f_type)(int fd, const struct iovec *iov, int iovcnt,off_t offset);
 typedef size_t  (*orig_fwrite_f_type)(const void *ptr, size_t size, size_t nmemb,FILE *stream);
-
+typedef int     (*orig_creat_f_type)(const char *pathname, mode_t mode);
 
 
 typedef int     (*orig_fprintf_f_type)(FILE *stream, const char *format, ...);
@@ -127,6 +127,7 @@ enum ioByFileState
     IOBYFILE_DUP,                     // 7
     IOBYFILE_DUP2,                    // 8
     IOBYFILE_DUP3,                    // 9
+    IOBYFILE_CREAT,                   // 10
   };
 
 enum iioStatus
@@ -1310,6 +1311,44 @@ extern int open64(const char *pathname, int flags,...)
   return retcode;
 }
 
+
+int creat(const char *pathname, mode_t mode)
+{
+  int retcode;
+  int fd;
+  std::string str;
+  std::ostringstream oss;
+  orig_creat_f_type orig_creat;
+  
+  orig_creat  = (orig_creat_f_type)dlsym(RTLD_NEXT,"creat");  
+  retcode=orig_creat(pathname,mode); 
+  
+  mtx.lock();
+  if (retcode>=0)
+    {
+      fd=retcode;
+      if (myiio.existFd(fd)==-1)
+	{
+	  Ifile ifi;
+	  ifi.setFd(fd);
+	  ifi.setName(std::string(pathname));
+	  ifi.setState(IOBYFILE_OPEN);
+	  myiio.iiof.push_back(ifi);
+	}
+      else
+	{
+	  myiio.getFd(fd).setState(IOBYFILE_CREAT);
+	  myiio.getFd(fd).setName(std::string(pathname));
+	}
+    }
+
+  oss << "creat("<<pathname<< ","<< mode << ")=" << retcode << "\n"; 
+  inspectio_log.add(oss.str());
+  mtx.unlock();
+  return retcode;
+}
+
+  
 int closedir(DIR *dirp)
 {
     int retcode;
