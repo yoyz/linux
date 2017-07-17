@@ -12,17 +12,15 @@ filename.
 Exemple
 =======
 
-$ g++ -fPIC -std=c++0x -ldl -shared inspectio9.cpp -o inspectio.so   # compilation
-$ export    INSPECTIO_DUMP=$PWD/LOG                                  # on dit à inspectio ou il va dumpé 
-$ mkdir -p $INSPECTIO_DUMP                                           # preparation du repertoire
-$ rm -f    $INSPECTIO_DUMP/*                                         # on le clean si il existe
-$ unset     INSPECTIO_ALL                                            # on desactive le plus gros du log 
-$ export LD_PRELOAD=$(pwd)/inspectio.so                              # on dis ou se trouve la lib
-$ time mpirun -n 4 dd if=/dev/zero of=/tmp/toto bs=1M count=1000
-$ unset LD_PRELOAD
-$ cd $INSPECTIO_DUMP
-$ grep ^ *
-$ cd - 
+$ g++ -fPIC -std=c++0x -ldl -shared inspectio11.cpp -o inspectio.so   	# compilation
+$ export    INSPECTIO_DUMP=$PWD/LOG.${SLURM_JOBID}                   	# tell where is the DUMP directory
+$ rm -f    $INSPECTIO_DUMP/*                                         	# remove this DUMP Directory
+$ mkdir -p $INSPECTIO_DUMP                                           	# then recreate it to be clean
+$ unset     INSPECTIO_ALL                                            	# don't want the "strace" like output
+$ export LD_PRELOAD=$(pwd)/inspectio.so                              	# tell ld to link the library
+$ time mpirun -n 4 dd if=/dev/zero of=/tmp/toto bs=1M count=1000	# launch a mpi job
+$ unset LD_PRELOAD							# deactivate the library
+$ grep ^ LOG.${SLURM_JOBID}/*|grep -v nompi				# show the log of inspectio
  
 
 1000+0 records in
