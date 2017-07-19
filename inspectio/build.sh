@@ -1,3 +1,4 @@
 #!/bin/bash
-g++ -fPIC -std=c++0x -ggdb -shared -ldl -lstdc++ -o inspectio.so  inspectio10.cpp
+set -x
+g++ -fPIC -std=c++0x -ggdb -shared -ldl -lstdc++ -o inspectio.so  inspectio11.cpp
 

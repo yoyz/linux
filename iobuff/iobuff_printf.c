@@ -7,8 +7,9 @@ main ()
    long int  i=0;
    int       align=1<<20;
    fp = fopen ("data.fil", "w");
-   buf = malloc (align);
-   setvbuf (fp, buf, _IOFBF, align+8);
+   //buf = malloc (align);
+   //setvbuf (fp, buf, _IOFBF, align+8);
+   //setvbuf (fp, buf, _IOFBF, align);
    while(i<1000000)
    {   
         fprintf(fp,"toto%i",i);
