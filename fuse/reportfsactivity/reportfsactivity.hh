@@ -19,11 +19,11 @@
 #include <iostream>
 #include <stdint.h>
 
-class ExampleFS {
+class ReportFSActivity {
 private: 
   const char *_root;
   
-  static ExampleFS *_instance;
+  static ReportFSActivity *_instance;
   
   void AbsPath(char dest[PATH_MAX], const char *path);
 
@@ -35,10 +35,10 @@ private:
 
 
 public:
-	static ExampleFS *Instance();
+	static ReportFSActivity *Instance();
 
-	ExampleFS();
-	~ExampleFS();
+	ReportFSActivity();
+	~ReportFSActivity();
 
 	void setRootDir(const char *path);
 
