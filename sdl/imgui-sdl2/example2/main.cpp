@@ -41,8 +41,12 @@ int main(int, char**)
     ImVec4 clear_color = ImColor(114, 144, 154);
 
     static bool cb_value[16] = { false };
+    
     static bool cb_inst_value[16] = { false };
+    static bool cb_last_value[16] = { false };
 
+    static int  cs=0; // current step
+    
     static float wrap_width = 200.0f;
     
     static bool no_titlebar  = true;
@@ -73,6 +77,36 @@ int main(int, char**)
             ImGui_ImplSdl_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
                 done = true;
+
+	    // press up                   it   activate A
+	    // press up   a second time,  it deactivate A
+	    if (event.type == SDL_KEYDOWN)
+	      {
+		if (event.key.keysym.sym == SDLK_UP)
+		  {
+		    if (cb_inst_value[cs]==0)
+		      {
+			cb_value[cs]=!cb_value[cs];
+			cb_inst_value[cs]=1;
+		      }
+		  }
+		if (event.key.keysym.sym == SDLK_LEFT) { cs--; if (cs<0) cs=15;  }
+	      }
+	    
+	    if (event.type == SDL_KEYUP)
+	      {
+		if (event.key.keysym.sym == SDLK_UP)
+		  {
+		    if (cb_inst_value[cs]==1)
+		      {
+			cb_inst_value[cs]=0;
+		      }
+		  }
+		if (event.key.keysym.sym == SDLK_RIGHT) { cs++; if (cs>15) cs=0;  }
+	      }
+
+
+	    
         }
         ImGui_ImplSdl_NewFrame(window);
 
@@ -83,30 +117,41 @@ int main(int, char**)
 
 	  ImGui::SliderFloat("Wrap width", &wrap_width, -20, 600, "%.0f");
 	  ImGui::Text("instant value : %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
-		      cb_inst_value[0], cb_inst_value[1], cb_inst_value[2], cb_inst_value[3],
-		      cb_inst_value[4], cb_inst_value[5], cb_inst_value[6], cb_inst_value[7],
-		      cb_inst_value[8], cb_inst_value[9], cb_inst_value[10], cb_inst_value[11],
+		      cb_inst_value[0],  cb_inst_value[1],  cb_inst_value[2],  cb_inst_value[3],
+		      cb_inst_value[4],  cb_inst_value[5],  cb_inst_value[6],  cb_inst_value[7],
+		      cb_inst_value[8],  cb_inst_value[9],  cb_inst_value[10], cb_inst_value[11],
 		      cb_inst_value[12], cb_inst_value[13], cb_inst_value[14], cb_inst_value[15]);
-		      
-	  cb_inst_value[0] =ImGui::Checkbox("A", &cb_value[0]);   ImGui::SameLine(50);
-	  cb_inst_value[1] =ImGui::Checkbox("B", &cb_value[1]);   ImGui::SameLine(100);
-	  cb_inst_value[2] =ImGui::Checkbox("C", &cb_value[2]);   ImGui::SameLine(150);
-	  cb_inst_value[3] =ImGui::Checkbox("D", &cb_value[3]);   ImGui::SameLine(200);
-	  cb_inst_value[4] =ImGui::Checkbox("E", &cb_value[4]);   ImGui::SameLine(250);
-	  cb_inst_value[5] =ImGui::Checkbox("F", &cb_value[5]);   ImGui::SameLine(300);
-	  cb_inst_value[6] =ImGui::Checkbox("G", &cb_value[6]);   ImGui::SameLine(350);
-	  cb_inst_value[7] =ImGui::Checkbox("H", &cb_value[7]);  
 
-	  cb_inst_value[8] =ImGui::Checkbox("I", &cb_value[8]);   ImGui::SameLine(50);
-	  cb_inst_value[9] =ImGui::Checkbox("J", &cb_value[9]);   ImGui::SameLine(100);
-	  cb_inst_value[10]=ImGui::Checkbox("K", &cb_value[10]);  ImGui::SameLine(150);
-	  cb_inst_value[11]=ImGui::Checkbox("L", &cb_value[11]);  ImGui::SameLine(200);
-	  cb_inst_value[12]=ImGui::Checkbox("M", &cb_value[12]);  ImGui::SameLine(250);
-	  cb_inst_value[13]=ImGui::Checkbox("N", &cb_value[13]);  ImGui::SameLine(300);
-	  cb_inst_value[14]=ImGui::Checkbox("O", &cb_value[14]);  ImGui::SameLine(350);
-	  cb_inst_value[15]=ImGui::Checkbox("P", &cb_value[15]);  
+	  ImGui::Text("last value : %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+		      cb_last_value[0],  cb_last_value[1],  cb_last_value[2],  cb_last_value[3],
+		      cb_last_value[4],  cb_last_value[5],  cb_last_value[6],  cb_last_value[7],
+		      cb_last_value[8],  cb_last_value[9],  cb_last_value[10], cb_last_value[11],
+		      cb_last_value[12], cb_last_value[13], cb_last_value[14], cb_last_value[15]);
+	  ImGui::Text("cs : %d ",cs);
 
+	  cb_last_value[0] =ImGui::Checkbox("A", &cb_value[0]);   ImGui::SameLine(50);
+	  cb_last_value[1] =ImGui::Checkbox("B", &cb_value[1]);   ImGui::SameLine(100);
+	  cb_last_value[2] =ImGui::Checkbox("C", &cb_value[2]);   ImGui::SameLine(150);
+	  cb_last_value[3] =ImGui::Checkbox("D", &cb_value[3]);   ImGui::SameLine(200);
+	  cb_last_value[4] =ImGui::Checkbox("E", &cb_value[4]);   ImGui::SameLine(250);
+	  cb_last_value[5] =ImGui::Checkbox("F", &cb_value[5]);   ImGui::SameLine(300);
+	  cb_last_value[6] =ImGui::Checkbox("G", &cb_value[6]);   ImGui::SameLine(350);
+	  cb_last_value[7] =ImGui::Checkbox("H", &cb_value[7]);  
+
+	  cb_last_value[8] =ImGui::Checkbox("I", &cb_value[8]);   ImGui::SameLine(50);
+	  cb_last_value[9] =ImGui::Checkbox("J", &cb_value[9]);   ImGui::SameLine(100);
+	  cb_last_value[10]=ImGui::Checkbox("K", &cb_value[10]);  ImGui::SameLine(150);
+	  cb_last_value[11]=ImGui::Checkbox("L", &cb_value[11]);  ImGui::SameLine(200);
+	  cb_last_value[12]=ImGui::Checkbox("M", &cb_value[12]);  ImGui::SameLine(250);
+	  cb_last_value[13]=ImGui::Checkbox("N", &cb_value[13]);  ImGui::SameLine(300);
+	  cb_last_value[14]=ImGui::Checkbox("O", &cb_value[14]);  ImGui::SameLine(350);
+	  cb_last_value[15]=ImGui::Checkbox("P", &cb_value[15]);  
+	  
 	  ImGui::End();
+	  
+	  // int i;	  
+	  // for (i=0;i<16;i++)
+	  //   cb_value[i]=cb_last_value[i];
 	  
         }
         // Rendering
