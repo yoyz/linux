@@ -1,0 +1,2 @@
+addr2line  -e ./toto 0x4004c7
+/home/peyrardj/build/linux/stacktrace/toto.c:5
