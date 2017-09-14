@@ -38,6 +38,17 @@
     else								\
       if (getenv("HOME")!=NULL)						\
 	stream_logfile << getenv("HOME") << "/" << "inspectiolog."<< hostname << "." << getpid(); \
+                                                                        \
+    if (getenv("INSPECTIO_GPLOT")!=NULL)				\
+      {									\
+	if (rank==-1)							\
+	  stream_bwgnuplot << getenv("INSPECTIO_DUMP") << "/" << "bwgplot." << hostname << "." << "nompi"  << "." <<getpid(); \
+	else								\
+	  stream_bwgnuplot << getenv("INSPECTIO_DUMP") << "/" << "bwgplot." << hostname << "." << rank_str << "." <<getpid(); \
+      }									\
+    else								\
+      if (getenv("HOME")!=NULL)						\
+	stream_bwgnuplot << getenv("HOME") << "/" << "bwgplot."<< hostname << "." << getpid(); \
   } while(0) 
 
 
@@ -161,6 +172,111 @@ void sighandler(int signum)
 }
 
 //################################################################################
+class BWGnuplot
+{
+public:
+  BWGnuplot();  
+  void add(struct timeval tv0, struct timeval tv1,int writesize, int readsize);
+  void flush();
+  char * genv;
+  int64_t last_step;
+  int64_t current_step;
+  int64_t write;
+  int64_t read;
+  int64_t write_time;
+  int64_t read_time;
+  std::vector<std::string> gplotstr;
+};
+
+BWGnuplot::BWGnuplot()
+{
+  last_step=0; 
+  current_step=0;
+  write_time=0;
+  read_time=0;
+  write=0;
+  read=0;
+}
+
+
+
+void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int readsize)
+{
+  std::ostringstream oss;
+  int64_t timestart=tv0.tv_sec*1000000+tv0.tv_usec;
+  int64_t duration=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
+  int64_t bandwidthwrite;
+  int64_t bandwidthread;
+  
+  //write=write+writesize;
+  //read=read+readsize;
+  if (writesize)
+    {
+      write_time = write_time + duration;
+      write=write+writesize;
+    }
+  if (readsize)
+    {
+      read_time  = read_time  + duration;
+      read=read+readsize;
+    }
+
+  if (last_step==0)
+    {
+      last_step=timestart;
+      current_step=timestart+duration;
+    }
+
+  if (timestart-last_step>1000000)
+    {
+      bandwidthwrite=(write)/(timestart-last_step);
+      bandwidthread=(read)/(timestart-last_step);
+      oss << timestart << "\t"
+	  << duration << "\t"
+	  << write << "\t"
+	  << read  << "\t"
+	  << bandwidthwrite << "\t"
+	  << bandwidthread << "\n";
+      gplotstr.push_back(oss.str());
+
+      last_step=timestart+duration;
+      
+      write=0;
+      read=0;
+      write_time=0;
+      read_time=0;
+    }
+}
+
+
+/*
+void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int readsize)
+{
+  std::ostringstream oss;
+  int64_t timestart=tv0.tv_sec*1000000+tv0.tv_usec;
+  int64_t duration=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
+  int64_t bandwidthwrite=(writesize)/(duration+1);
+  int64_t bandwidthread=(readsize)/(duration+1);
+  
+  
+  oss << timestart << "\t"
+      << duration << "\t"
+      << writesize << "\t"
+      << readsize << "\t"
+      << bandwidthwrite << "\t"
+      << bandwidthread << "\n";
+  gplotstr.push_back(oss.str());
+  //printf("%s",oss.str().c_str());
+}
+*/
+
+
+
+
+BWGnuplot bwgplot;
+
+//################################################################################
+
 
 class Logger
 {
@@ -168,19 +284,23 @@ public:
   Logger();
   void add(std::string str);
   std::vector<std::string> logstr;
+  char * genv;
 };
 
 
 Logger::Logger() 
 {
-  
+  genv=getenv("INSPECTIO_ALL");  
 }
 
 void Logger::add(std::string str)
 {
-  mtx_logger.lock();
-  logstr.push_back(str);
-  mtx_logger.unlock();
+  if (genv)
+    {
+      mtx_logger.lock();
+      logstr.push_back(str);
+      mtx_logger.unlock();
+    }
 }
 
 Logger  inspectio_log;
@@ -471,6 +591,7 @@ Iio::Iio()
   int    rank=-1;
   char   hostname[1024];
   std::ostringstream stream_logfile;
+  std::ostringstream stream_bwgnuplot;
   DIR   * procselffd;
   struct dirent *myfile_in_procselfd;
   struct stat mystat;
@@ -526,6 +647,7 @@ Iio::~Iio()
   orig_fopen_f_type  orig_fopen;
   orig_fclose_f_type orig_fclose;
   std::ostringstream stream_logfile;
+  std::ostringstream stream_bwgnuplot;
   gethostname(hostname, 1024);
 
   status=IIO_ENDING;
@@ -548,6 +670,7 @@ Iio::~Iio()
 void Iio::dump()
 {
   FILE * FD;
+  FILE * FDGPLOT;
   pid_t pid=1;
   int   rank=-1;
   char logfile[1024];
@@ -565,6 +688,7 @@ void Iio::dump()
 
   char * genv;
   std::ostringstream stream_logfile;
+  std::ostringstream stream_bwgnuplot;
   orig_fopen_f_type  orig_fopen;
   orig_fclose_f_type orig_fclose;
 
@@ -578,7 +702,10 @@ void Iio::dump()
 
   STREAMLOG();
   
-  FD=orig_fopen(stream_logfile.str().c_str(),"a");
+  FD      = orig_fopen(stream_logfile.str().c_str(),"a");
+
+  if (getenv("INSPECTIO_GPLOT")!=NULL)				
+    FDGPLOT = orig_fopen(stream_bwgnuplot.str().c_str(),"w");
 
 
   // Calculate IOTIME in usecond and total IOSize in byte
@@ -641,8 +768,18 @@ void Iio::dump()
       if (genv!=NULL)
 	fprintf(FD,inspectio_log.logstr[i].c_str());
     }
+  orig_fclose(FD);
 
-  orig_fclose(FD); 
+  if (getenv("INSPECTIO_GPLOT")!=NULL)
+    {
+      for (i=0;i<bwgplot.gplotstr.size();i++)
+	{
+	  if (genv!=NULL)
+	    fprintf(FDGPLOT,bwgplot.gplotstr[i].c_str());
+	}
+      orig_fclose(FDGPLOT);
+    }
+
 }
 
 //################################################################################
@@ -878,6 +1015,7 @@ size_t fwrite64(const void *ptr, size_t size, size_t nmemb,FILE *stream)
 ssize_t write(int fd, const void *buf, size_t count)
 {
   int size;
+  int readsize=0;
   int size_t_count=count;
   orig_write_f_type orig_write;
   //int gettimeofday(struct timeval *tv, struct timezone *tz);
@@ -914,7 +1052,7 @@ ssize_t write(int fd, const void *buf, size_t count)
     }
   oss << "write(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
   inspectio_log.add(oss.str());
-
+  bwgplot.add(tv0,tv1,size,0);
   mtx.unlock();
   return size;   
 }
@@ -958,7 +1096,7 @@ ssize_t read(int fd, void *buf, size_t count)
     }
   oss << "read(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
   inspectio_log.add(oss.str());
-
+  bwgplot.add(tv0,tv1,0,size);
   mtx.unlock();
   return size;   
 }
