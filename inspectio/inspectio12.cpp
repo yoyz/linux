@@ -20,7 +20,7 @@
    - class IIo,     contain a list of Ifile
   
  */
-
+#define M1 1000000
 #define STREAMLOG() do {						\
     int rank=-1;							\
     char rank_str[9];                                                   \
@@ -80,7 +80,8 @@
 #define MAX_FILEDESC 1024
 
 std::mutex mtx;
-std::mutex mtx_logger;  
+std::mutex mtx_logger;
+std::mutex mtx_bwgplot;  
 std::string str_log;
 
 std::string getStrFDInfo( long fd );
@@ -203,31 +204,163 @@ BWGnuplot::BWGnuplot()
 void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int readsize)
 {
   std::ostringstream oss;
-  int64_t timestart=tv0.tv_sec*1000000+tv0.tv_usec;
-  int64_t duration=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
+  int64_t timestart=tv0.tv_sec*M1+tv0.tv_usec;
+  int64_t duration=(tv1.tv_sec-tv0.tv_sec)*M1 + tv1.tv_usec-tv0.tv_usec;
   int64_t bandwidthwrite;
   int64_t bandwidthread;
-  
-  //write=write+writesize;
-  //read=read+readsize;
-  if (writesize)
-    {
-      write_time = write_time + duration;
-      write=write+writesize;
-    }
-  if (readsize)
-    {
-      read_time  = read_time  + duration;
-      read=read+readsize;
-    }
+  int64_t i,j;
 
+  mtx_bwgplot.lock();
+  //INIT step
   if (last_step==0)
     {
       last_step=timestart;
       current_step=timestart+duration;
+      /*
+      oss.str("");
+      oss << timestart << "\t"
+	  << 0 << "\t"
+	  << 0 << "\t"
+	  << 0 << "\t"
+	  << 0 << "\t"
+	  << 0 << "\n";
+      gplotstr.push_back(oss.str());
+      */
     }
 
-  if (timestart-last_step>1000000)
+  // increment the counter
+  if (writesize) { write_time = write_time + duration; write=write+writesize;   }
+  if (readsize)  { read_time  = read_time  + duration;  read=read+readsize;     }
+
+  if (timestart-last_step>M1)
+    {
+      if (timestart-last_step>(2*M1))
+	{
+	  bandwidthwrite=(write)/(M1);
+	  bandwidthread=(read)/(M1);
+	  oss.str("");
+	  oss << last_step << "\t"
+	      << duration << "\t"
+	      << write << "\t"
+	      << read  << "\t"
+	      << bandwidthwrite << "\t"
+	      << bandwidthread << "\n";
+	  gplotstr.push_back(oss.str());
+	  last_step=last_step+M1;
+	  write=0;
+	  read=0;
+	  write_time=0;
+	  read_time=0;
+	}
+      if (( timestart-last_step > M1 ) &&
+	  ((write==0) || (read==0)))
+	{
+	  j=0;
+	  for (i=last_step; i<timestart;i=i+M1)
+	    {
+	      oss.str("");
+	      oss << i << "\t"
+		  << 0 << "\t"
+		  << 0 << "\t"
+		  << 0 << "\t"
+		  << 0 << "\t"
+		  << 0 << "\n";
+	      gplotstr.push_back(oss.str());
+	      j++;
+	    }
+	  //last_step=timestart+duration;
+	  last_step=last_step+j*M1;
+	}
+      if (( timestart-last_step > M1) &&
+	  ((write>0) || (read>0)))	      
+	{
+	  bandwidthwrite=(write)/(timestart-last_step);
+	  bandwidthread=(read)/(timestart-last_step);
+	  oss.str("");
+	  oss << timestart << "\t"
+	      << duration << "\t"
+	      << write << "\t"
+	      << read  << "\t"
+	      << bandwidthwrite << "\t"
+	      << bandwidthread << "\n";
+	  gplotstr.push_back(oss.str());
+	  //last_step=timestart+duration;
+	  last_step=last_step+M1;
+	  write=0;
+	  read=0;
+	  write_time=0;
+	  read_time=0;
+	  //last_step=timestart+duration;
+	}
+    }
+  //last_step=timestart+duration;
+  mtx_bwgplot.unlock();
+}
+
+
+
+
+
+/*
+void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int readsize)
+{
+  std::ostringstream oss;
+  int64_t timestart=tv0.tv_sec*M1+tv0.tv_usec;
+  int64_t duration=(tv1.tv_sec-tv0.tv_sec)*M1 + tv1.tv_usec-tv0.tv_usec;
+  int64_t bandwidthwrite;
+  int64_t bandwidthread;
+  int64_t i;
+
+  //INIT step
+  if (last_step==0)
+    {
+      last_step=timestart;
+      current_step=timestart+duration;
+      oss << timestart << "\t"
+	  << 0 << "\t"
+	  << 0 << "\t"
+	  << 0 << "\t"
+	  << 0 << "\t"
+	  << 0 << "\n";
+      gplotstr.push_back(oss.str());
+    }
+
+  // increment the counter
+  if (writesize) { write_time = write_time + duration; write=write+writesize;   }
+  if (readsize)  { read_time  = read_time  + duration;  read=read+readsize;     }
+
+  // feel the blank to have a uniform bandwidth
+
+  if (timestart-last_step>2*M1)
+    {
+      bandwidthwrite=(write)/(M1);
+      bandwidthread=(read)/(M1);
+      oss << last_step+M1 << "\t"
+	  << duration << "\t"
+	  << write << "\t"
+	  << read  << "\t"
+	  << bandwidthwrite << "\t"
+	  << bandwidthread << "\n";
+      gplotstr.push_back(oss.str());
+      write=0;
+      read=0;
+      write_time=0;
+      read_time=0;
+      last_step=last_step+M1;
+    }
+  if (timestart-last_step>M1)
+    for (i=last_step; i<timestart-(M1+1);i=i+M1)
+      {
+	oss << i << "\t"
+	    << 0 << "\t"
+	    << 0 << "\t"
+	    << 0 << "\t"
+	    << 0 << "\t"
+	    << 0 << "\n";
+	gplotstr.push_back(oss.str());
+      }
+
+  if (timestart-last_step>M1)
     {
       bandwidthwrite=(write)/(timestart-last_step);
       bandwidthread=(read)/(timestart-last_step);
@@ -247,7 +380,7 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
       read_time=0;
     }
 }
-
+*/
 
 /*
 void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int readsize)
@@ -287,7 +420,7 @@ public:
   char * genv;
 };
 
-
+ 
 Logger::Logger() 
 {
   genv=getenv("INSPECTIO_ALL");  
@@ -952,7 +1085,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb,FILE *stream)
 
     oss << "fwrite(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
   inspectio_log.add(oss.str());
-
+  bwgplot.add(tv0,tv1,size*nmemb,0);
   mtx.unlock();
   return retsize;
 }
