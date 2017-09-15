@@ -234,6 +234,9 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
 
   if (timestart-last_step>M1)
     {
+      // There is more than 2s without IO ( 2*M1 ),
+      // so we calculate the bandwidth for one second
+      // and we increment the last_step by one second,
       if (timestart-last_step>(2*M1))
 	{
 	  bandwidthwrite=(write)/(M1);
@@ -251,7 +254,13 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
 	  read=0;
 	  write_time=0;
 	  read_time=0;
+
 	}
+      
+      // we fall here
+      // there is no IO we have marked it,
+      // but the last_step is not below one second
+      // so we send some 0 to have one line by second
       if (( timestart-last_step > M1 ) &&
 	  ((write==0) || (read==0)))
 	{
@@ -270,7 +279,11 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
 	    }
 	  //last_step=timestart+duration;
 	  last_step=last_step+j*M1;
-	}
+	}	  	  
+
+      // There is more than 1s since the last line
+      // so we calculate the bandwidth for one second
+      // and we increment the last_step by one second,
       if (( timestart-last_step > M1) &&
 	  ((write>0) || (read>0)))	      
 	{
@@ -1032,6 +1045,7 @@ int fprintf(FILE *stream, const char *format, ...)
 
   oss << "fprintf(" << stream << "(" << fd << ")" << "," << format << ")="<< retcode << "\n";
   inspectio_log.add(oss.str());
+  bwgplot.add(tv0,tv1,retcode,0);
   mtx.unlock();
   
   return retcode;
@@ -1133,7 +1147,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb,FILE *stream)
     }
   oss << "fread(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
   inspectio_log.add(oss.str());
-
+  bwgplot.add(tv0,tv1,0,size*nmemb);
   mtx.unlock();
   return retsize;
 }
@@ -1277,7 +1291,7 @@ ssize_t pwrite(int fd, const void *buf, size_t count,off_t offset)
     }
   oss << "pwrite(" << fd << "," << buf << "," << count << ")\n"; 
   inspectio_log.add(oss.str());
-
+  bwgplot.add(tv0,tv1,size,0);
   mtx.unlock();
   return size;
 }
@@ -1332,7 +1346,7 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
   mtx.lock();
   oss << "writev(" << fd << "," << iovcnt << ")\n"; 
   inspectio_log.add(oss.str());
-
+  bwgplot.add(tv0,tv1,size,0);
   mtx.unlock();
   
   return size;
@@ -1362,6 +1376,7 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt,off_t offset)
   mtx.lock();
   oss << "pwritev(" << fd << "," << iovcnt << ")\n"; 
   inspectio_log.add(oss.str());
+  bwgplot.add(tv0,tv1,size,0);
   mtx.unlock();
   return size;
 }
@@ -1782,7 +1797,7 @@ int close(int fd)
   //myiio.dump();
   oss << "close("<<fd<<")\n"; 
   inspectio_log.add(oss.str());
-
+  bwgplot.add(tv0,tv1,0,0);
   mtx.unlock();
   return retcode;
 }
@@ -1841,7 +1856,7 @@ int fclose(FILE * FD)
     }
   oss << "fclose("<<fd<<")\n"; 
   inspectio_log.add(oss.str());
-
+  bwgplot.add(tv0,tv1,0,0);
   mtx.unlock();
   return retcode;
 }
