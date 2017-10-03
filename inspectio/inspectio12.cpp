@@ -24,31 +24,31 @@
 #define STREAMLOG() do {						\
     int rank=-1;							\
     char rank_str[9];                                                   \
-    if (getenv("OMPI_COMM_WORLD_RANK")!=NULL)  rank=atoi(getenv("OMPI_COMM_WORLD_RANK")); \
-    if (getenv("PMI_RANK")!=NULL)              rank=atoi(getenv("PMI_RANK")); \
-    if (getenv("PMIX_RANK")!=NULL)             rank=atoi(getenv("PMIX_RANK")); \
-    sprintf(rank_str,"%08d",rank);                                      \
-    if (getenv("INSPECTIO_DUMP")!=NULL)					\
-      {									\
-	if (rank==-1)							\
-	  stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." << "nompi"  << "." <<getpid(); \
+    if (getenv_OMPI_COMM_WORLD_RANK != NULL)  rank=atoi(getenv_OMPI_COMM_WORLD_RANK); \
+    if (getenv_PMI_RANK             != NULL)  rank=atoi(getenv_PMI_RANK); \
+    if (getenv_PMIX_RANK            != NULL)  rank=atoi(getenv_PMIX_RANK); \
+    sprintf(rank_str,"%08d",rank);					\
+  if (getenv_INSPECTIO_DUMP!=NULL)					\
+    {									\
+      if (rank==-1)							\
+	  stream_logfile << getenv_INSPECTIO_DUMP << "/" << "inspectiolog." << hostname << "." << "nompi"  << "." << mypid; \
 	else								\
-	  stream_logfile << getenv("INSPECTIO_DUMP") << "/" << "inspectiolog." << hostname << "." << rank_str << "." <<getpid(); \
+	  stream_logfile << getenv_INSPECTIO_DUMP << "/" << "inspectiolog." << hostname << "." << rank_str << "." << mypid; \
       }									\
     else								\
-      if (getenv("HOME")!=NULL)						\
-	stream_logfile << getenv("HOME") << "/" << "inspectiolog."<< hostname << "." << getpid(); \
-                                                                        \
-    if (getenv("INSPECTIO_GPLOT")!=NULL)				\
+      if (getenv_HOME!=NULL)						\
+	stream_logfile << getenv_HOME << "/" << "inspectiolog."<< hostname << "." << pid; \
+									\
+  if (getenv_INSPECTIO_GPLOT!=NULL)					\
       {									\
 	if (rank==-1)							\
-	  stream_bwgnuplot << getenv("INSPECTIO_DUMP") << "/" << "bwgplot." << hostname << "." << "nompi"  << "." <<getpid(); \
+	  stream_bwgnuplot << getenv_INSPECTIO_DUMP << "/" << "bwgplot." << hostname << "." << "nompi"  << "." << pid; \
 	else								\
-	  stream_bwgnuplot << getenv("INSPECTIO_DUMP") << "/" << "bwgplot." << hostname << "." << rank_str << "." <<getpid(); \
+	  stream_bwgnuplot << getenv_INSPECTIO_DUMP << "/" << "bwgplot." << hostname << "." << rank_str << "." << pid; \
       }									\
-    else								\
-      if (getenv("HOME")!=NULL)						\
-	stream_bwgnuplot << getenv("HOME") << "/" << "bwgplot."<< hostname << "." << getpid(); \
+  else									\
+      if (getenv_HOME!=NULL)						\
+	stream_bwgnuplot << getenv_HOME << "/" << "bwgplot."<< hostname << "." << getpid(); \
   } while(0) 
 
 
@@ -79,6 +79,16 @@
 
 #define MAX_FILEDESC 1024
 
+char * getenv_HOME;
+char * getenv_OMPI_COMM_WORLD_RANK;
+char * getenv_PMI_RANK;
+char * getenv_PMIX_RANK;
+char * getenv_INSPECTIO_DUMP;
+char * getenv_INSPECTIO_GPLOT;
+char * getenv_INSPECTIO_ALL;
+int    mypid;
+std::mutex mtx_iio;
+std::mutex mtx_iio2;
 std::mutex mtx;
 std::mutex mtx_logger;
 std::mutex mtx_bwgplot;  
@@ -436,12 +446,13 @@ public:
  
 Logger::Logger() 
 {
-  genv=getenv("INSPECTIO_ALL");  
+  //genv=getenv("INSPECTIO_ALL");
+  //getenv_INSPECTIO_ALL=getenv("INSPECTIO_ALL");  
 }
 
 void Logger::add(std::string str)
 {
-  if (genv)
+  if (getenv_INSPECTIO_ALL)
     {
       mtx_logger.lock();
       logstr.push_back(str);
@@ -600,7 +611,7 @@ std::string Ifile::dump()
   f_readsize_MB=((double)(iac.readsize))/1000.0/1000.0;
   f_readtime_seconds=((double)(iac.readtime_useconds))/1000.0/1000.0;
   
-  genv=getenv("INSPECTIO_ALL");
+  //genv=getenv("INSPECTIO_ALL");
   //sprintf(str,"WRITE[%8lld %8lld %8lld] READ[%8lld %8lld %8lld] [%5d %5d %5d %s] \n",
   sprintf(str,"WRITE [%8lld %7.1f %7.1f ] READ[%8lld %7.1f %7.1f ]  [%5d %5d %5d %s] \n",
 	  iac.writecall,
@@ -616,7 +627,7 @@ std::string Ifile::dump()
 	  );
   // if we don't want all output : $ unset INSPECTIO_ALL
   // We don't display write and read under 1MB of working set, to reduce line noize
-  if (genv==NULL && iac.writesize/1000/1000 == 0 && iac.readsize/1000/1000 == 0)
+  if (getenv_INSPECTIO_ALL==NULL && iac.writesize/1000/1000 == 0 && iac.readsize/1000/1000 == 0)
     sprintf(str,"");
 
   return std::string(str);
@@ -644,82 +655,72 @@ public:
   int status; // 0=begin 1=running 2=end
 };
 
-/*
-int Iio::moveTrash(int fdtoseek)
-{
-  std::list<Ifile>::iterator iter2 = iiof.begin();
-  for (std::list<Ifile>::iterator iter = iiof.begin() ; iter != iiof.end(); iter++)
-    {
-      iter2++;
-      if (iter->fd==fdtoseek)
-	{
-	  iter2++;
-	  iiof_trash.splice(iiof_trash.end(),std::move(iiof),iter,iter2);
-	}
-    }
-}
-*/
 
 int Iio::moveTrash(int fdtoseek)
 {
+  mtx_iio2.lock();
   for (std::list<Ifile>::iterator iter = iiof.begin() ; iter != iiof.end(); iter++)
     {
       if (iter->fd==fdtoseek)
 	{
-	  Ifile ifi=*iter;
-	  //Ifile ifi;
-	  //ifi=*iter;
+	  Ifile ifi=*iter;	  
 	  iiof.erase(iter);
 	  iiof_trash.push_back(ifi);
+	  mtx_iio2.unlock();
 	  return 1;
 	}
     }
+  mtx_iio2.unlock();
   return 0;
 }
 
 Ifile & Iio::getFd(int fdtoseek)
 {
+  mtx_iio2.lock();
   int i;
   for (std::list<Ifile>::iterator iter = iiof.begin() ; iter != iiof.end(); iter++)
     if (iter->fd==fdtoseek)
-      return *iter;
-  
-  printf("ERROR Iio::getFd(%d) not found existFd(%d)=%d iiof.size()=%d",fdtoseek,fdtoseek,existFd(fdtoseek),iiof.size());
+      {
+	mtx_iio2.unlock();
+	return *iter;
+      }
+
+  printf("ERROR Iio::getFd(%d) not found",fdtoseek);
   backtrace_handler();
+  mtx_iio2.unlock();
   exit(1);
-  //backtrace_handler();
-  //exit(1);
 }
 
 
 Ifile & Iio::getTrashFd(int fdtoseek)
 {
+  mtx_iio2.lock();
   int i;
   for (std::list<Ifile>::iterator iter = iiof_trash.begin() ; iter != iiof_trash.end(); iter++)
     if (iter->fd==fdtoseek)
-      return *iter;
-  
-  printf("ERROR Iio::getTrashFd(%d) not found existFd(%d)=%d iiof.size()=%d",fdtoseek,fdtoseek,existFd(fdtoseek),iiof_trash.size());
+      {
+	mtx_iio2.unlock();
+	return *iter;
+      }  
+  printf("ERROR Iio::getTrashFd(%d) not found",fdtoseek);
   backtrace_handler();
+  mtx_iio2.unlock();
   exit(1);
-  //backtrace_handler();
-  //exit(1);
 }
 
 
 int Iio::existFd(int fdtoseek)
 {
+  mtx_iio2.lock();
   int i=0;
   int ret=-1;
-  // for (i=0;i<iiof.size();i++)
-  //   {
-  //     if (iiof[i].fd==fdtoseek)
-  // 	return 1;
-  //   }
   for (std::list<Ifile>::iterator iter = iiof.begin() ; iter != iiof.end(); iter++)
     if (iter->fd==fdtoseek)
-      return 1;
-  
+      {
+	mtx_iio2.unlock();
+	return 1;
+      }
+  mtx_iio2.unlock();
   return ret;
 }
 
@@ -732,18 +733,29 @@ void Iio::noop()
 
 Iio::Iio()
 {
+  mtx_iio.lock();
   FILE * FD;
+  DIR   * procselffd;
   int    pid=1;
   int    rank=-1;
   char   hostname[1024];
+  
   std::ostringstream stream_logfile;
   std::ostringstream stream_bwgnuplot;
-  DIR   * procselffd;
+
   struct dirent *myfile_in_procselfd;
   struct stat mystat;
   std::string strStarDot(".");
   std::string strStarDotdot("..");
 
+  // grab the environement variable one time
+  getenv_OMPI_COMM_WORLD_RANK = getenv("OMPI_COMM_WORLD_RANK");
+  getenv_PMI_RANK             = getenv("PMI_RANK");
+  getenv_PMIX_RANK            = getenv("PMIX_RANK");
+  getenv_INSPECTIO_DUMP       = getenv("INSPECTIO_DUMP");
+  getenv_HOME                 = getenv("HOME");
+  getenv_INSPECTIO_GPLOT      = getenv("INSPECTIO_GPLOT");
+  mypid=getpid();
   //printf("loading\n");
   orig_fopen_f_type orig_fopen;
   orig_fclose_f_type orig_fclose;
@@ -781,10 +793,12 @@ Iio::Iio()
   status=IIO_RUNNING;
   fclose(FD);
   closedir(procselffd);
+  mtx_iio.unlock();
 }
 
 Iio::~Iio()
 {
+  mtx_iio.lock();
   FILE * FD;
   pid_t pid=1;
   int   rank=-1;
@@ -807,7 +821,8 @@ Iio::~Iio()
   
   dump();
   FD=orig_fopen(stream_logfile.str().c_str(),"a");
-  orig_fclose(FD); 
+  orig_fclose(FD);
+  mtx_iio.unlock();
 }
 
 
@@ -841,7 +856,7 @@ void Iio::dump()
 
   
   gethostname(hostname, 1024);
-  genv=getenv("INSPECTIO_ALL");
+  //genv=getenv("INSPECTIO_ALL");
 
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
@@ -850,7 +865,7 @@ void Iio::dump()
   
   FD      = orig_fopen(stream_logfile.str().c_str(),"a");
 
-  if (getenv("INSPECTIO_GPLOT")!=NULL)				
+  if (getenv_INSPECTIO_GPLOT!=NULL)				
     FDGPLOT = orig_fopen(stream_bwgnuplot.str().c_str(),"w");
 
 
@@ -916,7 +931,7 @@ void Iio::dump()
     }
   orig_fclose(FD);
 
-  if (getenv("INSPECTIO_GPLOT")!=NULL)
+  if (getenv_INSPECTIO_GPLOT!=NULL)
     {
       for (i=0;i<bwgplot.gplotstr.size();i++)
 	{
@@ -958,7 +973,9 @@ void add_write_count(int fd,int count)
     {
       Ifile ifi;
       ifi.setFd(fd);
+      mtx_iio2.lock();
       myiio.iiof.push_back(ifi);
+      mtx_iio2.unlock();
     }
   myiio.getFd(fd).iac.writecall++;
   myiio.getFd(fd).iac.writesize+=count;
@@ -971,7 +988,9 @@ void add_read_count(int fd,int count)
     {
       Ifile ifi;
       ifi.setFd(fd);
+      mtx_iio2.lock();
       myiio.iiof.push_back(ifi);
+      mtx_iio2.unlock();
     }
   myiio.getFd(fd).iac.readcall++;
   myiio.getFd(fd).iac.readsize+=count;
@@ -985,7 +1004,9 @@ void add_write_time(int fd,  struct timeval tv0,  struct timeval tv1)
     {
       Ifile ifi;
       ifi.setFd(fd);
+      mtx_iio2.lock();
       myiio.iiof.push_back(ifi);
+      mtx_iio2.unlock();
     }
   myiio.getFd(fd).iac.writetime_useconds+=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
   ////mtx.unlock();
@@ -998,7 +1019,9 @@ void add_read_time(int fd,  struct timeval tv0,  struct timeval tv1)
     {
       Ifile ifi;
       ifi.setFd(fd);
+      mtx_iio2.lock();
       myiio.iiof.push_back(ifi);
+      mtx_iio2.unlock();
     }
   myiio.getFd(fd).iac.readtime_useconds+=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
   ////mtx.unlock();
@@ -1037,7 +1060,9 @@ int fprintf(FILE *stream, const char *format, ...)
 	  ifi.setName(std::string("UNKNOWN-FPRINTF"));
 	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_WRITE);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       add_write_count(fd,retcode);
       add_write_time(fd,tv0,tv1);
@@ -1091,7 +1116,9 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb,FILE *stream)
 	  ifi.setName(std::string("UNKNOWN-FWRITE"));
 	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_WRITE);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       add_write_count(fd,size*nmemb);
       add_write_time(fd,tv0,tv1);
@@ -1140,7 +1167,9 @@ size_t fread(void *ptr, size_t size, size_t nmemb,FILE *stream)
 	  ifi.setName(std::string("UNKNOWN-FWRITE"));
 	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_WRITE);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       add_read_count(fd,retsize);
       add_read_time(fd,tv0,tv1);
@@ -1191,7 +1220,9 @@ ssize_t write(int fd, const void *buf, size_t count)
 	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setName(std::string("UNKNOWN-WRITE"));
 	  ifi.setState(IOBYFILE_WRITE);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       add_write_count(fd,size);
       add_write_time(fd,tv0,tv1);
@@ -1236,7 +1267,9 @@ ssize_t read(int fd, void *buf, size_t count)
 	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setName(std::string("UNKNOWN-READ"));
 	  ifi.setState(IOBYFILE_READ);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       add_read_count(fd,size);
       add_read_time(fd,tv0,tv1);
@@ -1284,7 +1317,9 @@ ssize_t pwrite(int fd, const void *buf, size_t count,off_t offset)
 	  ifi.setFd(fd);
 	  ifi.setName(std::string("UNKNOWN-PWRITE"));
 	  ifi.setState(IOBYFILE_WRITE);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       add_write_count(fd,size);
       add_write_time(fd,tv0,tv1);
@@ -1324,6 +1359,8 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
   gettimeofday(&tv0,&tz);
   size=orig_writev(fd,iov,iovcnt);
   gettimeofday(&tv1,&tz);
+
+  mtx.lock();
   if (size>=0)
     {
       if (myiio.existFd(fd)==-1)
@@ -1333,7 +1370,9 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
 	  ifi.setName(std::string("UNKNOWN-WRITEV"));
 	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_WRITE);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       add_write_count(fd,size);
       add_write_time(fd,tv0,tv1);
@@ -1343,7 +1382,7 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
   if (myiio.getStatus()!=IIO_RUNNING) { return retsize; }
 
 
-  mtx.lock();
+
   oss << "writev(" << fd << "," << iovcnt << ")\n"; 
   inspectio_log.add(oss.str());
   bwgplot.add(tv0,tv1,size,0);
@@ -1354,7 +1393,7 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
 
 ssize_t writev64(int fd, const struct iovec *iov, int iovcnt)
 {
-	printf("*******************\n");
+  //printf("*******************\n");
   return writev(fd,iov,iovcnt);
 }
 
@@ -1414,7 +1453,9 @@ FILE *fopen(const char *pathname, const char *mode)
 	  ifi.setFd(fd);
 	  ifi.setName(std::string(pathname));
 	  ifi.setState(IOBYFILE_OPEN);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}      
       else
 	{
@@ -1455,7 +1496,9 @@ FILE *fdopen(int fd, const char *mode)
 	  Ifile ifi;
 	  ifi.setFd(fd);
 	  ifi.setState(IOBYFILE_OPEN);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1511,7 +1554,9 @@ FILE *fdopen64(int fd, const char *mode)
 	  ifi.setFd(fd);
 	  ifi.setName(std::string(pathname));
 	  ifi.setState(IOBYFILE_OPEN);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1564,7 +1609,9 @@ extern int openat64(int dirfd, const char *pathname, int flags,...)
 	  ifi.setFd(fd);
 	  ifi.setName(std::string(pathname));
 	  ifi.setState(IOBYFILE_OPEN);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1615,7 +1662,9 @@ extern int    open(const char *pathname, int flags,...)
 	  ifi.setFd(fd);
 	  ifi.setName(std::string(pathname));
 	  ifi.setState(IOBYFILE_OPEN);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1661,7 +1710,9 @@ extern int open64(const char *pathname, int flags,...)
 	  ifi.setFd(fd);
 	  ifi.setName(std::string(pathname));
 	  ifi.setState(IOBYFILE_OPEN);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1698,7 +1749,9 @@ int creat(const char *pathname, mode_t mode)
 	  ifi.setFd(fd);
 	  ifi.setName(std::string(pathname));
 	  ifi.setState(IOBYFILE_OPEN);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1731,7 +1784,9 @@ int closedir(DIR *dirp)
 	Ifile ifi;
 	ifi.setFd(-1);
 	ifi.setState(IOBYFILE_CLOSE);
+	mtx_iio2.lock();
 	myiio.iiof.push_back(ifi);
+	mtx_iio2.unlock();
       }
     else
       {
@@ -1776,7 +1831,9 @@ int close(int fd)
 	  ifi.setOldFd(fd);
 	  ifi.setFd(-1);
 	  ifi.setState(IOBYFILE_CLOSE);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1837,7 +1894,9 @@ int fclose(FILE * FD)
 	  //ifi.setName(std::string("UNKNOWN-FCLOSE"));
 	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_CLOSE);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1883,7 +1942,9 @@ int dup(int oldfd)
 	  ifi.setOldFd(oldfd);
 	  ifi.setName(std::string("UNKNOWN-DUP"));
 	  ifi.setState(IOBYFILE_DUP);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1928,7 +1989,9 @@ extern int dup2(int oldfd, int newfd)
 	  ifi.setName(std::string("UNKNOWN-DUP2"));
 	  //ifi.setName(getStrFDInfo(newfd));
 	  ifi.setState(IOBYFILE_DUP2);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
@@ -1969,7 +2032,9 @@ int dup3(int oldfd, int newfd, int flags)
 	  ifi.setOldFd(oldfd);
 	  ifi.setName(std::string("UNKNOWN-DUP3"));
 	  ifi.setState(IOBYFILE_DUP3);
+	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
+	  mtx_iio2.unlock();
 	}
       else
 	{
