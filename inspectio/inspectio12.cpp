@@ -272,7 +272,7 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
       // but the last_step is not below one second
       // so we send some 0 to have one line by second
       if (( timestart-last_step > M1 ) &&
-	  ((write==0) || (read==0)))
+	  ((write==0) && (read==0)))
 	{
 	  j=0;
 	  for (i=last_step; i<timestart;i=i+M1)
