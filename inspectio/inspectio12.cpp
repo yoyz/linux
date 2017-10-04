@@ -1,5 +1,5 @@
 /*
-  AUTHOR           : johann peyrard 2016/11/29
+  AUTHOR           : johann peyrard peyrard.johann@gmail.com 2016/11/29
   NOTE             : use a rhel6/7 gcc 4.4 which works fine 
   TO BUILD         : $ g++ -fPIC -std=c++0x -ldl -shared inspectio7.cpp -o inspectio.so
   TO TEST          : $ $ mkdir -p $PWD/LOG ; rm -f $PWD/LOG/* ; export INSPECTIO_DUMP=$PWD/LOG ; unset INSPECTIO_ALL ; export LD_PRELOAD=./inspectio.so ; dd if=/dev/zero of=/dev/null bs=100M count=50 ; cat $PWD/LOG/*
@@ -10,7 +10,7 @@
 /*
   DESIGN:
    - Every meaningfull libc call should be trapped
-   - when the lib is loaded a IIo is created and a log file is created in $INSPECTIO_DUMP directory
+   - when the lib is loaded a IIo is created and a log file is created in $INSPECTIO_DUMP directory, if this directory is not available, it will crash...
    - class Logger,  log every call with input parameter and return value, 
      it is print only if INSPECTIO_ALL=something
 
@@ -23,32 +23,29 @@
 #define M1 1000000
 #define STREAMLOG() do {						\
     int rank=-1;							\
-    char rank_str[9];                                                   \
+    char rank_str[16];                                                   \
     if (getenv_OMPI_COMM_WORLD_RANK != NULL)  rank=atoi(getenv_OMPI_COMM_WORLD_RANK); \
     if (getenv_PMI_RANK             != NULL)  rank=atoi(getenv_PMI_RANK); \
     if (getenv_PMIX_RANK            != NULL)  rank=atoi(getenv_PMIX_RANK); \
     sprintf(rank_str,"%08d",rank);					\
-  if (getenv_INSPECTIO_DUMP!=NULL)					\
-    {									\
-      if (rank==-1)							\
+    if (getenv_INSPECTIO_DUMP!=NULL)					\
+      {									\
+	if (rank==-1)							\
 	  stream_logfile << getenv_INSPECTIO_DUMP << "/" << "inspectiolog." << hostname << "." << "nompi"  << "." << mypid; \
 	else								\
 	  stream_logfile << getenv_INSPECTIO_DUMP << "/" << "inspectiolog." << hostname << "." << rank_str << "." << mypid; \
-      }									\
-    else								\
-      if (getenv_HOME!=NULL)						\
-	stream_logfile << getenv_HOME << "/" << "inspectiolog."<< hostname << "." << pid; \
-									\
-  if (getenv_INSPECTIO_GPLOT!=NULL)					\
-      {									\
 	if (rank==-1)							\
 	  stream_bwgnuplot << getenv_INSPECTIO_DUMP << "/" << "bwgplot." << hostname << "." << "nompi"  << "." << pid; \
 	else								\
 	  stream_bwgnuplot << getenv_INSPECTIO_DUMP << "/" << "bwgplot." << hostname << "." << rank_str << "." << pid; \
       }									\
-  else									\
-      if (getenv_HOME!=NULL)						\
-	stream_bwgnuplot << getenv_HOME << "/" << "bwgplot."<< hostname << "." << getpid(); \
+    else								\
+      {									\
+	if (getenv_HOME!=NULL)						\
+	  stream_logfile << getenv_HOME << "/" << "inspectiolog."<< hostname << "." << pid; \
+	if (getenv_HOME!=NULL)						\
+	  stream_bwgnuplot << getenv_HOME << "/" << "bwgplot."<< hostname << "." << getpid(); \
+      }									\
   } while(0) 
 
 
@@ -192,6 +189,7 @@ public:
   char * genv;
   int64_t last_step;
   int64_t current_step;
+  int64_t first_step;
   int64_t write;
   int64_t read;
   int64_t write_time;
@@ -201,6 +199,7 @@ public:
 
 BWGnuplot::BWGnuplot()
 {
+  first_step=0;
   last_step=0; 
   current_step=0;
   write_time=0;
@@ -219,26 +218,19 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
   int64_t bandwidthwrite;
   int64_t bandwidthread;
   int64_t i,j;
+  char    str[128];
+  const char * format="%8llu\t%12llu\t%12llu\t%8llu\t%8llu\n";
 
   mtx_bwgplot.lock();
-  //INIT step
-  if (last_step==0)
+
+  if (last_step==0)   //INIT step we get the "time" 
     {
+      first_step=timestart;
       last_step=timestart;
       current_step=timestart+duration;
-      /*
-      oss.str("");
-      oss << timestart << "\t"
-	  << 0 << "\t"
-	  << 0 << "\t"
-	  << 0 << "\t"
-	  << 0 << "\t"
-	  << 0 << "\n";
-      gplotstr.push_back(oss.str());
-      */
     }
 
-  // increment the counter
+  // increment the counters time and write/read
   if (writesize) { write_time = write_time + duration; write=write+writesize;   }
   if (readsize)  { read_time  = read_time  + duration;  read=read+readsize;     }
 
@@ -252,14 +244,16 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
 	  bandwidthwrite=(write)/(M1);
 	  bandwidthread=(read)/(M1);
 	  oss.str("");
-	  oss << last_step << "\t"
-	      << duration << "\t"
-	      << write << "\t"
-	      << read  << "\t"
-	      << bandwidthwrite << "\t"
-	      << bandwidthread << "\n";
+	  snprintf(str,128,
+		   format,
+		   (last_step-first_step) / M1,
+		   write,
+		   read,
+		   bandwidthwrite,
+		   bandwidthread);
+	  oss << str;
 	  gplotstr.push_back(oss.str());
-	  last_step=last_step+M1;
+	  last_step=last_step+M1;     // here we jump one second 
 	  write=0;
 	  read=0;
 	  write_time=0;
@@ -278,12 +272,15 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
 	  for (i=last_step; i<timestart;i=i+M1)
 	    {
 	      oss.str("");
-	      oss << i << "\t"
-		  << 0 << "\t"
-		  << 0 << "\t"
-		  << 0 << "\t"
-		  << 0 << "\t"
-		  << 0 << "\n";
+	      snprintf(str,128,
+		       format,
+		       (i-first_step) / M1,
+		       0,
+		       0,
+		       0,
+		       0);
+	      oss << str;
+	  
 	      gplotstr.push_back(oss.str());
 	      j++;
 	    }
@@ -300,131 +297,25 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
 	  bandwidthwrite=(write)/(timestart-last_step);
 	  bandwidthread=(read)/(timestart-last_step);
 	  oss.str("");
-	  oss << timestart << "\t"
-	      << duration << "\t"
-	      << write << "\t"
-	      << read  << "\t"
-	      << bandwidthwrite << "\t"
-	      << bandwidthread << "\n";
+	  snprintf(str,128,
+		   format,
+		   (timestart-first_step) / M1,
+		   write,
+		   read,
+		   bandwidthwrite,
+		   bandwidthread);
+	  oss << str;
 	  gplotstr.push_back(oss.str());
-	  //last_step=timestart+duration;
 	  last_step=last_step+M1;
 	  write=0;
 	  read=0;
 	  write_time=0;
 	  read_time=0;
-	  //last_step=timestart+duration;
 	}
     }
   //last_step=timestart+duration;
   mtx_bwgplot.unlock();
 }
-
-
-
-
-
-/*
-void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int readsize)
-{
-  std::ostringstream oss;
-  int64_t timestart=tv0.tv_sec*M1+tv0.tv_usec;
-  int64_t duration=(tv1.tv_sec-tv0.tv_sec)*M1 + tv1.tv_usec-tv0.tv_usec;
-  int64_t bandwidthwrite;
-  int64_t bandwidthread;
-  int64_t i;
-
-  //INIT step
-  if (last_step==0)
-    {
-      last_step=timestart;
-      current_step=timestart+duration;
-      oss << timestart << "\t"
-	  << 0 << "\t"
-	  << 0 << "\t"
-	  << 0 << "\t"
-	  << 0 << "\t"
-	  << 0 << "\n";
-      gplotstr.push_back(oss.str());
-    }
-
-  // increment the counter
-  if (writesize) { write_time = write_time + duration; write=write+writesize;   }
-  if (readsize)  { read_time  = read_time  + duration;  read=read+readsize;     }
-
-  // feel the blank to have a uniform bandwidth
-
-  if (timestart-last_step>2*M1)
-    {
-      bandwidthwrite=(write)/(M1);
-      bandwidthread=(read)/(M1);
-      oss << last_step+M1 << "\t"
-	  << duration << "\t"
-	  << write << "\t"
-	  << read  << "\t"
-	  << bandwidthwrite << "\t"
-	  << bandwidthread << "\n";
-      gplotstr.push_back(oss.str());
-      write=0;
-      read=0;
-      write_time=0;
-      read_time=0;
-      last_step=last_step+M1;
-    }
-  if (timestart-last_step>M1)
-    for (i=last_step; i<timestart-(M1+1);i=i+M1)
-      {
-	oss << i << "\t"
-	    << 0 << "\t"
-	    << 0 << "\t"
-	    << 0 << "\t"
-	    << 0 << "\t"
-	    << 0 << "\n";
-	gplotstr.push_back(oss.str());
-      }
-
-  if (timestart-last_step>M1)
-    {
-      bandwidthwrite=(write)/(timestart-last_step);
-      bandwidthread=(read)/(timestart-last_step);
-      oss << timestart << "\t"
-	  << duration << "\t"
-	  << write << "\t"
-	  << read  << "\t"
-	  << bandwidthwrite << "\t"
-	  << bandwidthread << "\n";
-      gplotstr.push_back(oss.str());
-
-      last_step=timestart+duration;
-      
-      write=0;
-      read=0;
-      write_time=0;
-      read_time=0;
-    }
-}
-*/
-
-/*
-void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int readsize)
-{
-  std::ostringstream oss;
-  int64_t timestart=tv0.tv_sec*1000000+tv0.tv_usec;
-  int64_t duration=(tv1.tv_sec-tv0.tv_sec)*1000000 + tv1.tv_usec-tv0.tv_usec;
-  int64_t bandwidthwrite=(writesize)/(duration+1);
-  int64_t bandwidthread=(readsize)/(duration+1);
-  
-  
-  oss << timestart << "\t"
-      << duration << "\t"
-      << writesize << "\t"
-      << readsize << "\t"
-      << bandwidthwrite << "\t"
-      << bandwidthread << "\n";
-  gplotstr.push_back(oss.str());
-  //printf("%s",oss.str().c_str());
-}
-*/
 
 
 
@@ -755,6 +646,7 @@ Iio::Iio()
   getenv_INSPECTIO_DUMP       = getenv("INSPECTIO_DUMP");
   getenv_HOME                 = getenv("HOME");
   getenv_INSPECTIO_GPLOT      = getenv("INSPECTIO_GPLOT");
+  getenv_INSPECTIO_ALL        = getenv("INSPECTIO_ALL");
   mypid=getpid();
   //printf("loading\n");
   orig_fopen_f_type orig_fopen;
@@ -865,8 +757,7 @@ void Iio::dump()
   
   FD      = orig_fopen(stream_logfile.str().c_str(),"a");
 
-  if (getenv_INSPECTIO_GPLOT!=NULL)				
-    FDGPLOT = orig_fopen(stream_bwgnuplot.str().c_str(),"w");
+  FDGPLOT = orig_fopen(stream_bwgnuplot.str().c_str(),"w");
 
 
   // Calculate IOTIME in usecond and total IOSize in byte
@@ -920,26 +811,18 @@ void Iio::dump()
 		f_readtime_seconds,
 		(f_readsize_MB+f_writesize_MB)/(f_readtime_seconds+f_writetime_seconds)
 		);
-
     }
   
   // dump the 'strace -e file'
-  for (i=0;i<inspectio_log.logstr.size();i++)
-    {
-      if (genv!=NULL)
-	fprintf(FD,inspectio_log.logstr[i].c_str());
-    }
+  if (getenv_INSPECTIO_ALL!=NULL)
+    for (i=0;i<inspectio_log.logstr.size();i++)
+      fprintf(FD,inspectio_log.logstr[i].c_str());
   orig_fclose(FD);
+  
+  for (i=0;i<bwgplot.gplotstr.size();i++)
+    fprintf(FDGPLOT,bwgplot.gplotstr[i].c_str());
+  orig_fclose(FDGPLOT);
 
-  if (getenv_INSPECTIO_GPLOT!=NULL)
-    {
-      for (i=0;i<bwgplot.gplotstr.size();i++)
-	{
-	  if (genv!=NULL)
-	    fprintf(FDGPLOT,bwgplot.gplotstr[i].c_str());
-	}
-      orig_fclose(FDGPLOT);
-    }
 
 }
 
@@ -1058,7 +941,6 @@ int fprintf(FILE *stream, const char *format, ...)
 	  Ifile ifi;
 	  ifi.setFd(fd);
 	  ifi.setName(std::string("UNKNOWN-FPRINTF"));
-	  //ifi.setName(getStrFDInfo(fd));
 	  ifi.setState(IOBYFILE_WRITE);
 	  mtx_iio2.lock();
 	  myiio.iiof.push_back(ifi);
@@ -1067,9 +949,11 @@ int fprintf(FILE *stream, const char *format, ...)
       add_write_count(fd,retcode);
       add_write_time(fd,tv0,tv1);
     }
-
-  oss << "fprintf(" << stream << "(" << fd << ")" << "," << format << ")="<< retcode << "\n";
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {
+      oss << "fprintf(" << stream << "(" << fd << ")" << "," << format << ")="<< retcode << "\n";
+      inspectio_log.add(oss.str());
+    }
   bwgplot.add(tv0,tv1,retcode,0);
   mtx.unlock();
   
@@ -1123,9 +1007,11 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb,FILE *stream)
       add_write_count(fd,size*nmemb);
       add_write_time(fd,tv0,tv1);
     }
-
-    oss << "fwrite(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {
+      oss << "fwrite(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
+      inspectio_log.add(oss.str());
+    }
   bwgplot.add(tv0,tv1,size*nmemb,0);
   mtx.unlock();
   return retsize;
@@ -1174,8 +1060,11 @@ size_t fread(void *ptr, size_t size, size_t nmemb,FILE *stream)
       add_read_count(fd,retsize);
       add_read_time(fd,tv0,tv1);
     }
-  oss << "fread(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {
+      oss << "fread(" << ptr << "(" << fd << ")" << "," << size << "," << nmemb << "," << stream << ")="<< retsize << "\n"; 
+      inspectio_log.add(oss.str());
+    }
   bwgplot.add(tv0,tv1,0,size*nmemb);
   mtx.unlock();
   return retsize;
@@ -1228,8 +1117,11 @@ ssize_t write(int fd, const void *buf, size_t count)
       add_write_time(fd,tv0,tv1);
       ////mtx.unlock();
     }
-  oss << "write(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "write(" << fd << "," << buf << "," << count << ")=" << size << "\n";
+      inspectio_log.add(oss.str());
+    }
   bwgplot.add(tv0,tv1,size,0);
   mtx.unlock();
   return size;   
@@ -1274,8 +1166,11 @@ ssize_t read(int fd, void *buf, size_t count)
       add_read_count(fd,size);
       add_read_time(fd,tv0,tv1);
     }
-  oss << "read(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "read(" << fd << "," << buf << "," << count << ")=" << size << "\n"; 
+      inspectio_log.add(oss.str());
+    }
   bwgplot.add(tv0,tv1,0,size);
   mtx.unlock();
   return size;   
@@ -1324,8 +1219,12 @@ ssize_t pwrite(int fd, const void *buf, size_t count,off_t offset)
       add_write_count(fd,size);
       add_write_time(fd,tv0,tv1);
     }
-  oss << "pwrite(" << fd << "," << buf << "," << count << ")\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "pwrite(" << fd << "," << buf << "," << count << ")\n";
+      inspectio_log.add(oss.str());
+    }
+
   bwgplot.add(tv0,tv1,size,0);
   mtx.unlock();
   return size;
@@ -1382,9 +1281,11 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
   if (myiio.getStatus()!=IIO_RUNNING) { return retsize; }
 
 
-
-  oss << "writev(" << fd << "," << iovcnt << ")\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "writev(" << fd << "," << iovcnt << ")\n"; 
+      inspectio_log.add(oss.str());
+    }
   bwgplot.add(tv0,tv1,size,0);
   mtx.unlock();
   
@@ -1413,8 +1314,11 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt,off_t offset)
   size=orig_pwritev(fd,iov,iovcnt,offset);
 
   mtx.lock();
-  oss << "pwritev(" << fd << "," << iovcnt << ")\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "pwritev(" << fd << "," << iovcnt << ")\n"; 
+      inspectio_log.add(oss.str());
+    }
   bwgplot.add(tv0,tv1,size,0);
   mtx.unlock();
   return size;
@@ -1463,8 +1367,11 @@ FILE *fopen(const char *pathname, const char *mode)
 	  myiio.getFd(fd).setFd(fd);
 	  //myiio.getFd(fd).setOldFd(fd);
 	}
-      oss << "fopen("<<pathname<< mode << ")="<< FP<< "(" << fd << ")" << "\n"; 
-      inspectio_log.add(oss.str());            
+      if (getenv_INSPECTIO_ALL)
+	{      
+	  oss << "fopen("<<pathname<< mode << ")="<< FP<< "(" << fd << ")" << "\n"; 
+	  inspectio_log.add(oss.str());
+	}
   }
   
   mtx.unlock();
@@ -1505,9 +1412,11 @@ FILE *fdopen(int fd, const char *mode)
 	  myiio.getFd(fd).setState(IOBYFILE_OPEN);
 	}
     }
-
-  oss << "fdopen("<<fd<< ","<< mode << ")=" << file << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "fdopen("<<fd<< ","<< mode << ")=" << file << "\n"; 
+      inspectio_log.add(oss.str());
+    }
   mtx.unlock();
   return file;  
 }
@@ -1564,9 +1473,11 @@ FILE *fdopen64(int fd, const char *mode)
 	  myiio.getFd(fd).setName(std::string(pathname));
 	}
     }
-
-  oss << "openat("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "openat("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
+      inspectio_log.add(oss.str());
+    }
   mtx.unlock();
   return retcode;
 }
@@ -1619,9 +1530,11 @@ extern int openat64(int dirfd, const char *pathname, int flags,...)
 	  myiio.getFd(fd).setName(std::string(pathname));
 	}
     }
-  
-  oss << "openat64("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {        
+      oss << "openat64("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
+      inspectio_log.add(oss.str());
+    }
   mtx.unlock();
   return retcode;
 }
@@ -1671,9 +1584,11 @@ extern int    open(const char *pathname, int flags,...)
 	  myiio.getFd(fd).setState(IOBYFILE_OPEN);
 	}
     }
-  //myiio.dump();
-  oss << "open("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "open("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
+      inspectio_log.add(oss.str());
+    }
   mtx.unlock();
   return retcode;
 }
@@ -1720,9 +1635,11 @@ extern int open64(const char *pathname, int flags,...)
 	  myiio.getFd(fd).setName(std::string(pathname));
 	}
     }
-
-  oss << "open64("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "open64("<<pathname<< ","<< flags << ")=" << retcode << "\n"; 
+      inspectio_log.add(oss.str());
+    }
   mtx.unlock();
   return retcode;
 }
@@ -1759,9 +1676,11 @@ int creat(const char *pathname, mode_t mode)
 	  myiio.getFd(fd).setName(std::string(pathname));
 	}
     }
-
-  oss << "creat("<<pathname<< ","<< mode << ")=" << retcode << "\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "creat("<<pathname<< ","<< mode << ")=" << retcode << "\n"; 
+      inspectio_log.add(oss.str());
+    }
   mtx.unlock();
   return retcode;
 }
@@ -1852,8 +1771,11 @@ int close(int fd)
 	}
     }
   //myiio.dump();
-  oss << "close("<<fd<<")\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "close("<<fd<<")\n"; 
+      inspectio_log.add(oss.str());
+    }
   bwgplot.add(tv0,tv1,0,0);
   mtx.unlock();
   return retcode;
@@ -1913,8 +1835,11 @@ int fclose(FILE * FD)
 
 	}
     }
-  oss << "fclose("<<fd<<")\n"; 
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "fclose("<<fd<<")\n"; 
+      inspectio_log.add(oss.str());
+    }
   bwgplot.add(tv0,tv1,0,0);
   mtx.unlock();
   return retcode;
@@ -2003,10 +1928,11 @@ extern int dup2(int oldfd, int newfd)
 	}
     }
 
-
-  oss << "dup2("<< oldfd << "," << newfd << ")=" << retcode << "\n";
-  //oss << "dup2("<< oldfd << "," << newfd << ")=" << retcode << str << "\n";
-  inspectio_log.add(oss.str());
+  if (getenv_INSPECTIO_ALL)
+    {      
+      oss << "dup2("<< oldfd << "," << newfd << ")=" << retcode << "\n";
+      inspectio_log.add(oss.str());
+    }
 
   mtx.unlock();
   return retcode;
