@@ -215,10 +215,14 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
   std::ostringstream oss;
   int64_t timestart=tv0.tv_sec*M1+tv0.tv_usec;
   int64_t duration=(tv1.tv_sec-tv0.tv_sec)*M1 + tv1.tv_usec-tv0.tv_usec;
+  int64_t timestop=timestart+duration;
   int64_t bandwidthwrite;
   int64_t bandwidthread;
+  float   time_f;
+  int64_t time_d;
   int64_t i,j;
   char    str[128];
+  //const char * format="%8f\t%12llu\t%12llu\t%8llu\t%8llu\n";
   const char * format="%8llu\t%12llu\t%12llu\t%8llu\t%8llu\n";
 
   mtx_bwgplot.lock();
@@ -226,27 +230,30 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
   if (last_step==0)   //INIT step we get the "time" 
     {
       first_step=timestart;
-      last_step=timestart;
-      current_step=timestart+duration;
+      last_step=timestop;
+      current_step=timestop;
     }
 
   // increment the counters time and write/read
   if (writesize) { write_time = write_time + duration; write=write+writesize;   }
   if (readsize)  { read_time  = read_time  + duration;  read=read+readsize;     }
 
-  if (timestart-last_step>M1)
+  if (timestop-last_step>M1)
     {
       // There is more than 2s without IO ( 2*M1 ),
       // so we calculate the bandwidth for one second
       // and we increment the last_step by one second,
-      if (timestart-last_step>(2*M1))
+      if ((timestop-last_step)>(2*M1))
 	{
 	  bandwidthwrite=(write)/(M1);
 	  bandwidthread=(read)/(M1);
+	  time_f=(last_step-first_step);
+	  time_f=(time_f/ M1)+1;
+	  time_d=time_f;
 	  oss.str("");
 	  snprintf(str,128,
 		   format,
-		   (last_step-first_step) / M1,
+		   time_d,//(last_step-first_step) / M1,
 		   write,
 		   read,
 		   bandwidthwrite,
@@ -258,23 +265,25 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
 	  read=0;
 	  write_time=0;
 	  read_time=0;
-
 	}
       
       // we fall here
       // there is no IO we have marked it,
       // but the last_step is not below one second
       // so we send some 0 to have one line by second
-      if (( timestart-last_step > M1 ) &&
+      if (( (timestop-last_step) > M1 ) &&
 	  ((write==0) && (read==0)))
 	{
 	  j=0;
-	  for (i=last_step; i<timestart;i=i+M1)
+	  for (i=last_step; i<timestop;i=i+M1)
 	    {
+	      time_f=i-first_step;
+	      time_f=(time_f/M1)+1;
+	      time_d=time_f;
 	      oss.str("");
 	      snprintf(str,128,
 		       format,
-		       (i-first_step) / M1,
+		       time_d,//(i-first_step) / M1,
 		       0,
 		       0,
 		       0,
@@ -291,15 +300,18 @@ void BWGnuplot::add(struct timeval tv0, struct timeval tv1, int writesize, int r
       // There is more than 1s since the last line
       // so we calculate the bandwidth for one second
       // and we increment the last_step by one second,
-      if (( timestart-last_step > M1) &&
+      if (( (timestop-last_step) > M1) &&
 	  ((write>0) || (read>0)))	      
 	{
-	  bandwidthwrite=(write)/(timestart-last_step);
-	  bandwidthread=(read)/(timestart-last_step);
+	  bandwidthwrite=(write)/(timestop-last_step);
+	  bandwidthread=(read)/(timestop-last_step);
+	  time_f=timestop-first_step;
+	  time_f=time_f/ M1;
+	  time_d=time_f;
 	  oss.str("");
 	  snprintf(str,128,
 		   format,
-		   (timestart-first_step) / M1,
+		   time_d,//(timestart-first_step) / M1,
 		   write,
 		   read,
 		   bandwidthwrite,
@@ -798,8 +810,6 @@ void Iio::dump()
 	{
 	  fprintf(FD,iter->dump().c_str());
 	}
-
-
       
       // if there is no catched time spent in IO, ok it's a lie, but should be easier to understand
       // print BW=0 
