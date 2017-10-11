@@ -1,5 +1,6 @@
 #ifndef EXT2_H_
 #define EXT2_H_
+#include <stdint.h>
 
 //  CHAR    1 byte
 //  INT     2 byte
@@ -137,7 +138,7 @@ extern volatile uint8_t    buffer[1024];
 #define MAX_F_NAME          20
 #define EXT2_FT_DIR         2
 #define EXT2_FT_REG_FILE    1
-#define EOF                 0x04
+//#define EOF                 0x04
 #define MAX_FLINE_LENGHT    1024
 
 int        EXT_mount();
