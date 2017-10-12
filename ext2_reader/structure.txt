@@ -1,0 +1,30 @@
+Table 3-2. Sample 20mb Partition Layout
+---------------------------------------
+
+
+Block Offset		Length		Description
+byte 0			512  bytes			boot record (if present)
+byte 512		512  bytes	additional boot record data (if present)
+
+-- block group 0, blocks 1 to 8192 --
+byte 1024		1024 bytes	superblock
+block 2			1    block	block group descriptor table
+block 3			1    block	block bitmap
+block 4			1    block	inode bitmap
+block 5			214  blocks	inode table
+block 219		7974 blocks	data blocks
+
+-- block group 1, blocks 8193 to 16384 --
+block 8193		1    block	superblock backup
+block 8194		1    block	block group descriptor table backup
+block 8195		1    block	block bitmap
+block 8196		1    block	inode bitmap
+block 8197		214  blocks	inode table
+block 8408		7974 blocks	data blocks
+
+-- block group 2, blocks 16385 to 24576 --
+block 16385		1    block	block bitmap
+block 16386		1    block	inode bitmap
+block 16387		214  blocks	inode table
+block 16601		3879 blocks	data blocks
+
