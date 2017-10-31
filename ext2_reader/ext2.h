@@ -36,7 +36,7 @@ struct superblock {
     uint32_t   s_first_data_block;         //  identification id of the first block that contain the superblock - for 1KB block = 1 - for block > 1KB = 0; 
     uint32_t   s_long_block_size;          //  shift value used for: block size = 1024 << s_long_block_size
      int32_t   s_log_frag_size;            //  shift value used for: fragment size = 1024 << s_long_frag_size or fragment size = 1024 >> -s_long_frag_size
-    uint32_t   s_blocks_per_gruop;         //  number of block per group
+    uint32_t   s_blocks_per_group;         //  number of block per group
     uint32_t   s_frags_per_group;          //  number of fragment per group
     uint32_t   s_inodes_per_group;         //  number of inode per group also used for calculate the size of the inode bitmap of each block group
     uint32_t   s_mtime;                    //  last time fs was mounted - UNIX time def POSIX
