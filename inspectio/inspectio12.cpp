@@ -31,20 +31,20 @@
     if (getenv_INSPECTIO_DUMP!=NULL)					\
       {									\
 	if (rank==-1)							\
-	  stream_logfile << getenv_INSPECTIO_DUMP << "/" << "inspectiolog." << hostname << "." << "nompi"  << "." << mypid; \
+	  stream_logfile   << getenv_INSPECTIO_DUMP << "/" << "inspectiolog." << hostname << "." << "nompi"  << "." << mypid; \
 	else								\
-	  stream_logfile << getenv_INSPECTIO_DUMP << "/" << "inspectiolog." << hostname << "." << rank_str << "." << mypid; \
+	  stream_logfile   << getenv_INSPECTIO_DUMP << "/" << "inspectiolog." << hostname << "." << rank_str << "." << mypid; \
 	if (rank==-1)							\
-	  stream_bwgnuplot << getenv_INSPECTIO_DUMP << "/" << "bwgplot." << hostname << "." << "nompi"  << "." << pid; \
+	  stream_bwgnuplot << getenv_INSPECTIO_DUMP << "/" << "bwgplot."      << hostname << "." << "nompi"  << "." << mypid; \
 	else								\
-	  stream_bwgnuplot << getenv_INSPECTIO_DUMP << "/" << "bwgplot." << hostname << "." << rank_str << "." << pid; \
+	  stream_bwgnuplot << getenv_INSPECTIO_DUMP << "/" << "bwgplot."      << hostname << "." << rank_str << "." << mypid; \
       }									\
     else								\
       {									\
 	if (getenv_HOME!=NULL)						\
-	  stream_logfile << getenv_HOME << "/" << "inspectiolog."<< hostname << "." << pid; \
+	  stream_logfile   << getenv_HOME           << "/" << "inspectiolog."<< hostname << "." << mypid; \
 	if (getenv_HOME!=NULL)						\
-	  stream_bwgnuplot << getenv_HOME << "/" << "bwgplot."<< hostname << "." << getpid(); \
+	  stream_bwgnuplot << getenv_HOME           << "/" << "bwgplot."     << hostname << "." << mypid; \
       }									\
   } while(0) 
 
@@ -639,7 +639,7 @@ Iio::Iio()
   mtx_iio.lock();
   FILE * FD;
   DIR   * procselffd;
-  int    pid=1;
+  //int    pid=1;
   int    rank=-1;
   char   hostname[1024];
   
@@ -704,7 +704,7 @@ Iio::~Iio()
 {
   mtx_iio.lock();
   FILE * FD;
-  pid_t pid=1;
+  //pid_t pid=1;
   int   rank=-1;
   char logfile[1024];
   char   hostname[1024];
@@ -719,7 +719,7 @@ Iio::~Iio()
   orig_fopen   = (orig_fopen_f_type)dlsym(RTLD_NEXT,"fopen");
   orig_fclose  = (orig_fclose_f_type)dlsym(RTLD_NEXT,"fclose");
   
-  pid=getpid();
+  //pid=getpid();
   
   STREAMLOG();
   
@@ -736,7 +736,7 @@ void Iio::dump()
 {
   FILE * FD;
   FILE * FDGPLOT;
-  pid_t pid=1;
+  //pid_t pid=1;
   int   rank=-1;
   char logfile[1024];
   char   hostname[1024];
