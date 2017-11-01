@@ -1,27 +1,27 @@
-#include "FixedPoint32.h"
+#include "FPtypes.h"
 #include "math.h"
 
 #define SIZE 32
 int main()
 {
   printf("FixedPoint\n");
-  FixedPoint a1,b1,c1;
-  FixedPoint a2,b2,c2;
-  FixedPoint a3,b3,c3;
-  FixedPoint a4,b4,c4;
+  FPfloat a1,b1,c1;
+  FPfloat a2,b2,c2;
+  FPfloat a3,b3,c3;
+  FPfloat a4,b4,c4;
   
-  FixedPoint *tab_fx=(FixedPoint*)malloc(sizeof(FixedPoint)*SIZE);
+  FPfloat *tab_fx=(FPfloat*)malloc(sizeof(FPfloat)*SIZE);
   float      *tab_f=(float*)malloc(sizeof(float)*SIZE);
-  a1=FixedPoint(float(1.24));
-  b1=FixedPoint(float(2.33));
+  a1=FPfloat(float(1.24));
+  b1=FPfloat(float(2.33));
   c1=a1+b1;
 
-  a2=FixedPoint(float(1.24));
-  b2=FixedPoint(float(2.33));
+  a2=FPfloat(float(1.24));
+  b2=FPfloat(float(2.33));
   c2=a2/b2;
 
-  a3=FixedPoint(float(1.24));
-  b3=FixedPoint(float(2.33));
+  a3=FPfloat(float(1.24));
+  b3=FPfloat(float(2.33));
   c3=a3-b3;
 
   a4=1;
