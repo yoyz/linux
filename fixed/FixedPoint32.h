@@ -19,7 +19,6 @@ public:
 	inline FixedPoint(const FTYPE b, int d)                { v = b; }
 	inline FixedPoint(float a)                             { v = (FTYPE)(a * ((FTYPE)1 << FBITS)); }
 	inline operator float()                                { return ((float)v) / ((FTYPE)1 << FBITS); }
-	inline operator int()                                  { return         v  / ((FTYPE)1 << FBITS); }
 	inline FixedPoint& operator =(const float &b)          { v = (FTYPE) (b * ((FTYPE)1 << FBITS)); return *this; }
 	inline FixedPoint& operator =(const int32_t b)         { v = (FTYPE)b << FBITS; return *this; }
 	inline FixedPoint operator *(const FixedPoint &b)      { return FixedPoint((v >> CBITS) * (b.v >> CBITS), 0); 	  }
