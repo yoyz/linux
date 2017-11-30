@@ -1,0 +1,165 @@
+#!/usr/bin/python
+
+import commands
+import re
+import sys
+
+class job:
+      def __init__(self):
+            self.jobid=None
+            self.jobname=None
+            self.username=None
+            self.licensename=None
+            self.nodelist=None
+            self.jobstate=None
+            self.nodecount=None
+            self.licensecount=None
+            self.priority=None
+            self.partition=None
+            self.printf_str=None
+      
+      def printheader(self):
+            print "================================================================================================================"
+            print "JOBID     USERNAME     JOBNAME      JOBSTATE     LICENSENAME     LC    PRIO     NC   PARTITION NODELIST"
+            print "----------------------------------------------------------------------------------------------------------------"
+
+      def printfooter(self):
+            print "================================================================================================================"
+
+
+      def printme(self):
+            #print "toto"
+            if ( self.licensename==None and  
+                self.licensecount==None):                  
+                  self.licensename=""
+                  self.licensecount=0
+
+            print "%.7s   %.12s %.12s %.12s %.15s %.4s  %.4s     %.7s %.7s   %24s" % (str(self.jobid).ljust(7), 
+                                                                                 str(self.username.ljust(12)),
+                                                                                 str(self.jobname.ljust(12)),
+                                                                                 str(self.jobstate.ljust(12)),
+                                                                                 str(self.licensename.ljust(17)),
+                                                                                 str(self.licensecount).ljust(4),
+                                                                                 str(self.priority).ljust(4),
+                                                                                 str(self.nodecount).ljust(4),
+                                                                                 str(self.partition).ljust(7),
+                                                                                 str(self.nodelist).ljust(24))
+
+                  #print "%.5d %.8s %.10s %.2d" % (self.jobid, self.jobname, "nofs", 0)
+
+	    #print self.jobid
+
+
+
+
+
+
+
+if __name__ == '__main__':      
+      joblist=[]
+
+      jobid=commands.getoutput('squeue -h -o "%A"')
+      for id in jobid.split('\n'):
+            #print sys.getsizeof(id)
+            if (len(id)==0):
+                  break
+            j=job()
+            j.jobid=int(id)
+            joblist.append(j)
+
+      if (len(joblist)==0):
+            print "No Job in queue"
+            sys.exit(0)
+ 
+      for j in joblist:
+            cmd='scontrol show job '+str(j.jobid)
+            jobcmd=commands.getoutput(cmd)
+
+            # fetch Licenses compliant with fabien leydier which read man page ;)
+            p=re.compile(r'Licenses=([a-zA-Z0-9\_]+)[\*:](\d+)\ ')
+            if p.search(jobcmd):
+                  j.licensename=p.search(jobcmd).group(1)
+                  j.licensecount=p.search(jobcmd).group(2)
+
+            # fetch UserId
+            p=re.compile(r'UserId=([a-zA-Z]+)')
+            if p.search(jobcmd):
+                  j.username=p.search(jobcmd).group(1)
+
+            # fetch JobName
+            p=re.compile(r'Name=([a-zA-Z0-9\_]+)')
+            if p.search(jobcmd):
+                  j.jobname=p.search(jobcmd).group(1)
+
+
+            # fetch JobName
+            p=re.compile(r'Partition=([a-zA-Z0-9\_]+)')
+            if p.search(jobcmd):
+                  j.partition=p.search(jobcmd).group(1)
+
+
+            # fetch NodeList
+            s=' NodeList='
+            slen=len(s)
+            ridx=jobcmd.find(s)
+            if ridx:
+                  lidx=jobcmd[ridx:].find('\n') 
+                  nodelist=jobcmd[ridx+slen:ridx+lidx]
+                  j.nodelist=nodelist
+                  #print nodelist
+                  p=re.compile(r'[a-z]+\[[0-9\-]\]')
+                  if p.search(nodelist):
+                        nodecount=commands.getoutput('nodeset -c '+nodelist)
+                        print nodecount
+                        for count in nodecount.split('\n'):
+                              j.nodecount=int(count)
+                  else:
+                        j.nodecount=int(0)
+                        j.nodelist=""
+
+                        
+            # fetch NumNodes
+            p=re.compile(r'NumNodes=([0-9]+)')
+            if p.search(jobcmd):
+                  j.nodecount=p.search(jobcmd).group(1)
+
+            p=re.compile(r'Priority=([0-9]+)')
+            if p.search(jobcmd):
+                  j.priority=p.search(jobcmd).group(1)
+
+
+            # fetch JobState
+            p=re.compile(r'JobState=([a-zA-Z]+)')
+            if p.search(jobcmd):
+                  j.jobstate=p.search(jobcmd).group(1)
+                        
+
+
+            
+
+
+      joblist[0].printheader()
+
+      for j in joblist:
+            if (j.jobstate=="PENDING"):
+                  j.printme()
+
+      for j in joblist:
+            if (j.jobstate=="RUNNING"):
+                  j.printme()
+
+
+      joblist[0].printfooter()
+     #jobid=commands.getoutput('squeue -t "RUNNING" -h -o "%i"')
+
+
+      #cmd='scontrol show job '+str(id)
+      #jobcmd=commands.getoutput(cmd)
+
+#      j=job()
+#      j.jobid=1;
+#      j.jobname="jobname"
+#      j.printme()
+#      joblist.append(j)
+#      joblist[0].printme()
+
