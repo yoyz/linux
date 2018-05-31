@@ -1,4 +1,4 @@
-#include <cdk/cdk.h>
+#include <cdk.h>
     int displayCallback (EObjectType cdktype, void *object, void *clientData, chtype input);
     char *menuInfo[4][4];
 int main() {
@@ -8,7 +8,7 @@ int main() {
     CDKLABEL     *infoBox;
     CDKLABEL     *monlabel;
     int selection;
-    char *menulist[MAX_MENU_ITEMS][MAX_SUB_ITEMS];
+    const char *menulist[MAX_MENU_ITEMS][MAX_SUB_ITEMS];
     int submenusize[4], menuloc[4];
     char *mesg[3],temp[256];
     char *letexte[5];
