@@ -14,14 +14,14 @@
 #define S_MANUF 8
 #define S_VL    11
 #define S_BS    448
-#define S_FSID  11
+#define S_FSID  8
 typedef struct 
 {
   uint8_t   bootstrap0;                    //  0x00 3
   uint8_t   bootstrap1;                    //  0x01
   uint8_t   bootstrap2;                    //  0x02   Part of the bootstrap 3 bytes
 
-  char      manufacturer[S_MANUF];      //  0x03 8 Optional manufacturer description
+  char      manufacturer[S_MANUF];         //  0x03 8 Optional manufacturer description
   uint16_t  bytes_per_block;               //  0x0b 2 Number of bytes per block (almost always 512).
   uint8_t   block_per_allocation_unit;     //  0x0d 1 Number of blocks per allocation unit
   uint16_t  reserved_block;                //  0x0e 2 Reserved block including the boot_block so usually 1
@@ -122,8 +122,8 @@ void print_boot_block(boot_block_f16 * bb)
   printf("\n");
 
   printf("signature                     : ");
-  //printf("0x%04x", bb->boot_block_signature);
-  printf("%u", bb->boot_block_signature);
+  printf("0x%04x", bb->boot_block_signature);
+  //printf("%u", bb->boot_block_signature);
   printf("\n");
 
 }
@@ -136,15 +136,16 @@ int main(int argc, char **argv)
   void *         data;
   data=&bbf16;
   int fid;
-  
-  //printf("%d\n",sizeof(boot_block_f16));
+  int size;
+  //printf("%d\n",sizeof(boot_block_f16)); // Need to be 512
   if (argc==2)
     {
       filename=argv[1];
       //printf("%s\n",filename);
       fid=open(filename,O_RDONLY);
       if (fid<0) { write(MY_STDERR,ERROR_FNOT_FOUND,strlen(ERROR_FNOT_FOUND)); exit(1); }
-      read(fid,data,512);
+      size=read(fid,data,512);
+      //printf("Reading %d from %s\n",size,filename); // need to be 512
       print_boot_block(data);
     }
   if (argc==1) { printf("Argument needed\n"); exit(1); }
