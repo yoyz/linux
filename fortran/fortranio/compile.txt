@@ -1,0 +1,1 @@
+mpiifort -O2 -xCORE-AVX512 -o test_IO fortran_IO.f90
