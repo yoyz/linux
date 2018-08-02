@@ -1,4 +1,4 @@
-#include <cdk/cdk.h>
+#include <cdk.h>
 int main() {
     CDKSCREEN    *cdkscreen;
     WINDOW       *cursesWin;
