@@ -1,0 +1,1376 @@
+#!/usr/bin/perl -w
+###############################################################################
+# Copyright (C) 2009  Bull S. A. S.  -  All rights reserved
+# Bull, Rue Jean Jaures, B.P.68, 78340, Les Clayes-sous-Bois
+# This is not Free or Open Source software.
+# Please contact Bull S. A. S. for details about its license.
+###############################################################################
+
+##=============================================================================
+##
+## extractDns : Example of perl script using Bull::CLM basic modules
+##
+##=============================================================================
+# HISTORY
+# Created June 2009
+# XXXXXX : defect or feature description
+
+# @(#) $Id: extractDns,v 1.40.4.6 2011/05/24 14:52:58 peyrardj Exp $
+
+
+
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Basename;
+use Bull::CLM::Usage;
+use Bull::CLM::Trace;
+use Bull::CLM::Config;
+use Bull::CLM::History;
+use Bull::CLM::DB::ClusterDB;
+use Bull::CLM::BCMPath;
+use Net::Ping;
+use Net::IP;
+use Sys::Hostname;
+
+#@INC=(@INC,".");
+use Bull::CLM::DB::NetworkEquipment;
+#use ZoneParse;
+use Bull::CLM::DB::ClusterDBEquipment;
+use Bull::CLM::DB::DNSVIP;
+
+# get command basename and parameters
+my $program = basename($0);
+my @programParams = @ARGV;
+
+# standard option variables for outputs
+my $opt_verbose=0;
+my $opt_Debug;
+my $opt_quiet;
+# other example option variables
+my $opt_file;
+my $opt_dir;
+my $opt_Action;
+my $opt_Force;
+my $opt_timeout;
+my $dns_kerberos_multi_homed_ptr=undef;
+##################################################
+
+my $bcmpath = Bull::CLM::BCMPath->new();
+my $clusterdb_conf=$bcmpath->getBCMPath()."/conf/clusterdb/clusterdb.conf";
+
+##################################################
+
+use constant SLASH_ETC                          => '/etc/';
+use constant SLASH	                        => '/';
+use constant DEFAULT_OUTPUT_DIRECTORY           => '/tmp/dbmConfig/';
+use constant CLM_NAMED_CONF                     => SLASH_ETC."named-bull.conf";
+use constant NAMED_CONF                         => SLASH_ETC."named.conf";
+use constant DIRECTORY_NAMEDD                   => SLASH_ETC."named.d";
+use constant NAMED_OPTION             		=> DIRECTORY_NAMEDD.SLASH."named.conf.option";
+use constant NAMED_VIEW				=> DIRECTORY_NAMEDD.SLASH."named.conf.view";
+use constant NAMED_ACL			  	=> DIRECTORY_NAMEDD.SLASH."named.conf.acl";
+use constant NAMED_PRIMARY			=> DIRECTORY_NAMEDD.SLASH."primary".SLASH;
+use constant ZONE_SPECIFIC			=> DIRECTORY_NAMEDD.SLASH."specific".SLASH;
+use constant SPECIFIC_OPTION			=> DIRECTORY_NAMEDD.SLASH."specific".SLASH."named.conf.option";
+use constant SPECIFIC_GLOBAL			=> DIRECTORY_NAMEDD.SLASH."specific".SLASH."named.conf.global";
+
+
+my $outputDirectory="/";
+
+my %configHashNamed;
+my %configHashClusterdb;
+
+#my $regex_ipv4="(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+#my $regex_ipv4_network="(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\/[0-9]|[0-9][0-9])";
+#my $regex_name="[a-zA-Z0-9-_]+";
+
+my $regex_ipv4_network=qr!(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\/[0-9]|[0-9][0-9])!;
+my $regex_ipv4=qr!(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)!;
+my $regex_name=qr!^[a-zA-Z0-9-_]+!;
+my $regex_mac=qr!^[a-fA-f0-9][a-fA-f0-9]:.+!;
+
+
+my $serial=undef;
+my $tag_named_begin        ="# TO ADD SOME LINES, EDIT TEMPLATE FILE: ".NAMED_OPTION."\n";
+
+my $clusterdb;
+my $dnsvip;
+my $clusterDBEquipment;
+my $networkList;
+my $equipmentNetwork;
+my $export_all="yes";
+
+my $global_IN_A="";
+my $alias_eq_service;
+my $ns;
+my @aclList=();
+my @rev_inaddr_list=();
+my $header_zone=undef;
+my $default_namedconf='
+include "/etc/named.d/named.conf.option";
+include "/etc/named.d/named.conf.acl";
+include "/etc/named.d/named.conf.view";
+';
+
+my $default_namedconflocal="
+# README_FIRST
+#
+# This file will be overwritten, 
+# your local configuration could be set in
+# global configuration in : ".SPECIFIC_GLOBAL."
+# specific option in      : ".SPECIFIC_OPTION."
+#
+
+
+include \"".SPECIFIC_GLOBAL."\";
+
+options {
+       directory \"/etc/named.d/primary/\";
+       query-source address * port 53;
+       include \"".SPECIFIC_OPTION."\";
+
+ };
+";
+
+my $default_namedconf_specific_option="
+# README_FIRST
+#
+# This file will not be overwritten, add your local option configuration in this file
+# 
+# option cannot be overwritten here.
+#
+
+       # Allow DNS query to be forwarded to another DNS
+       #forwarders { 10.5.0.1; };
+
+
+";
+
+
+my $default_namedconf_global_configuration="
+# README_FIRST
+#
+# This file will not be overwritten, add your global configuration in this file
+# 
+# 
+#
+";
+
+
+##################################################
+
+
+# Bull::CLM::Trace : initialization
+#   By default :
+#   clmInitTrace() is equivalent to : clmInitTrace(undef,undef);
+#   - trace configuration file = /etc/clm/clmtrace.conf
+#   - trace directory = /tmp
+#   Example using local trace configuration file and specific trace directory :
+#   clmInitTrace("./localtrace.conf","/tmp/mydir");
+clmInitTrace();
+
+
+
+#my $action = clmGetAction();
+#my $actionParams = clmGetActionParams();
+my $action='exec';
+my $actionParams='';
+my $group;
+
+
+my $dbname="";
+my $dbhost=undef;
+my $help=undef;
+
+my $str_include_equipment_class;
+
+# Bull::CLM::Usage is not usable in this case, 
+# extractCmd -d directory -g group -g group
+# Replaced by 'GetOptions'
+
+GetOptions( "d=s"=>\$opt_dir,
+            "dir=s"=>\$opt_dir,
+            "g=s"=>\$group,
+            "group=s"=>\$group,
+	    # output options
+	    "verbose" => \$opt_verbose,
+	    "Debug"   => \$opt_Debug,
+	    "debug"   => \$opt_Debug,
+	    "quiet"   => \$opt_quiet,
+	    "dbname=s"  => \$dbname,
+	    "dbhost=s"  => \$dbhost,
+       	    "h!"        => \$help,
+	    "help"     =>  \$help,
+    );
+
+my $fct = (caller(0))[3];
+# Bull::CLM::Trace : initialize output options
+clmOutputOptions($opt_verbose,$opt_Debug,$opt_quiet);
+
+if ( ! $opt_dir ) { $opt_dir='/'; }
+
+if ($help)
+{
+    clmOutput($fct, "
+$0 
+    [--dbname databaseName]  
+    [--dbhost hostname]
+    [-d outputDirectory]
+    [-v]
+
+");
+    exit 0;
+}
+
+# Execute action
+if ($action eq 'usage') {
+    actionUsage();
+} elsif ($action eq 'config') {
+    actionConfig($opt_file);
+} elsif ($action eq 'exec') 
+{
+    actionExec($opt_Action, $opt_Force, $opt_timeout, $actionParams);
+}
+else 
+{
+    actionExec($opt_Action, $opt_Force, $opt_timeout, $actionParams);
+}
+
+
+exit(0);
+
+
+##-----------------------------------------------------------------------------
+## actionUsage()
+##     Show the list of standard CLM options.
+## Parameters
+##     none
+##-----------------------------------------------------------------------------
+sub actionUsage {
+    my $fct = (caller(0))[3];
+    clmOutput($fct,"$0 [-d directory] ");
+}
+
+
+sub purifyString($)
+{
+    my $string=shift;
+
+    $string=~s|//|/|g;
+    $string=~s|//|/|g;
+    $string=~s|//|/|g;
+    $string=~s|//|/|g;
+    return $string;
+}
+
+
+sub readFile($)
+{
+    my $filename=shift;
+    my $content="";
+    open(FHFILER,$filename) or die "can not open $filename";
+    while (my $line=<FHFILER>)
+    {   
+        $content.=$line;
+    }
+    close (FHFILER);
+    return $content;
+}
+
+sub writeFile($$)
+{
+    my $filename=shift;                                                                                                                                                                                                      
+    my $content=shift;                                                                                                                                                                                                       
+    open(FHFILEW,">".$filename) or die "can not write on $filename";
+    {
+        print FHFILEW $content;
+    }
+    close (FHFILEW);
+    return 1;
+}
+
+
+sub backupWorkingSpace()
+{
+    my $fct = (caller(0))[3];
+    my $date_cmd="date +%Y-%m-%d--%H:%M:%S";
+    my $date;
+    if (!(-d DIRECTORY_NAMEDD)) { return 0; }
+    open(FHCMD,"$date_cmd|");
+    while (my $line=<FHCMD>)
+    {
+	$date=$line;
+	chomp $date;
+    }
+    clmOutput($fct,"Backup directory ".DIRECTORY_NAMEDD." to ".DIRECTORY_NAMEDD.'.'.$date);
+    system("cp -R ".DIRECTORY_NAMEDD." ".DIRECTORY_NAMEDD.'.'."$date");
+    return 1;
+}
+
+sub createWorkingSpace()
+{
+    my $fct = (caller(0))[3];
+    
+    my $namedd="$outputDirectory/".DIRECTORY_NAMEDD;
+
+    
+    if ($opt_verbose)
+    {
+	clmOutput($fct,"Create directory $outputDirectory");
+	clmHistoryMsg("Create directory $outputDirectory");
+    }
+    
+    if (! -d $outputDirectory)
+    { if (!(mkdir $outputDirectory))
+      { clmOutput($fct,"Can not create dir $outputDirectory"); exit 1; } }
+    
+    if (! -d $outputDirectory.SLASH_ETC )
+    { if (!(mkdir $outputDirectory.SLASH_ETC)) 
+      { clmOutput($fct,"Can not create dir $outputDirectory".SLASH_ETC); exit 1; } }
+    
+    if (! -d $namedd)
+    { if (!(mkdir $namedd))                    
+      { clmOutput($fct,"Can not create dir $namedd"); exit 1; } }    
+    
+    if (! -d $outputDirectory.NAMED_PRIMARY)
+    { if (!(mkdir $outputDirectory.NAMED_PRIMARY))
+      { clmOutput($fct,"Can not create dir $outputDirectory.NAMED_PRIMARY"); exit 1; } 
+    }    
+
+    if (! -d $outputDirectory.ZONE_SPECIFIC)
+    { 
+	if (!(mkdir $outputDirectory.ZONE_SPECIFIC))
+	{  clmOutput($fct,"Can not create dir $outputDirectory.ZONE_SPECIFIC"); exit 1; } 
+    }    
+    
+    my $specific_local_option_file=$outputDirectory.SPECIFIC_OPTION; 
+    if ( ! -f $specific_local_option_file ) 
+    {
+    	open(FH_SPECIF_NAMED_CONF,">$specific_local_option_file") or die "can not open $specific_local_option_file";
+	clmOutput($fct,"Created $specific_local_option_file file");
+	print FH_SPECIF_NAMED_CONF $default_namedconf_specific_option;
+    	close FH_SPECIF_NAMED_CONF;
+    }
+
+    my $specific_global_file=$outputDirectory.SPECIFIC_GLOBAL; 
+    if ( ! -f $specific_global_file ) 
+    {
+    	open(FH_SPECIF_NAMED_CONF,">$specific_global_file") or die "can not open $specific_global_file";
+	clmOutput($fct,"Created $specific_global_file file");
+	print FH_SPECIF_NAMED_CONF $default_namedconf_global_configuration;
+    	close FH_SPECIF_NAMED_CONF;
+    }
+}
+
+
+sub create_str_zone_specific()
+{
+    my $fct = (caller(0))[3];
+    my $str_zone_specific="";   
+    my $i=0;
+    my $localdir=$outputDirectory.ZONE_SPECIFIC;
+    
+    $localdir=purifyString($localdir);
+    clmOutput($fct,"Importing conf file in all view  from  : $localdir"."*.conf");
+    foreach my $line (<$localdir/*.conf>)
+    {
+	$i++;
+	$line=purifyString($line);
+	$str_zone_specific.="\t".'include "'.$line.'";'."\n";
+    }
+    if ($str_zone_specific eq "") 
+    { clmOutput($fct,"There is no conf to import from        : $localdir"."*.conf");     }
+    else
+    { clmOutput($fct,"There is $i conf imported from         : $localdir"."*.conf");     }
+
+    return $str_zone_specific;
+}
+
+sub touch_conf_specific_acl($)
+{
+    my $aclEqList=shift;
+    my $fct = (caller(0))[3];
+    my $localdir=$outputDirectory.ZONE_SPECIFIC;
+    for (my $i=0;$i<$aclEqList->number_of_equipment();$i++)
+    {
+	my $eq=$aclEqList->get($i);
+	my $eqname=$eq->get_name();
+	my $filename="$localdir/ACL-$eqname".".conf.include";
+	$filename=purifyString($filename);
+	system("touch $filename");
+	clmOutput($fct,"touch    $filename");
+    }
+    my $filename="$localdir/ACL-ALLOTHERS.conf.include";
+    $filename=purifyString($filename);
+    clmOutput($fct,"touch    $filename");
+    system("touch $filename");
+}
+
+
+sub touch_zone_specific_acl($)
+{
+    my $aclEqList=shift;
+    my $fct = (caller(0))[3];
+    my $localdir=$outputDirectory.ZONE_SPECIFIC;
+    for (my $i=0;$i<$aclEqList->number_of_equipment();$i++)
+    {
+	my $eq=$aclEqList->get($i);
+	my $eqname=$eq->get_name();
+	my $filename="$localdir/ACL-$eqname".".zone.include";
+	$filename=purifyString($filename);
+	if (! (-f $filename))
+	{
+	    clmOutput($fct,"touch    $filename");
+	    system("touch $filename");
+	}
+    }
+    my $filename="$localdir/ACL-ALLOTHERS.zone.include";
+    purifyString($filename);
+    if (!(-f $filename))
+    {
+	clmOutput($fct,"Touch    $filename");
+	system("touch $filename");
+    }
+}
+
+
+
+sub createAclFile()
+{
+    my $fct = (caller(0))[3];
+    
+    my $named_acl="$outputDirectory/".NAMED_ACL;
+    $named_acl=purifyString($named_acl);
+    checkAclDB();
+
+    #open(FH,">$named_acl") or die "can not open $named_acl";
+    #print FH returnStrAclFile();
+    #close FH;
+    writeFile($named_acl,returnStrAclFile());
+    clmOutput($fct,"Creating $named_acl");
+
+}
+
+sub createOptionsFile()
+{
+   my $fct = (caller(0))[3];  
+   my $named_local="$outputDirectory/".NAMED_OPTION;
+   $named_local=purifyString($named_local);
+#   open(FH,">$named_local") or die "can not open $named_local";
+   writeFile($named_local,$default_namedconflocal);
+   clmOutput($fct,"Creating $named_local");
+   #print FH $default_namedconflocal;
+   #close FH;
+}
+
+sub createViewFile()
+{
+    my $fct = (caller(0))[3]; 
+    my $named_view="$outputDirectory/".NAMED_VIEW;
+     $named_view=purifyString($named_view);
+    #open(FH,">$named_view") or die "can not open $named_view";
+    writeFile($named_view,returnStrViewFile());
+    clmOutput($fct,"Creating $named_view");
+    #print FH returnStrViewFile();
+    #close FH;
+}
+
+sub createNamedConf()
+{
+    my $fct = (caller(0))[3]; 
+    my $named_conf="$outputDirectory/".NAMED_CONF;
+    #$named_conf=~s|//|/|g;
+    $named_conf=purifyString($named_conf);
+    writeFile($named_conf,$default_namedconf);
+    #open(FH,">$named_conf") or die "can not open $named_conf";
+    clmOutput($fct,"Creating $named_conf");
+    #print FH $default_namedconf;
+    #close FH;
+}
+
+sub getReverseIpForReverseZone($)
+{
+    my $fct = (caller(0))[3];
+    my $cidr=shift;
+
+
+    my $localIP = new Net::IP ("$cidr");
+    my $reverseIp = $localIP->reverse_ip();
+
+    #print ("CIDR:$cidr, rev:$reverseIp.\n");
+
+    return $reverseIp;
+}
+
+sub headerZoneFile($)
+{
+    my $fct = (caller(0))[3];
+    my $domainName=shift;
+    my $mail=$dnsvip->get_dns_domain_from_cluster();
+    my @ns_list=();
+    
+    if ($header_zone) { return $header_zone; }
+
+    if (!(defined($serial)))
+    {
+	open(CMD,"date +%Y%m%d%H|") or die "can not launch date command";
+	$serial=<CMD>;
+	chomp($serial);
+    }
+
+    if (!($dnsvip->acl_table_exist()))
+    {
+	@ns_list=$dnsvip->get_list_mngt();
+    }
+    elsif (!defined($alias_eq_service))
+    {   
+        $alias_eq_service=$dnsvip->get_equipment_list_alias_services($clusterDBEquipment->get_equipmentList());
+        for (my $i=0;$i<$alias_eq_service->number_of_equipment();$i++)
+        {   
+            my $eq=$alias_eq_service->get($i);
+            if ($eq->get_name() =~ /dns-server/)
+            {   
+                $ns=$eq->get("cname");
+                if (!defined($ns))
+                { $ns=$eq->get("name"); }
+                @ns_list=(@ns_list,$ns);
+            }
+        }
+    }
+    
+    if (!defined($ns))         { $ns=`hostname -s`; chomp $ns; }
+    if (!defined($domainName)) { $ns=`dnsdomainname`; chomp $ns; }
+
+    $mail=~s|\@|\.|;
+
+    my $str=";
+\$TTL ".$configHashNamed{"soa_ttl"}."\n".
+    "\@\tIN\tSOA\t".$domainName.". ".
+    $mail.". ("."\n".
+    "\t\t\t\t".$serial." ; Serial\n".
+    "\t\t\t\t".$configHashNamed{"soa_refresh"}."  ; Refresh\n".
+    "\t\t\t\t".$configHashNamed{"soa_retry"}."    ; Retry\n".
+    "\t\t\t\t".$configHashNamed{"soa_expire"}."   ; Expire\n".
+    "\t\t\t\t".$configHashNamed{"soa_minimum"}.") ; Minimum\n".
+    "\t\t\t\t"."IN\tNS\t".$ns.".".$domainName.".\n\n";
+
+#    "\t\t"."IN\tNS\t".$configHash{"nameserver_name"}.".".$configHash{"soa_root_domain"}.".\n\n";
+#;\n".$configHash{"nameserver_name"}." IN A 127.0.0.1
+#";
+    return $str;
+}
+
+sub returnStrViewFile()
+{
+    my $fct = (caller(0))[3];
+
+    my $domainName; 
+    my $viewFile;
+    my $str_zone_specific;
+    my $str_reverse_includes="";
+    
+    $viewFile="";
+    #$domainName=$configHashNamed{"soa_root_domain"};
+    $domainName=$dnsvip->get_dns_domain_from_cluster();
+    
+    $str_zone_specific=create_str_zone_specific();
+
+
+    # build reverse  reverse zone
+    foreach my $inaddr (@rev_inaddr_list)
+    {
+	$str_reverse_includes.="\t\t"."zone \"".$inaddr.".in-addr.arpa.\"\t IN { type master; file \"named.".$inaddr.".zone\"; };\n";
+    }   
+    
+    my $viewEqList=$dnsvip->get_service_struct();
+
+    # foreach equipment in the list
+    # here an equipment is an ACL
+    # an interface is a member of the ACL
+    for (my $i=0;$i<$viewEqList->number_of_equipment();$i++)
+    {
+	my $eq=$viewEqList->get($i);
+#	for (my $j=0;$j<$eq->number_of_interface();$j++)
+#	{
+	#my $int=$eq->get_interface($j);
+	#my $intname=$int->get_name();
+	my $eqname=$eq->get_name();
+	
+	#   if ($j==0) 
+#	    { 
+	$viewFile.="view ".'"ACL-'.$eqname.'"'."\n";
+	$viewFile.="{\n";
+	$viewFile.="\t".'match-clients { "ACL-'.$eqname.'"; };'."\n"; 
+	$viewFile.="\t"."rrset-order { type A name ".'"*.'.$domainName.'"'." order fixed; };\n";
+	$viewFile.="\t".'include "'.ZONE_SPECIFIC.'ACL-'.$eqname.'.conf.include";'."\n";
+	
+	$viewFile.=$str_zone_specific;
+	$viewFile.="\n";
+
+	$viewFile.="\t\t".'zone "'.$domainName."\" \tIN { type master; file \"ACL-".$eqname.".".$domainName.".zone\"; };\n"  ;
+	#$viewFile.="\t\t"."zone \"".$domainName."\" \tIN { type master; file \"".$domainName.".zone\"; };\n"  ;
+	
+	#$viewFile.="\t\t"."zone ".'"'.$intname.'.'.$domainName.'"'."\tIN { type master; file ".'"ACL-'.$eqname.$intname.'.'.$domainName.'.zone"; };'."\n";
+	
+	$viewFile.=$str_reverse_includes;
+	$viewFile.="\n};\n\n";
+    }
+    
+    $viewFile.="view ".'"ACL-ALLOTHERS"'."\n"; 
+    $viewFile.="{\n";
+    $viewFile.="\t"."match-clients { ".'"ACL-ALLOTHERS"'."; };\n";
+    $viewFile.="\t"."rrset-order { type A name ".'"*.'.$domainName.'"'." order fixed; type PTR name \"*.in-addr.arpa\" order fixed; };\n";
+    $viewFile.="\t".'include "'.ZONE_SPECIFIC.'ACL-'.'ALLOTHERS.'.'conf.include";'."\n";
+    $viewFile.=$str_zone_specific; 
+
+    $viewFile.="\t\t"."zone \"".$domainName."\" \tIN { type master; file \"".$domainName.".zone\"; };\n"  ;
+    $viewFile.=$str_reverse_includes;
+
+    $viewFile.="};\n";
+    
+    return $viewFile;
+}
+
+
+
+
+
+sub checkAclDB()
+{
+    my $fct = (caller(0))[3];    
+    my $acl_prerequirements=0;
+    my $fault_list_ref;
+                   
+    $acl_prerequirements=$dnsvip->check_acl_prerequirements();
+                   
+    if (!$acl_prerequirements)
+    {              
+        my @result_tab2=$dnsvip->{acl_require_fault};
+                   
+        if ( $#result_tab2 > 0)
+        {          
+            clmOutput($fct,"The metaservice configuration of network interfaces must be changed for these items");
+	    
+            foreach my $fault_config (@$fault_list_ref) 
+	    {
+                clmOutput($fct,"The item [type, id]: [".@$fault_config[2].", ".@$fault_config[1]."] on : [".@$fault_config[3]."] is set ".@$fault_config[0]." times.\n");
+            }      
+            exit 1;
+        }
+    }          
+    else           
+    {              
+        $dnsvip->build_ACL_list();
+    }              
+    
+    if ($dnsvip->acl_table_exist()==0)
+    {              
+        clmOutput($fct,"there is no metaservice_host entry");
+        return 0;  
+    }              
+                   
+    return 1;      
+}
+
+
+sub returnStrAclFile()
+{
+    my $fct = (caller(0))[3];
+
+    my $aclFile;
+    #my %hash_acl_to_ip=undef;
+    my $aclEqList=undef;
+    my $acl_group;
+    my @acl_ip_list;
+    my $ip_list;
+    my $acl_string="";
+    my $acl_group_nb=-1;
+
+    if ($dnsvip->acl_table_exist())
+    {
+	$aclEqList=$dnsvip->get_acl_struct();
+	my $k=0;
+	for (my $i=0; $i<$aclEqList->number_of_equipment();$i++)
+	{
+	    my $aclEq=$aclEqList->get($i);
+	    $acl_string.="acl ".'"ACL-'.$aclEq->get_name().'"'."\n{ \n";
+	    
+	    for (my $j=0; $j<$aclEq->number_of_interface();$j++)
+	    {
+		my $interface=$aclEq->get_interface($j);
+		$acl_string.=$interface->get_ip().";\t";
+		$k++;
+		if ($k>4) { $k=0; $acl_string.="\n"; }
+	    }
+	    
+	    $acl_string.="\n};\n\n\n\n";
+	    $acl_group_nb=$i;
+	}
+	
+    }
+    $aclFile=$acl_string;
+
+    if ($acl_group_nb==-1)
+    {
+	clmOutput($fct,"There is no DNS ACL defined in the clusterdb");
+    }
+
+    $aclFile.="acl \"ACL-ALLOTHERS\" { any; };\n ";
+    return $aclFile;
+}
+
+
+
+sub get_global_IN_A()
+{
+    my $fct = (caller(0))[3];
+    my $eql;
+    my $eq;
+    my $int;
+    my $eq_name;
+    my $eq_int_name;
+    my $eq_iname;
+    my $ip;
+    my $domainName;
+    my $str="";
+    my $str_adm="";;
+    my $zone_info="";
+    my $network_function=undef;
+
+    if (!($global_IN_A eq "")) { return $global_IN_A; }
+    #$domainName=$configHashNamed{"soa_root_domain"};
+    $domainName=$dnsvip->get_dns_domain_from_cluster();
+    $eql=$clusterDBEquipment->get_equipmentList();
+    for (my $i=0; $i < $eql->number_of_equipment();$i++)
+    {  
+        $eq=$eql->get($i);
+        $eq_name=$eq->get_name();
+
+        for (my $j=0; $j < $eq->number_of_interface(); $j++)
+        {  
+            $int=$eq->get_interface($j);
+            $eq_int_name=$int->get_name();
+	    $network_function=$int->get("function");
+	    if ($eq->get_type() eq "HOST")
+            { $eq_iname=$eq_name."-".$int->get("iname"); }
+
+	    if ($dns_kerberos_multi_homed_ptr)
+	    { # kerberos multihome
+		if ($network_function && $network_function =~/mn/ ) # deal with interface on management network
+		{
+		    if (!($eq_name eq $eq_int_name))
+		    {
+			$str_adm.=$eq_name."\tIN\tA\t".$int->get_ip()."\n";
+			$str_adm.=$eq_int_name."\tIN\tA\t".$int->get_ip()."\n";		    
+		    }
+		    else
+		    {
+			$str_adm.=$eq_int_name."\tIN\tA\t".$int->get_ip()."\n";		    
+		    }
+		}
+		else
+		{
+		    $str.=$eq_name."\tIN\tA\t".$int->get_ip()."\n";
+		    $str.=$eq_int_name."\tIN\tA\t".$int->get_ip()."\n";
+		}
+	    } # Not kerberos multihome
+	    else
+	    {	    
+		if ($network_function && $network_function =~/mn/ ) # deal with interface on management network
+		{
+		    $str_adm.=$eq_int_name."\tIN\tA\t".$int->get_ip()."\n";
+		    if (!($eq_int_name eq $eq_name))
+		    { 
+			$str_adm.=$eq_name."\tIN\tA\t".$int->get_ip()."\n"; 
+			#$str_adm.=$eq_name."\tIN\tCNAME\t".$eq_int_name.".".$domainName.".\n";
+		    }
+		    
+		    
+		}
+		else
+		{
+		    $str.=$eq_int_name."\tIN\tA\t".$int->get_ip()."\n";
+		}
+	    }
+	    if ($eq->get_type() eq "HOST")
+            {
+                $str.=$eq_iname."\tIN\tA\t".$int->get_ip()."\n";
+                if ($int->get("network-suffix"))
+                {
+                    my $network_suffix=$int->get("network-suffix");
+                    my $iname=$int->get("iname");
+                    $str.=$eq_name."-".$network_suffix."-".$iname."\tIN\tA\t".$int->get_ip()."\n";
+                }
+            }	    
+	}
+        $zone_info.=$str_adm;
+        $zone_info.=$str;
+        $str="";
+        $str_adm="";
+    }
+    $global_IN_A=$zone_info;
+    return $zone_info;
+}
+
+
+sub get_equipment_list_alias_services_for_view()
+{
+    my $fct = (caller(0))[3];
+
+    my $ZoneInfo;
+
+    my $domainName; 
+    my $zoneFile;
+    my $zoneFilePath;
+    my $zoneName = "";
+    my $zoneDomain = "";
+    my $groupId;
+
+    #$domainName=$configHashNamed{"soa_root_domain"};
+    $domainName=$dnsvip->get_dns_domain_from_cluster();
+
+    my $index=0;
+    my $view_string;
+    my $alias_eql=Bull::CLM::DB::EquipmentList::new();
+    my $eql=$clusterDBEquipment->get_equipmentList();
+
+    $view_string=$dnsvip->get_service_struct();
+
+    for (my $i=0; $i<$view_string->number_of_equipment();$i++)
+    {
+	my $aclEq=$view_string->get($i);
+
+	for (my $j=0;$j<$aclEq->number_of_interface();$j++)
+	{
+	    my $aclInt=$aclEq->get_interface($j);
+	    my $ip=$aclInt->get_ip();
+	    my $name=$aclInt->get_name();
+	    my $alias_eq=Bull::CLM::DB::NetworkInterface::new();
+	    $alias_eq->set_name($name);
+	    $alias_eq->set_ip($ip);
+	    $alias_eq->set("global_cname","no");
+	    $alias_eq->set("local_cname","no");
+	    $alias_eq->set("acl",$aclEq->get_name());
+	    for (my $k=0;$k<$eql->number_of_equipment();$k++)
+	    {
+		my $eq=$eql->get($k);
+		for (my $l=0;$l<$eq->number_of_interface();$l++)
+		{
+		    my $int=$eq->get_interface($l);
+		    if ($ip eq $int->get_ip())
+		    {
+			$alias_eq->set("local_cname","yes");
+			$alias_eq->set("cname",$eq->get_name());			    
+		    }
+		}
+	    }
+	    $alias_eql->add($alias_eq);
+	}
+    }
+    return $alias_eql;
+}
+
+sub get_equipment_list_alias_services()
+{
+    #my $self = shift ;
+    my $view_service_str="";
+    my $ref_list_metaservice_id=$dnsvip->get_metaservice_global();
+    
+    my $alias_eql=Bull::CLM::DB::EquipmentList::new();
+    my $eql=$clusterDBEquipment->get_equipmentList();
+
+    foreach my $ref_list_node (@$ref_list_metaservice_id)
+    {	   
+	if ( defined( (@$ref_list_node)[1]) )
+	{
+	    my $name=@$ref_list_node[0];
+	    my $ip=@$ref_list_node[1];
+	    my $alias_eq=Bull::CLM::DB::NetworkInterface::new();
+
+	    $alias_eq->set_name($name);	    
+	    $alias_eq->set_ip($ip);
+	    $alias_eq->set("global_cname","no");
+	    for (my $i=0;$i<$eql->number_of_equipment();$i++)
+	    {
+		my $eq=$eql->get($i);
+		for (my $j=0;$j<$eq->number_of_interface();$j++)
+		{
+		    my $int=$eq->get_interface($j);
+		    if ($ip eq $int->get_ip())
+		    {
+			$alias_eq->set("global_cname","yes");
+			$alias_eq->set("cname",$eq->get_name());			    
+		    }
+		}
+	    }
+	    $alias_eql->add($alias_eq);
+	}
+    }
+    return $alias_eql;
+}
+
+
+
+sub createZoneFileForView()
+{
+    my $fct = (caller(0))[3];
+    my $clusterdb=shift;
+
+
+    my $ZoneInfo;
+
+    my $domainName; 
+    my $zoneFile;
+    my $zoneFilePath;
+    my $zoneName = "";
+    my $zoneDomain = "";
+    my $groupId;
+
+    $zoneFile="";
+    $zoneFilePath="";
+    #$domainName=$configHashNamed{"soa_root_domain"};
+    $domainName=$dnsvip->get_dns_domain_from_cluster();
+
+    my $index=0;
+    my $view_string;
+    my $alias_eql=get_equipment_list_alias_services_for_view();
+    my %hash_zone_content;
+
+    $view_string=$dnsvip->get_service_struct();
+    touch_conf_specific_acl($view_string);
+    touch_zone_specific_acl($view_string);
+
+
+    # Put the header for the zone
+    for (my $i=0;$i<$view_string->number_of_equipment();$i++)
+    {
+	my $eq=$view_string->get($i);
+	my $eqname=$eq->get_name();
+	if (!(exists $hash_zone_content{"$eqname"}))
+	{
+	    $hash_zone_content{"$eqname"}.=headerZoneFile($domainName);	    
+	}
+    }
+    
+    # Put specific information in the forward zone view
+    for (my $i=0;$i<$view_string->number_of_equipment();$i++)
+    {
+	my $eq=$view_string->get($i);
+	my $eqname=$eq->get_name();
+	my $localdir=$outputDirectory.ZONE_SPECIFIC;
+	my $filename="$localdir/ACL-$eqname".".zone.include";
+	if ( -f $filename)
+	{
+	    $hash_zone_content{"$eqname"}.=readFile($filename);
+	}	    	
+    }
+    
+
+
+    for (my $i=0; $i<$alias_eql->number_of_equipment();$i++)
+    {
+	my $aclEq=$alias_eql->get($i);
+	if (!(exists $hash_zone_content{$aclEq->get("acl")}))
+	{
+	    $hash_zone_content{$aclEq->get("acl")}.=headerZoneFile($domainName);
+	}
+
+	if ($aclEq->get("local_cname") eq "yes")
+	{
+	    $hash_zone_content{$aclEq->get("acl")}.=$aclEq->get("name")."\tIN\tCNAME\t".$aclEq->get("cname")."\n";
+	}
+	else
+	{
+	    $hash_zone_content{$aclEq->get("acl")}.=$aclEq->get("name")."\tIN\tA\t".$aclEq->get("ip")."\n";
+	}
+    }
+    $alias_eql=get_equipment_list_alias_services();
+    foreach my $key (keys %hash_zone_content)
+    {
+	for (my $i=0;$i<$alias_eql->number_of_equipment();$i++)
+	{
+	    my $alias_eq=$alias_eql->get($i);
+	    my $name=$alias_eq->get_name();
+	    if (!(($hash_zone_content{$key} =~ /$name\t/m))) #or
+#		  ($alias_eq->get("cname")  =~ /$hash_zone_content{$key}/m)))
+	    {
+		if ($alias_eq->get("global_cname") eq "yes")
+		{
+		    $hash_zone_content{$key}.=$alias_eq->get("name")."\tIN\tCNAME\t".$alias_eq->get("cname")."\n"; 	
+		}
+		else
+		{
+		    $hash_zone_content{$key}.=$alias_eq->get("name")."\tIN\tA\t".$alias_eq->get("ip")."\n"; 	
+		}
+	    }
+	}
+    }
+
+    foreach my $key (keys %hash_zone_content)
+    {	
+	#print "####$key####\n";
+	#print $hash_zone_content{$key}."\n\n";
+	my $zoneFilePath="$outputDirectory".NAMED_PRIMARY."ACL-".$key.".".$domainName."."."zone";
+	$zoneFilePath=~s|//|/|g;
+	clmOutput($fct,"Creating $zoneFilePath");
+	open(FH,">$zoneFilePath");
+	print FH $hash_zone_content{$key}.get_global_IN_A();
+	close(FH);
+    }
+}
+
+
+
+sub createForwardZoneFile()
+{
+    my $fct = (caller(0))[3];
+    my $ref_networkList=$clusterDBEquipment->get_networkList()->get_ref();
+    my @networkList=@$ref_networkList;
+    my $network;
+    my $eql;
+    my $eq;
+    my $int;
+    my $eq_name;
+    my $eq_int_name;
+    my $ip;
+    my $str="";
+    my $str_adm="";
+    #my $domainName=$configHash{"soa_root_domain"};
+    my $domainName=$dnsvip->get_dns_domain_from_cluster();
+    my $zoneFilePath="$outputDirectory".NAMED_PRIMARY."$domainName".".zone";
+    my $ref_networkHash;        
+    my $zone_info="";
+    
+    my %hash_cname;
+    my @ip_list;
+    my $localdir=$outputDirectory.ZONE_SPECIFIC;
+    my $filename="$localdir/ACL-ALLOTHERS.zone.include";
+
+
+    #my $dnsvip=Bull::CLM::DB::DNSVIP::new($clusterdb);
+
+    clmOutput($fct,"Creating forward zone file for domain $domainName");
+    $zoneFilePath=purifyString($zoneFilePath);
+    open(FH,">$zoneFilePath") or die "can not open $zoneFilePath";
+    clmOutput($fct,"Creating $zoneFilePath");
+    $zone_info=headerZoneFile($domainName);
+
+    if ( -f $filename)
+    {
+	$zone_info.=readFile($filename);
+    }	    	
+
+    #$eql=$clusterDBEquipment->get_equipmentList();
+    
+
+#    $zone_info.=return_rr_zone_info_cname_for_global_zone();
+    $eql=get_equipment_list_alias_services();
+    for (my $i=0;$i<$eql->number_of_equipment();$i++)
+    {
+	my $eq=$eql->get($i);
+	if ($eq->get("global_cname") eq "yes")
+	{ $zone_info.=$eq->get("name")."\tIN\tCNAME\t".$eq->get("cname")."\n"; 	}
+	else
+	{ $zone_info.=$eq->get("name")."\tIN\tA\t".$eq->get("ip")."\n";         }
+    }
+    $zone_info.=get_global_IN_A();
+    print FH $zone_info;
+    close(FH);
+}
+
+sub appendReverseZoneFile($$)
+{
+    my $fct = (caller(0))[3];
+    my $zoneFilePath=shift;
+    my $zoneFileContent=shift;
+    my $equipmentObject;
+    my $ip;
+    my $name;
+    my $reverse_ip;
+    #my $netmask=$networkObject->get_netmask();
+    #my $domainName=$configHashNamed{"soa_root_domain"};
+    my $domainName=$dnsvip->get_dns_domain_from_cluster();
+    
+    #print ("mask:$mask_num\n");
+#    my $filePath="$outputDirectory/".NAMED_PRIMARY."/named.".$zoneFileName.".zone";
+    open(FH,">$zoneFilePath") or die "can not open $zoneFilePath";
+    print FH headerZoneFile($domainName);
+    print FH $zoneFileContent;
+    close(FH);
+}
+
+sub cleaningPrimaryZoneFile()
+{
+    my $zoneFilePath="$outputDirectory/".NAMED_PRIMARY."/named.";    
+    $zoneFilePath=~s|//|/|g;
+    $zoneFilePath=~s|//|/|g;
+    clmOutput($fct,"Cleaning $zoneFilePath"."*");
+    system("rm -f $zoneFilePath"."*");
+}
+
+
+sub createReverseZoneFile()
+{
+    my $fct = (caller(0))[3];
+    my $networkList=$clusterDBEquipment->get_networkList();
+    my $ref_networkList=$networkList->get_ref();
+    my @networkList=@$ref_networkList;
+    my $domainName;
+    my $network;
+    my $zoneFileName;
+    my $zoneFilePath;
+    my %hash_file;
+    #$domainName=$configHashNamed{"soa_root_domain"};    
+    $domainName=$dnsvip->get_dns_domain_from_cluster();
+    my $tmp;
+    my @tmp_lst;
+    for (my $i=0; $i<$networkList->number_of_network(); $i++)
+    {
+	my $str="";
+	my $key;
+	$network=$networkList->get($i);
+	
+	for (my $j=0; $j<$network->number_of_equipment();$j++)
+	{
+	    my $d1;
+	    my $d2;
+	    my $d3;
+	    my $d4;
+	    my $int=$network->get_equipment($j);
+	    my $ip=$int->get_ip();
+	    my $network_function=$int->get("function");
+	    my $eq_int_name=$int->get_name();
+	    my $eq_name=$int->get("equipment_name");
+	    if ($ip=~/(\d+)\.(\d+)\.(\d+)\.(\d+)/)
+	    { 	$d1=$1; $d2=$2; $d3=$3; $d4=$4; }
+
+	    $key=$d3.'.'.$d2.'.'.$d1;
+	    if (!(exists $hash_file{$key})) { $hash_file{$key}=""; }
+
+	    
+	    # We are using kerberos_multihomed_ptr so 
+	    # we give the equipment name to each PTR record 
+	    if ($dns_kerberos_multi_homed_ptr)
+	    {
+		#print "DNS kerberos"; exit 1;		   
+		$hash_file{$key}=$hash_file{$key}."$d4\tIN\tPTR\t$eq_name.$domainName.\n";
+	    }
+	    else
+	    {
+
+	    # We are using kerberos multi-homed configuration 
+	    # BUT kerberos is configured to handle itself different name 
+	    # on reverse lookup
+	    #if ($eq_int_name eq $eq_name)
+	    #{
+		$hash_file{$key}=$hash_file{$key}."$d4\tIN\tPTR\t$eq_int_name.$domainName.\n";
+		if (!( $eq_int_name eq $eq_name) && $network_function eq "mn")
+		{
+		    $hash_file{$key}=$hash_file{$key}."$d4\tIN\tPTR\t$eq_name.$domainName.\n";
+		}
+	    #}
+	    }
+	}
+    }
+    
+    my $eql_alias=get_equipment_list_alias_services();
+    foreach my $key (keys %hash_file)
+    {
+	for (my $i=0;$i<$eql_alias->number_of_equipment();$i++)
+	{
+	    my $eq_alias=$eql_alias->get($i);		 
+	    my $ip=$eq_alias->get("ip");
+	    my $name=$eq_alias->get("name");
+	    my $d1;
+	    my $d2;
+	    my $d3;
+	    my $d4;
+	    my $key_ip;
+	    if ($eq_alias->get("global_cname") eq "yes") { next; }
+	    if ($ip=~/(\d+)\.(\d+)\.(\d+)\.(\d+)/)
+	    { 	$d1=$1; $d2=$2; $d3=$3; $d4=$4; }
+	    $key_ip=$d3.'.'.$d2.'.'.$d1;
+	    if (!($key eq $key_ip)) { next; }
+	    #print "Not Next : $name $ip\n";
+	    
+	    #if (!(($hash_file{$key} =~ /$d4\tIN\tPTR\t/m))) #or
+	    #{ 
+	    $hash_file{$key}=$hash_file{$key}."$d4\tIN\tPTR\t$name.$domainName.\n"; 
+	    #}
+	}
+    }
+    
+    
+    foreach my $key (keys %hash_file)
+    {
+	@rev_inaddr_list=(@rev_inaddr_list,$key);
+	my $filePath1="$outputDirectory/".NAMED_PRIMARY."/named.".$key.".zone";
+	my $filePath2="$outputDirectory/".ZONE_SPECIFIC."/named.".$key.".zone";
+	$filePath1=purifyString($filePath1);
+	$filePath2=purifyString($filePath2);
+	clmOutput($fct,"Creating "."$filePath1");
+	if (-f $filePath2 && -s $filePath2) 
+	{ 
+	    clmOutput($fct,"There is a zone to include in named."."$key".".zone");     
+	    $hash_file{$key}="\n;BEGIN IMPORT ".$filePath2."\n\n".readFile($filePath2)."\n;END IMPORT   ".$filePath2."\n\n".$hash_file{$key}; 
+	}
+	else
+	{ writeFile($filePath2,""); }
+	appendReverseZoneFile($filePath1,$hash_file{$key});
+    }
+}
+
+sub createZoneFile()
+{
+    my $fct = (caller(0))[3];
+    my $networkList=shift;
+    createForwardZoneFile();
+    createReverseZoneFile();
+}
+
+
+sub loadConfigBullNamed()
+{
+    my $fct = (caller(0))[3];
+    my $ok=0;    
+    %configHashNamed=clmLoadConfig(CLM_NAMED_CONF);
+    foreach my $variable (keys %configHashNamed)
+    {
+	if ($variable =~ "nameserver_name")    { $ok=1; }
+	if ($variable =~ "kerberos_multi_homed_ptr") 
+	{
+	    if ($configHashNamed{$variable} =~/yes|1/)
+	    { $dns_kerberos_multi_homed_ptr=1; }
+	}
+    }
+    return $ok;
+}
+
+
+sub loadConfig()
+{
+    if (!defined($dbhost))
+    {
+	%configHashClusterdb=clmLoadConfig($clusterdb_conf);
+	foreach my $variable (keys %configHashClusterdb)
+	{
+	    if ($variable =~ "host")
+	    { 
+		$dbhost=$configHashClusterdb{"host"}; 
+	    }
+	}	
+    }
+}
+
+
+
+
+
+sub connectClusterDB()
+{
+    my $fct = (caller(0))[3]; 
+    my $p;
+    my $dbhandler=undef;
+
+    if (!defined($dbhost))
+    { 
+	$dbhost="127.0.0.1"; 
+    }
+    else
+    {
+	$p = Net::Ping->new();    
+	if (!($p->ping($dbhost,1))) { $dbhost="127.0.0.1"; }
+	$p->close();
+    }
+    
+       
+    if ($dbname)
+    {
+	clmOutput($fct,"Connecting to ClusterDB on host : $dbhost"."/".$dbname);
+	$dbhandler=connectDB Bull::CLM::DB::ClusterDB({db_name=>$dbname,db_host=>$dbhost});
+    }    
+    else
+    {   
+	clmOutput($fct,"Connecting to ClusterDB on host : $dbhost");
+	$dbhandler=connectDB Bull::CLM::DB::ClusterDB({db_host=>$dbhost});
+    }
+    if (!defined($dbhandler)) 
+    {
+	clmHistoryMsg("Connection to ClusterDB on host : $dbhost failed");
+	die "Connection to ClusterDB on host : $dbhost failed";
+    }
+    return $dbhandler;
+}
+
+
+sub actionExec {
+    my $fct = (caller(0))[3];
+    my ($action, $force, $timeout, $nodes) = @_;    
+    my $zoneFileName;
+    
+    
+    clmHistoryStart();
+    #importConf();
+    loadConfig();
+
+    if (!loadConfigBullNamed()) 
+    { 
+	clmOutput($fct,"loadConfig from file : ".CLM_NAMED_CONF." failed."); 
+	clmOutput($fct,"Please, check the nameserver_name variable definition in the ".CLM_NAMED_CONF." file and restart this command");
+	exit 1;
+    }
+    $export_all=$configHashNamed{"export_all"};
+    
+    if ($opt_dir) { $outputDirectory=$opt_dir; }
+    else          { $outputDirectory=DEFAULT_OUTPUT_DIRECTORY; }
+    
+    backupWorkingSpace();
+    createWorkingSpace();
+    
+    $str_include_equipment_class=create_str_zone_specific();
+    
+    $clusterdb=connectClusterDB();
+    
+    
+    $clusterDBEquipment=Bull::CLM::DB::ClusterDBEquipment::new();
+    $equipmentNetwork=Bull::CLM::DB::EquipmentNetwork::new();
+    $dnsvip=$equipmentNetwork->get_dnsvip();
+
+    $clusterDBEquipment->set_dbhandler($clusterdb);
+    $dnsvip->set_dbhandler($clusterdb);
+
+    $configHashNamed{"soa_root_domain"}=$dnsvip->get_dns_domain_from_cluster();
+
+
+    $clusterDBEquipment->set_equipmentNetwork($equipmentNetwork);
+
+
+    
+    $clusterDBEquipment->import_network();
+    if (($export_all eq "yes") || ($export_all eq "1"))
+    {
+	$clusterDBEquipment->import_host();
+	$clusterDBEquipment->import_hardwareManager();
+	$clusterDBEquipment->import_diskArray();
+	$clusterDBEquipment->import_VM();
+	$clusterDBEquipment->import_switch();
+	$clusterDBEquipment->import_gateway();
+    }
+
+    if ($opt_verbose) { $clusterDBEquipment->print_network(); }
+    
+    $clusterDBEquipment->get_networkList();
+
+    createNamedConf();
+    createAclFile();
+    createOptionsFile();
+    
+    cleaningPrimaryZoneFile();
+    createZoneFile();
+    createZoneFileForView();
+    
+    createViewFile();
+    
+    clmHistoryEnd(0);
+}

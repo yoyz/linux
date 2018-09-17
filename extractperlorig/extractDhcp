@@ -1,0 +1,942 @@
+#!/usr/bin/perl -w 
+###############################################################################
+# Copyright (C) 2009  Bull S. A. S.  -  All rights reserved
+# Bull, Rue Jean Jaures, B.P.68, 78340, Les Clayes-sous-Bois
+# This is not Free or Open Source software.
+# Please contact Bull S. A. S. for details about its license.
+###############################################################################
+
+##=============================================================================
+##
+## extractDhcp 
+##
+##=============================================================================
+# HISTORY
+# Created June 2009
+# XXXXXX : defect or feature description
+
+# @(#) $Id: extractDhcp,v 1.35.2.2 2011/02/11 13:44:51 peyrardj Exp $
+
+
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Basename;
+use Bull::CLM::Usage;
+use Bull::CLM::Trace;
+use Bull::CLM::Config;
+use Bull::CLM::History;
+use Bull::CLM::DB::ClusterDB;
+use Bull::CLM::BCMPath;
+use Net::Ping;
+
+#@INC=(@INC,".");
+use Bull::CLM::DB::NetworkEquipment;
+#use ZoneParse;
+use Bull::CLM::DB::ClusterDBEquipment;
+use Bull::CLM::DB::DNSVIP;
+
+# get command basename and parameters
+my $program = basename($0);
+my @programParams = @ARGV;
+
+
+# standard option variables for outputs
+my $opt_verbose;
+my $opt_Debug;
+my $opt_quiet;
+# other example option variables
+my $opt_file;
+my $opt_dir;
+my $opt_Action;
+my $opt_Force;
+my $opt_timeout;
+
+##################################################
+
+my $bcmpath = Bull::CLM::BCMPath->new();
+my $clusterdb_conf=$bcmpath->getBCMPath()."/conf/clusterdb/clusterdb.conf";
+
+##################################################
+
+use constant SLASH                                => '/';
+use constant SLASH_ETC                            => '/etc';
+use constant DEFAULT_OUTPUT_DIRECTORY             => '/tmp/dbmConfig';
+use constant DIRECTORY_DHCP                       => SLASH_ETC.SLASH."dhcp";
+use constant DHCP_CONF                            => DIRECTORY_DHCP.SLASH."dhcpd.conf";
+use constant DHCP_CONF_EQUIPMENT_CLASS            => DIRECTORY_DHCP.SLASH."equipmentClass";
+
+use constant DHCP_NETWORK                         => DIRECTORY_DHCP.SLASH."dhcpd.conf.network";
+use constant CLM_NAMED_CONF                       => SLASH_ETC.SLASH."named-bull.conf";
+
+use constant GPXE_BOOT_PROTOCOL                   => "tftp";
+use constant DNS_NODE                             => "dns-server";
+use constant TFTP_NODE                            => "tftp-server";
+
+
+
+my $outputDirectory;
+
+
+my %configHashNamed;
+my %clusterdbHash;
+
+
+
+
+my $regex_ipv4="(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+my $regex_ipv4_network="(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\/[0-9]|[0-9][0-9])";
+my $regex_name="[a-zA-Z0-9-_]+";
+
+my $tag_dhcp_begin        ="# README_FIRST
+#
+# This file will not be overwritten, you can add your local configuration here
+#
+";
+
+my $dhcp_internal_tpl="#
+allow booting;
+deny bootp;
+default-lease-time 259200;
+max-lease-time     259200;
+not authoritative;
+allow unknown-clients;
+";
+
+my @file_to_include=();
+
+my $clusterdb;
+my $dbname="";
+my $dbhost=undef;
+my $help=undef;
+
+##################################################
+
+
+# Bull::CLM::Trace : initialization
+#   By default :
+#   clmInitTrace() is equivalent to : clmInitTrace(undef,undef);
+#   - trace configuration file = /etc/clm/clmtrace.conf
+#   - trace directory = /tmp
+#   Example using local trace configuration file and specific trace directory :
+#   clmInitTrace("./localtrace.conf","/tmp/mydir");
+
+
+
+
+
+clmInitTrace();
+
+
+
+#my $action = clmGetAction();
+#my $actionParams = clmGetActionParams();
+my $action='exec';
+my $actionParams='';
+my $group;
+my $fqdn=0;
+my $ntpserver=undef;
+
+
+# Bull::CLM::Usage is not usable in this case, 
+# extractCmd -d directory -g group -g group
+# Replaced by 'GetOptions'
+
+GetOptions( "d=s"        =>\$opt_dir,
+            "dir=s"      =>\$opt_dir,
+            "g=s"        =>\$group,
+            "group=s"    =>\$group,
+	    # output options
+	    "verbose"    => \$opt_verbose,
+	    "Debug"      => \$opt_Debug,
+	    "debug"      => \$opt_Debug,
+	    "quiet"      => \$opt_quiet,
+	    "dbname=s"   => \$dbname,
+	    "dbhost=s"   => \$dbhost,
+	    "ntp-ip=s"   => \$ntpserver,
+	    "fqdn"       => \$fqdn,
+	    "h"          => \$help,
+	    "help"       => \$help
+            );
+
+my $fct = (caller(0))[3];
+# Bull::CLM::Trace : initialize output options
+clmOutputOptions($opt_verbose,$opt_Debug,$opt_quiet);
+
+if ($help)
+{
+    clmOutput($fct, "
+$0 
+    [--dbname databaseName]  
+    [--dbhost hostname]
+    [-d outputDirectory]
+    [-v]
+    [--ntp-ip <ip1,ip2,ip3>]
+
+");
+    exit 0;
+}
+
+if ( ! $opt_dir ) { $opt_dir='/'; }
+
+# Execute action
+if ($action eq 'usage') {
+    actionUsage();
+} elsif ($action eq 'config') {
+    actionConfig($opt_file);
+} elsif ($action eq 'exec') 
+{
+    actionExec($opt_Action, $opt_Force, $opt_timeout, $actionParams);
+}
+else 
+{
+    actionExec($opt_Action, $opt_Force, $opt_timeout, $actionParams);
+}
+
+
+exit(0);
+
+
+##-----------------------------------------------------------------------------
+## actionUsage()
+##     Show the list of standard CLM options.
+## Parameters
+##     none
+##-----------------------------------------------------------------------------
+sub actionUsage {
+    my $fct = (caller(0))[3];
+    clmOutput($fct,"$0 <-d directory> ");
+}
+
+
+
+
+
+##-----------------------------------------------------------------------------
+## actionConfig()
+##     Bull::CLM::Config : example of reading a configuration file
+## Parameters
+##     $confFile : configuration file name
+##-----------------------------------------------------------------------------
+sub actionConfig {
+    my $fct = (caller(0))[3];
+    my ($confFile) = @_;
+
+    if (!defined $confFile) {
+        clmUsage(1,"Missing configuration file name"); # display usage and exit 1
+    }
+
+    # read the configuration file in a hash table
+    my %configHash = clmLoadConfig($opt_file);
+
+    my $variable;
+    clmOutput($fct, "Configuration variables defined in $confFile :\n");
+    foreach $variable (keys %configHash) {
+        clmOutput($fct,"Name = '$variable' => Value = '$configHash{$variable}'");
+    }
+
+    # read a single configuration parameter :
+    # my $paramValue = clmConfig($opt_file,$paramName);
+}
+
+
+
+sub createWorkingSpace()
+{
+    my $fct = (caller(0))[3];
+    
+    my $directory_dhcp="$outputDirectory/".DIRECTORY_DHCP;
+    
+    if ($opt_verbose)
+    {
+	clmOutput($fct,"Create directory $outputDirectory");
+	clmHistoryMsg("Create directory $outputDirectory");
+    }
+    
+    if (! -d $outputDirectory)
+    { if (!(mkdir $outputDirectory))           { clmOutput($fct,"Can not create dir $outputDirectory"); exit 1; } }
+
+    if (! -d $outputDirectory.SLASH_ETC )
+    { if (!(mkdir $outputDirectory.SLASH_ETC)) { clmOutput($fct,"Can not create dir $outputDirectory".SLASH_ETC); exit 1; } }
+    
+    if (! -d $directory_dhcp)
+    { if (!(mkdir $directory_dhcp))            { clmOutput($fct,"Can not create dir $directory_dhcp"); exit 1; } }    
+
+    if (! -d $outputDirectory.DHCP_CONF_EQUIPMENT_CLASS)
+    { if (!(mkdir $outputDirectory.DHCP_CONF_EQUIPMENT_CLASS))            { clmOutput($fct,"Can not create dir $outputDirectory.DHCP_CONF_EQUIPMENT_CLASS"); exit 1; } }    
+}
+
+
+
+
+
+sub returnDhcpEntryFQDN($$$$$)
+{
+    my $fct = (caller(0))[3];
+    my $equipmentObject=shift;
+    my $gateway=shift;
+    my $function=shift;
+    my $techno=shift;
+    my $pkey=shift;
+    my $name;
+    my $shortname;
+    my $type;
+    my $mac;
+    my $ip;    
+    my $domainName="";
+    my $dhcp_entry="";
+    my $str_err="";
+    my $port_number=1;
+    my $rank_number=1;
+#    my $number=0;
+ 
+
+    $domainName=$configHashNamed{"soa_root_domain"};
+
+
+    $name=$equipmentObject->get_name();
+    $ip=$equipmentObject->get_ip();
+    $mac=$equipmentObject->get_mac();
+    $port_number=$equipmentObject->get("rank_number");
+    $rank_number=$equipmentObject->get("port_number");
+    $type=$equipmentObject->get("type");
+    $shortname=$equipmentObject->get("shortname");
+
+    if (!(defined($name)     and
+	  defined($ip)       and
+	  defined($mac)      and
+	  defined($function) and
+	  defined($techno) )) 
+    { 
+		if ($opt_verbose)
+		{
+			$str_err="Warning clusterdb is not completed, bypass entry :";
+			if (!defined($name)) { $str_err.=" hostname ** UNKOWN **,"; }
+				else { $str_err.=" hostname $name,"; }
+			if (!defined($ip)) { $str_err.=" ip ** UNKOWN **,"; }
+				else { $str_err.=" ip $ip,"; }
+			if (!defined($mac)) { $str_err.=" mac ** UNKOWN **,"; }
+				else { $str_err.=" mac $mac,"; }
+			if (!defined($gateway)) { $str_err.=" gateway ** UNKOWN **,"; }
+				else { $str_err.=" gateway $gateway,"; }
+			if (!defined($function)) { $str_err.=" function ** UNKOWN **,"; }
+				else { $str_err.=" function $function,"; }
+			if (!defined($techno)) { $str_err.=" techno ** UNKOWN **,"; }
+				else { $str_err.=" techno $techno,"; }
+			
+			clmWarning($fct,$str_err);
+	    	clmHistoryMsg($str_err);
+		}
+	return ""; 
+   }
+
+#    	if (   $port_number==1 && $rank_number==1 )
+#    		{ $number=0; }
+#	elsif ($port_number==1 && $rank_number==2 )
+#    		{ $number=1; }
+#	elsif ($port_number==2 && $rank_number==1 )
+#    		{ $number=2; }
+#	elsif ($port_number==2 && $rank_number==2 )
+#    		{ $number=3; }
+	
+#    print "[$name] [$ip] [$gateway] [$mac] [$function] [$techno]\n";
+
+    $dhcp_entry.="host ".$name."__"."$ip"." { \n";
+#    $dhcp_entry.="host $name { \n";
+
+    if (defined($ntpserver))
+    {
+	$dhcp_entry.="\toption ntp-servers;\n";
+    }
+
+    if ($techno =~ /infiniband/i)
+    {
+	$dhcp_entry.="\t"."option dhcp-client-identifier ".$pkey.":".$mac.";\n";
+    }
+    else # For now Ethernet only
+    {
+	$dhcp_entry.="\t"."hardware ethernet $mac;\n";
+    }
+	
+    $dhcp_entry.="\t"."fixed-address ".$ip.";\n";
+    $dhcp_entry.="\t"."option host-name \"".$shortname."\";\n";
+      
+    #print $type."\n";
+    if (defined($type))
+    {
+	if ($type=~/VM/i)
+	{ 
+	    $dhcp_entry.="\t"."filename \"pxelinux.0\";\n";
+	}
+	elsif ($type=~/HOST/i and 
+	       $techno =~ /eth/i)
+	{
+	    $dhcp_entry.="\t"."filename \"pxelinux.0\";\n";
+	}
+	elsif ($type=~/HOST/i and 
+	       $techno =~ /infiniband/i and
+	       $configHashNamed{"soa_root_domain"}
+	    )
+	{
+	    my $domainName=$configHashNamed{"soa_root_domain"};
+	    $dhcp_entry.="\t"."filename \"".GPXE_BOOT_PROTOCOL."://".TFTP_NODE."."."$domainName/gpxe/$shortname\";\n";
+	}
+	elsif ($type=~/HardwareManager/i)
+	{
+	    $dhcp_entry.="\t"."log(info, log_msg_inventory);\n";
+	}
+    }
+    
+    $dhcp_entry.="\n}\n\n";
+    
+#	print "equipment : $name $ip $mac $type\n";
+    
+    return $dhcp_entry;
+}
+
+sub returnDhcpEntry($$$$$)
+{
+    my $fct = (caller(0))[3];
+    my $nic=shift;
+    my $gateway=shift;
+    my $function=shift;
+    my $techno=shift;
+    my $pkey=shift;
+    my $name;
+    my $shortname;
+    my $equipment_name;
+    my $type;
+    my $port_type;
+    my $mac;
+    my $ip;    
+    my $domainName="";
+    my $dhcp_entry="";
+    my $str_err="";
+    my $port_number=1;
+    my $rank_number=1;
+#    my $number=0;
+ 
+
+    $domainName=$configHashNamed{"soa_root_domain"};
+
+
+    $name=$nic->get_name();
+    $ip=$nic->get_ip();
+    $mac=$nic->get_mac();
+    $port_number=$nic->get("rank_number");
+    $rank_number=$nic->get("port_number");
+    $type=$nic->get("type");
+    $port_type=$nic->get("port_type");
+    $shortname=$nic->get("name");
+    $equipment_name=$nic->get("equipment-name");
+
+    if (!(defined($name)     and
+	  defined($ip)       and
+	  defined($mac)      and
+	  defined($function) and
+	  defined($techno) )) 
+    { 
+		if ($opt_verbose)
+		{
+			$str_err="Warning clusterdb is not completed, bypass entry :";
+			if (!defined($name)) { $str_err.=" hostname ** UNKOWN **,"; }
+				else { $str_err.=" hostname $name,"; }
+			if (!defined($ip)) { $str_err.=" ip ** UNKOWN **,"; }
+				else { $str_err.=" ip $ip,"; }
+			if (!defined($mac)) { $str_err.=" mac ** UNKOWN **,"; }
+				else { $str_err.=" mac $mac,"; }
+			if (!defined($gateway)) { $str_err.=" gateway ** UNKOWN **,"; }
+				else { $str_err.=" gateway $gateway,"; }
+			if (!defined($function)) { $str_err.=" function ** UNKOWN **,"; }
+				else { $str_err.=" function $function,"; }
+			if (!defined($techno)) { $str_err.=" techno ** UNKOWN **,"; }
+				else { $str_err.=" techno $techno,"; }
+			
+			clmWarning($fct,$str_err);
+	    	clmHistoryMsg($str_err);
+		}
+	return ""; 
+   }
+
+#    	if (   $port_number==1 && $rank_number==1 )
+#    		{ $number=0; }
+#	elsif ($port_number==1 && $rank_number==2 )
+#    		{ $number=1; }
+#	elsif ($port_number==2 && $rank_number==1 )
+#    		{ $number=2; }
+#	elsif ($port_number==2 && $rank_number==2 )
+#    		{ $number=3; }
+	
+#    print "[$name] [$ip] [$gateway] [$mac] [$function] [$techno]\n";
+
+    $dhcp_entry.="host ".$name."__"."$ip"." { \n";
+#    $dhcp_entry.="host $name { \n";
+
+    if (defined($ntpserver))
+    {
+	$dhcp_entry.="\toption ntp-servers $ntpserver;\n";
+    }
+
+
+    if ($techno =~ /infiniband/i)
+    {
+	$dhcp_entry.="\t"."option dhcp-client-identifier ".$pkey.":".$mac.";\n";
+    }
+    else # For now Ethernet only
+    {
+	$dhcp_entry.="\t"."hardware ethernet $mac;\n";
+    }
+	
+    $dhcp_entry.="\t"."fixed-address ".$ip.";\n";
+    $dhcp_entry.="\t"."option host-name \"".$equipment_name."\";\n";
+      
+    #print $type."\n";
+    if (defined($type))
+    {
+	if ($type=~/VM/i)
+	{ 
+	    $dhcp_entry.="\t"."filename \"pxelinux.0\";\n";
+	}
+	elsif ($type=~/HOST/i and 
+	       $techno =~ /eth/i)
+	{
+	    $dhcp_entry.="\t"."filename \"pxelinux.0\";\n";
+	}
+	elsif ($type=~/HOST/i and 
+	       $techno =~ /infiniband/i and
+	       $configHashNamed{"soa_root_domain"}
+	    )
+	{
+	    my $domainName=$configHashNamed{"soa_root_domain"};
+	    $dhcp_entry.="\t"."filename \"".GPXE_BOOT_PROTOCOL."://".TFTP_NODE."."."$domainName/gpxe/$shortname\";\n";
+	}
+	elsif (($type=~/HardwareManager/i ) and (!($port_type =~/bmc/)))
+	{
+	    $dhcp_entry.="\t"."log(info, log_msg_inventory);\n";
+	}
+    }
+    
+    $dhcp_entry.="\n}\n\n";
+    
+#	print "equipment : $name $ip $mac $type\n";
+    
+    return $dhcp_entry;
+}
+
+
+
+sub createDhcpFileForANetwork($)
+{
+    my $fct = (caller(0))[3];
+    
+    my $networkObject=shift;
+    my $equipmentObject;
+    my $dhcp_file="";
+    my $gateway="";
+    my $cidr="";
+    my $network="";
+    my $netmask="";
+    my $broadcast="";
+    my $function="";
+    my $techno="";
+    my $type="";
+    my $pkey="";
+
+    my @tmpList=();
+    my $dhcp_by_network_file_path="";
+    my $dhcp_by_network_file_to_include="";
+
+    $type=$networkObject->get_type();
+    $gateway=$networkObject->get_gateway();
+    $netmask=$networkObject->get_netmask();
+    $cidr=$networkObject->get_cidr();
+    $broadcast=$networkObject->get_broadcast();
+    $function=$networkObject->get_function();             #function : mn bb ic
+    $techno=$networkObject->get_techno();                 #techno   : GbEthernet InfiniBand
+    $pkey=$networkObject->get_pkey();
+
+    @tmpList=split("/",$cidr);
+    $network=$tmpList[0];
+
+    $dhcp_by_network_file_to_include=DHCP_NETWORK.".".$network.".conf";
+    $dhcp_by_network_file_path=$outputDirectory.$dhcp_by_network_file_to_include;
+
+
+    for (my $i=0; $i<$networkObject->number_of_equipment() ; $i++ )
+    {
+	    $equipmentObject=$networkObject->get_equipment($i);
+	    if ($fqdn)
+	    {
+		$dhcp_file.=returnDhcpEntryFQDN($equipmentObject,$gateway,$function,$techno,$pkey);
+	    }
+	    else
+	    {
+		$dhcp_file.=returnDhcpEntry($equipmentObject,$gateway,$function,$techno,$pkey);
+	    }
+    }
+
+
+    open(FH_DHCP_BY_NETWORK,">$dhcp_by_network_file_path");
+    $dhcp_by_network_file_path=~s|//|/|g;
+    clmOutput($fct,"Created $dhcp_by_network_file_path file");
+    print FH_DHCP_BY_NETWORK $dhcp_file;
+    close(FH_DHCP_BY_NETWORK);
+    @file_to_include=(@file_to_include,$dhcp_by_network_file_to_include);
+}
+
+
+sub createDhcpFileForEachNetwork #($)
+{
+    my $fct = (caller(0))[3];
+    my $networkList=shift;
+    my $network_parent_id=shift;
+    my $ref_networkList=$networkList->get_ref();
+    my $networkObject;
+    my @nwList=@$ref_networkList;
+    my @tmpList=();
+    my $dhcp_network_file_path=$outputDirectory.DHCP_NETWORK;
+	my $dhcp_network_file="";
+    my $dhcp_file="";
+    my $shared_network_function="";
+    my $shared_network_function_opened=0;
+    my $techno="";
+    my $netmask="";
+    my $broadcast="";
+    my $nw="";
+    my $domainName=$configHashNamed{"soa_root_domain"};
+	my $nw_id=-1;
+
+    foreach $networkObject (@nwList)
+    {
+        #if (! defined($network_parent_id)) {
+		#   print ("NET initial:".$networkObject->get_name().".\n");
+		#}
+		#else
+		#{
+		#   if (defined ($networkObject->get_parent_id())) {
+		#       print ("NET :".$networkObject->get_name().", parent:".$networkObject->get_parent_id()." from ".$network_parent_id.".\n");
+		#   }
+		#   else {
+		#       print ("NET :".$networkObject->get_name().", without parent from ".$network_parent_id.".\n");
+		#   }
+
+		if (!defined($networkObject->get_function())) 	{ next; }
+
+		#BEGIN DISABLE BACKBONE ENTRY FOR CEA       
+		if ($networkObject->get_function() =~ /bb/)
+		{
+	    	clmOutput($fct,"Bypass backbone network ".$networkObject->get_cidr());
+	    	next;
+		}
+		#END DISABLE BACKBONE ENTRY FOR CEA
+
+		#BEGIN DON'T use RANGE ENTRY
+		if ($networkObject->get_function() =~ /range/) 	{ next; }
+		#END DON'T use RANGE ENTRY
+
+        if (defined($network_parent_id)) {
+			my $tmp_id="--UNDEFINED--";
+			if ( defined ($networkObject->get_parent_id())) {
+				$tmp_id=$networkObject->get_parent_id();
+			}
+			if (( $tmp_id eq $network_parent_id) || (($networkObject->get_id()) eq $network_parent_id)) {
+				if ($networkObject->get_cidr())
+					{ clmOutput($fct,"Creating dhcp file for network ".$networkObject->get_cidr()); }
+				else
+					{  next; }
+				$dhcp_network_file.=createDhcpCommonFileForOneNetwork($networkObject, $domainName);
+			}
+		}
+		else
+		{
+			if ($networkObject->get_parent_id()) { next; }
+
+			# BEGIN Shared Network
+			if ($nw_id != -1)
+			{ 
+			    $dhcp_network_file.="}\n\n";
+			}
+			$nw_id=$networkObject->get_id();
+			$dhcp_network_file.="shared-network \"".$networkObject->get_name()."\" \n{\n\n";
+			$shared_network_function_opened=1;
+
+			$dhcp_network_file.=createDhcpFileForEachNetwork($networkList,$nw_id);
+		}
+    }
+
+	if (!defined($network_parent_id)) {
+    	if ($shared_network_function_opened==1)
+    	{
+			$dhcp_network_file.="\n}\n";
+    	}
+
+    	foreach $networkObject (@nwList)
+    	{
+			if ($networkObject->get_type() eq "range")  { next; }
+			#	if ($networkObject->get_function())         { next; }
+			if (!($networkObject->get_cidr()))          { next; }
+			createDhcpFileForANetwork($networkObject);
+			#BEGIN DISABLE BACKBONE ENTRY FOR CEA
+	
+			if ($networkObject->get_function() =~ /bb/) { pop @file_to_include }
+			#END DISABLE BACKBONE ENTRY FOR CEA
+    	}
+	
+	$dhcp_network_file_path=~s|//|/|g;
+    	open(FH_DHCP_NETWORK,">$dhcp_network_file_path");
+	clmOutput($fct,"Created $dhcp_network_file_path file");
+    	print FH_DHCP_NETWORK $dhcp_network_file;
+    	close(FH_DHCP_NETWORK);
+	}
+	else {
+		return $dhcp_network_file;
+	}
+}
+
+sub createDhcpCommonFileForOneNetwork($$$)
+{
+    my $fct = (caller(0))[3];
+    my $networkObject=shift;
+    my $domainName=shift;
+
+    my $next_server="localhost";
+    my $dhcp_network_file="";
+    my $line="";
+
+    my $gateway=$networkObject->get_gateway();
+    my $netmask=$networkObject->get_netmask();
+    my $cidr=$networkObject->get_cidr();
+    my $broadcast=$networkObject->get_broadcast();
+    my $function=$networkObject->get_function();
+    my $techno=$networkObject->get_techno();
+    
+    
+    my @tmpList=split("/",$cidr);
+    my $nw=$tmpList[0];
+    
+    $dhcp_network_file.="\tsubnet ".$nw." netmask ".$netmask." \n";
+    $dhcp_network_file.="\t{ \n";
+    $dhcp_network_file.="\t option broadcast-address ".$broadcast.";\n";
+    
+    
+    if ($domainName)
+    {
+	$dhcp_network_file.="\t option domain-name \"$domainName\";\n";
+	$dhcp_network_file.="\t option domain-name-servers ".DNS_NODE."."."$domainName;\n";
+	$dhcp_network_file.="\t next-server ".TFTP_NODE."."."$domainName;\n";
+    }
+    else
+    {
+	open(CMD,"/bin/hostname|") or die "Error calling system command '/bin/hostname'";
+	$line=<CMD>;
+	chomp($line);
+	$next_server=$line;
+	$dhcp_network_file.="#No dns configuration found, defining this host as the tftp server\n";
+	$dhcp_network_file.="next-server $next_server;\n";
+    }
+    
+    
+    
+    if ($function=~/mn/ &&
+	$gateway && 
+	$gateway=~/$regex_ipv4/)  
+    { $dhcp_network_file.="\t option routers ".$gateway.";\n"; }
+    
+    
+    
+#	if ($techno=~/eth/i) 
+#	{ $dhcp_network_file.="\t".' filename "pxelinux.0";'."\n"; }
+    
+    $dhcp_network_file.="\t}\n\n";
+    
+    return $dhcp_network_file;
+}
+
+sub loadNamedConfig()
+{
+    my $fct = (caller(0))[3];
+    my $ok=1;    
+    if ( ! -f CLM_NAMED_CONF ) 
+    {
+	clmOutput($fct,"No DNS configuration file found, in order to export DNS configuration, you have to run the extractDns command.");
+	$ok=0
+    }
+    else
+    {
+    	%configHashNamed=clmLoadConfig(CLM_NAMED_CONF);
+    	foreach my $variable (keys %configHashNamed)
+    	{
+		if ($variable =~ "soa_root_domain") { $ok=1; }
+    	}
+    }
+    return $ok;
+}
+
+sub createCommonIncludeFile()
+{
+    my $dhcpd_conf_file_path;
+    my $dhcpd_conf_local_file_path;
+    my $line;
+    my $dhcp_tpl="";
+
+    $dhcpd_conf_file_path=$outputDirectory.DHCP_CONF;
+    $dhcpd_conf_local_file_path=$dhcpd_conf_file_path.".local";
+
+    $dhcp_tpl.=$tag_dhcp_begin;
+    $dhcp_tpl.=$dhcp_internal_tpl;
+
+    if (! ( -f $dhcpd_conf_local_file_path))
+    {
+	$dhcpd_conf_local_file_path=~s|//|/|g;
+	open(FH_DHCP_CONF_LOCAL,">$dhcpd_conf_local_file_path");
+	clmOutput($fct,"Created $dhcpd_conf_local_file_path file");
+	print FH_DHCP_CONF_LOCAL $dhcp_tpl;
+	close(FH_DHCP_CONF_LOCAL);
+    }
+    
+    $dhcpd_conf_file_path=$outputDirectory.DHCP_CONF;
+    $dhcpd_conf_file_path=~s|//|/|g;
+    open(FH_DHCP_CONF,">$dhcpd_conf_file_path");
+    clmOutput($fct,"Created $dhcpd_conf_file_path file");
+#    print FH_DHCP_CONF $dhcp_tpl."\n";
+    print FH_DHCP_CONF "include \"".DHCP_CONF.".local\";\n";
+    print FH_DHCP_CONF "include \"".DHCP_NETWORK."\";\n";
+ 
+    my $str="";
+    my $localdir=$outputDirectory.DHCP_CONF_EQUIPMENT_CLASS;
+
+    foreach my $line ( <$localdir/*>)
+    {
+	$str.="include \"".$line."\";\n";
+    }
+    #print $str;
+    print FH_DHCP_CONF $str;
+
+#    if ( -d $outputDirectory.DHCP_CONF_EQUIPMENT_CLASS)
+#    {
+#	print "EQUIPMENT CLASS";
+#	open(FH_LS,"ls ".$outputDirectory.DHCP_CONF_EQUIPMENT_CLASS."|");
+#	foreach my $line (<FH_LS>)
+#	{
+#	    chomp $line;
+#	    my $str="include \"".DHCP_CONF_EQUIPMENT_CLASS."/".$line."\";\n";
+#	    print $str;
+#	    print FH_DHCP_CONF $str;
+#	}
+#    }
+
+    foreach my $file (@file_to_include)
+    {
+	print FH_DHCP_CONF "include \"".$file."\";\n";
+    }
+    close(FH_DHCP_CONF);
+}
+
+
+sub connectClusterDB()
+{
+    my $fct = (caller(0))[3]; 
+    my $p;
+    my $dbhandler=undef;
+
+    if (!defined($dbhost))
+    { 
+	$dbhost="127.0.0.1"; 
+    }
+    else
+    {
+	$p = Net::Ping->new();    
+	if (!($p->ping($dbhost,1))) { $dbhost="127.0.0.1"; }
+	$p->close();
+    }
+    
+    clmOutput($fct,"Connecting to ClusterDB on host : $dbhost");
+    
+    
+    if ($dbname)
+    {
+	$dbhandler=connectDB Bull::CLM::DB::ClusterDB({db_name=>$dbname,db_host=>$dbhost});
+    }    
+    else
+    {   
+	$dbhandler=connectDB Bull::CLM::DB::ClusterDB({db_host=>$dbhost});
+    }
+    if (!defined($dbhandler)) 
+    {
+	clmHistoryMsg("Connection to ClusterDB on host : $dbhost failed");
+	die "Connection to ClusterDB on host : $dbhost failed";
+    }
+    return $dbhandler;
+}
+
+sub loadConfig()
+{
+    if (!defined($dbhost))
+    {
+	%clusterdbHash=clmLoadConfig($clusterdb_conf);
+	foreach my $variable (keys %clusterdbHash)
+	{
+	    if ($variable =~ "host")
+	    { 
+		$dbhost=$clusterdbHash{"host"};
+	    }
+	}	
+    }
+}
+
+
+
+
+sub actionExec {
+    my $fct = (caller(0))[3];
+    my ($action, $force, $timeout, $nodes) = @_;    
+    my $zoneFileName;
+    my $ref_networkList;
+    my $clusterDBEquipment;
+    my $equipmentNetwork;
+    my $dnsvip;
+    my $networkList;
+    
+#    my $dnsvip=Bull::CLM::DB::DNSVIP::new();
+
+
+    loadConfig();
+    loadNamedConfig();
+
+    $clusterdb=connectClusterDB();
+
+    $clusterDBEquipment=Bull::CLM::DB::ClusterDBEquipment::new();
+    $equipmentNetwork=Bull::CLM::DB::EquipmentNetwork::new();
+    $dnsvip=Bull::CLM::DB::DNSVIP::new();
+
+    $dnsvip->set_dbhandler($clusterdb);
+    $clusterDBEquipment->set_dbhandler($clusterdb);
+    $clusterDBEquipment->set_equipmentNetwork($equipmentNetwork);
+
+    if ($opt_dir) { $outputDirectory=$opt_dir; }
+    else          { $outputDirectory=DEFAULT_OUTPUT_DIRECTORY; }
+
+    clmHistoryStart();
+    createWorkingSpace();
+
+
+    $configHashNamed{"soa_root_domain"}=$dnsvip->get_dns_domain_from_cluster();
+    
+
+
+    $clusterDBEquipment->import_network();
+    $clusterDBEquipment->import_host($ref_networkList);
+    $clusterDBEquipment->import_hardwareManager($ref_networkList);
+    $clusterDBEquipment->import_VM($ref_networkList);
+    if ($opt_verbose) { $clusterDBEquipment->print_network($ref_networkList); }
+
+    $clusterDBEquipment->import_switch($ref_networkList);
+    $clusterDBEquipment->import_diskArray($ref_networkList);
+
+
+    $networkList=$clusterDBEquipment->get_networkList();
+    createDhcpFileForEachNetwork($networkList);
+    createCommonIncludeFile();
+    
+    clmHistoryEnd(0);
+}
