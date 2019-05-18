@@ -170,7 +170,14 @@ int main( int argc, char* args[] )
   
   //Normalized direction
   int xDir,yDir,lastXDir,lastYDir=0;
-  
+  double joystickAngle=0;
+
+  xDir=0;
+  yDir=0;
+  lastXDir=0;
+  lastXDir=0;
+  joystickAngle=0;
+
   //While application is running
   while( !quit )
     {
@@ -242,7 +249,7 @@ int main( int argc, char* args[] )
       SDL_RenderClear( gRenderer );
       
       //Calculate angle
-      double joystickAngle = atan2( (double)yDir, (double)xDir ) * ( 180.0 / M_PI );
+      joystickAngle = atan2( (double)yDir, (double)xDir ) * ( 180.0 / M_PI );
       
       //Correct angle
       if( xDir == 0 && yDir == 0 )
