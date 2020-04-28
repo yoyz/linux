@@ -17,7 +17,7 @@ int main(int argc,char **argv)
 	{	
 		char * ptn=argv[1];
 		char * dev=argv[2];
-		if (strcmp(dev,"S_IFREG")==0)  { mknod(ptn,mode,S_IFREG); }
+		if (strcmp(dev,"S_IFREG")==0)  { mknod(ptn,mode,0); }
 		if (strcmp(dev,"S_IFIFO")==0)  { mkfifo(ptn,mode);  }
 		if (strcmp(dev,"S_IFSOCK")==0) { mknod(ptn,S_IFSOCK|mode,0); } 
 	}
