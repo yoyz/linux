@@ -1,0 +1,129 @@
+#!/usr/bin/python2
+
+import commands
+import re
+import sys
+import os.path
+from os import path
+import time
+from os import listdir
+from os.path import isfile, join
+
+
+sci="/sys/class/infiniband/"
+scn="/sys/class/net/"
+mlx4_0="mlx4_0"
+mlx5_0="mlx5_0"
+mlx5_1="mlx5_1"
+
+intNameList=[ mlx4_0, mlx5_0, mlx5_1 ]
+intNameFound=[ ]
+netIntList=[ ]
+
+class net_int_obj:
+    def __init__(self):
+        self.intName=None
+        self.portNumber=0
+        self.rcv_data_0=0
+        self.rcv_data_1=0
+        self.xmit_data_0=0
+        self.xmit_data_1=0
+        self.ib=0
+        self.ip=0
+
+
+    def setIP(self,ip):
+        self.ip=ip
+
+    def setIB(self,ib):
+        self.ib=ib
+
+
+
+    def setName(self,name):
+        self.intName=name
+
+    def setPort(self,portNumber):
+        self.portNumber=portNumber
+
+    def updatePortState(self):
+        if self.ib:
+            self.updatePortState_ib()
+        if self.ip:
+            self.updatePortState_ip()
+
+
+    def updatePortState_ib(self):
+        # port_rcv_data Total number of data octets, divided by 4 (lanes), received on all VLs. This is 64 bit counter.  PortRcvData Informative
+        self.rcv_data_0=self.rcv_data_1
+        out=commands.getoutput("cat "+sci+"/"+self.intName+"/ports/"+str(self.portNumber)+"/counters/port_rcv_data")
+        self.rcv_data_1=int(out)*4
+
+        self.xmit_data_0=self.xmit_data_1
+        out=commands.getoutput("cat "+sci+"/"+self.intName+"/ports/"+str(self.portNumber)+"/counters/port_xmit_data")
+        self.xmit_data_1=int(out)*4
+
+    def updatePortState_ip(self):
+        self.rcv_data_0=self.rcv_data_1
+        out=commands.getoutput("cat "+scn+"/"+self.intName+"/statistics/rx_bytes")
+        self.rcv_data_1=int(out)
+
+
+        self.xmit_data_0=self.xmit_data_1
+        out=commands.getoutput("cat "+scn+"/"+self.intName+"/statistics/tx_bytes")
+        self.xmit_data_1=int(out)
+
+
+
+
+
+    def printMe(self):
+        print       "%10s %5s %2s %10s %8s %10s %9s" % (
+                    self.intName,
+                    "port",
+                    str(self.portNumber),
+                    " xmit MiB/s ",
+                    str((((self.xmit_data_1-self.xmit_data_0)/1024)/1024)),
+                     " rcv MiB/s ",
+                    str((( self.rcv_data_1 - self.rcv_data_0 ) /1024 ) /1024 ))
+
+if __name__ == '__main__':
+    for intName in intNameList:
+        if ( path.exists(sci+"/"+intName) ):
+            intNameFound.append(intName)
+
+
+    for intName in intNameFound:
+       if ( path.exists(sci+"/"+intName+"/ports/1/") ):
+            ni = net_int_obj()
+            ni.setName(intName)
+            ni.setPort(1)
+            ni.setIB(1)
+            netIntList.append(ni)
+
+       if ( path.exists(sci+"/"+intName+"/ports/2/") ):
+            ni = net_int_obj()
+            ni.setName(intName)
+            ni.setPort(2)
+            ni.setIB(1)
+            netIntList.append(ni)
+
+    for intName in listdir(scn):
+            ni = net_int_obj()
+            ni.setName(intName)
+            ni.setPort(1)
+            ni.setIP(1)
+            netIntList.append(ni)
+
+    for netInt in netIntList:
+        netInt.updatePortState()
+
+    while True :
+        time.sleep(1)
+        for netInt in netIntList:
+            netInt.updatePortState()
+            netInt.printMe()
+        print ""
+
+
+
