@@ -1,20 +1,20 @@
-#!/usr/bin/python2
+#! /usr/bin/env python
 
-import commands
 import re
 import sys
-import os.path
-from os import path
+import getopt
 import time
-from os import listdir
-from os.path import isfile, join
-
+from   os import path, listdir
 
 sci="/sys/class/infiniband/"
 scn="/sys/class/net/"
 
-intNameFound=[ ]
-netIntList=[ ]
+useFloat=0                 # usefull if we want to see above 1MB/s or for example 0.4MiB/s
+delay=1                    # wait how many second between each display
+
+################################################################################
+#  net_int_obj : network interface object, which store name and counter
+################################################################################
 
 class net_int_obj:
     def __init__(self):
@@ -37,8 +37,6 @@ class net_int_obj:
     def setIB(self):
         self.ib=1
         self.ip=0
-
-
 
     def setName(self,name):
         self.intName=name
@@ -63,11 +61,11 @@ class net_int_obj:
 
         # read counter, and multiply them by 4 assuming we use 4 lane which should be the case if we are on SDR/QDR/FDR/EDR, need to check on HDR
         f=open(sci+"/"+self.intName+"/ports/"+str(self.portNumber)+"/counters/port_rcv_data")
-        self.rcv_data_1=int(f.readline())*4
+        self.rcv_data_1=float(f.readline())*4
         f.close()
 
         f=open(sci+"/"+self.intName+"/ports/"+str(self.portNumber)+"/counters/port_xmit_data")    
-        self.xmit_data_1=int(f.readline())*4
+        self.xmit_data_1=float(f.readline())*4
         f.close()
         
     def updatePortState_ip(self):
@@ -75,12 +73,12 @@ class net_int_obj:
         self.rcv_data_0=self.rcv_data_1
         self.xmit_data_0=self.xmit_data_1
         f=open(scn+"/"+self.intName+"/statistics/rx_bytes")
-        self.rcv_data_1=int(f.readline())
+        self.rcv_data_1=float(f.readline())
         f.close()
 
         f=open(scn+"/"+self.intName+"/statistics/tx_bytes")
         #out=commands.getoutput("cat "+scn+"/"+self.intName+"/statistics/tx_bytes")
-        self.xmit_data_1=int(f.readline())
+        self.xmit_data_1=float(f.readline())
         f.close
 
 
@@ -88,17 +86,55 @@ class net_int_obj:
 
     # print one line of performance status for this interface
     def printMe(self):
-        print       "%10s %5s %2s %10s %8s %10s %9s" % (
+        if useFloat==1:
+            print(       "%10s %5s %2s %10s %5f %10s %5f" % (
                     self.intName,
                     "port",
                     str(self.portNumber),
                     " xmit MiB/s ",
-                    str((((self.xmit_data_1-self.xmit_data_0)/1024)/1024)),
+                    ((((float(self.xmit_data_1 - self.xmit_data_0)) / 1024.0 ) / 1024.0 /delay)),
                      " rcv MiB/s ",
-                    str((( self.rcv_data_1 - self.rcv_data_0 ) /1024 ) /1024 ))
+                    ((( float(self.rcv_data_1  - self.rcv_data_0))  / 1024.0 ) / 1024.0 )/delay))
+        if useFloat==0:
+            print(       "%10s %5s %2s %10s %5d %10s %5d" % (
+                    self.intName,
+                    "port",
+                    str(self.portNumber),
+                    " xmit MiB/s ",
+                    ((((int(self.xmit_data_1 - self.xmit_data_0)) / 1024.0 ) / 1024.0 )/delay),
+                     " rcv MiB/s ",
+                    ((( int(self.rcv_data_1  - self.rcv_data_0))  / 1024.0 ) / 1024.0 )/delay))
 
+
+################################################################################
+#  main and simple function
+################################################################################
+            
+def usage():
+    print( "nettraf.py [-f|-h] [ -d X ]")
+    print( "            -h : help")
+    print( "            -f : use fload")
+    print( "            -d : wait a number of second between each display 1 by default")
+
+            
 if __name__ == '__main__':
+    netIntList=[ ]
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hfd:")
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        usage()
+        sys.exit(2)
 
+    for o, a in opts:
+        if o == "-f":
+            useFloat = True
+        if o == "-h":
+            usage()
+            sys.exit(0)
+        if o == "-d":
+            delay=int(a)
+    
     if ( path.exists(sci) ):
         # fetch the interface in /sys/class/infiniband
         for intName in listdir(sci):
@@ -129,16 +165,16 @@ if __name__ == '__main__':
             netInt.updatePortState()
 
     if len(netIntList)==0:
-        print "No interface found, exiting"
+        print("No interface found, exiting")
         sys.exit(1)
         
     # display the port state in a loop
     while True:
-        time.sleep(1)
+        time.sleep(delay)
         for netInt in netIntList:
             netInt.updatePortState()
             netInt.printMe()
-        print ""
+        print("")
 
 
 
