@@ -1,10 +1,11 @@
 #! /usr/bin/env python
-
+#  author peyrard.johann@gmail.com
 import re
 import sys
 import getopt
 import time
 from   os import path, listdir
+import signal
 
 sci="/sys/class/infiniband/"
 scn="/sys/class/net/"
@@ -18,8 +19,8 @@ delay=1                    # wait how many second between each display
 
 class net_int_obj:
     def __init__(self):
-        self.intName=None
-        self.portNumber=0
+        self.intName=None   # interface name like eth0 mlx4_0 etc.
+        self.portNumber=0   # the port number only usefull on infiniband which can have two port like this /sys/class/infiniband/mlx4_0/ports/2/
         self.rcv_data_0=0   # rcv  data in 2 buffer to do bw = (b1-b0)/time
         self.rcv_data_1=0   #
         self.xmit_data_0=0  # xmit data in 2 buffer to do bw = (b1-b0)/time
@@ -87,7 +88,7 @@ class net_int_obj:
     # print one line of performance status for this interface
     def printMe(self):
         if useFloat==1:
-            print(       "%10s %5s %2s %10s %5f %10s %5f" % (
+            print(       "%10s %5s %2s %10s %9.3f %10s %9.3f" % (
                     self.intName,
                     "port",
                     str(self.portNumber),
@@ -96,7 +97,7 @@ class net_int_obj:
                      " rcv MiB/s ",
                     ((( float(self.rcv_data_1  - self.rcv_data_0))  / 1024.0 ) / 1024.0 )/delay))
         if useFloat==0:
-            print(       "%10s %5s %2s %10s %5d %10s %5d" % (
+            print(       "%10s %5s %2s %10s %9d %10s %9d" % (
                     self.intName,
                     "port",
                     str(self.portNumber),
@@ -116,13 +117,18 @@ def usage():
     print( "            -f : use fload")
     print( "            -d : wait a number of second between each display 1 by default")
 
+def handler(signum, frame):
+    sys.exit(0)
             
 if __name__ == '__main__':
+
     netIntList=[ ]
+    signal.signal(signal.SIGINT, handler)
+
+    # argument parsing
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hfd:")
     except getopt.GetoptError as err:
-        # print help information and exit:
         usage()
         sys.exit(2)
 
@@ -175,6 +181,3 @@ if __name__ == '__main__':
             netInt.updatePortState()
             netInt.printMe()
         print("")
-
-
-
