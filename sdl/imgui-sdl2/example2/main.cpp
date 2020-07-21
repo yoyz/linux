@@ -67,6 +67,16 @@ int main(int, char**)
     if (!no_menu)     window_flags |= ImGuiWindowFlags_MenuBar;
 
 
+    static const char * value_zero_sixteen[] =
+      {
+       "01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16"
+      };
+    static const char * value_zero_sixteen_s[] =
+      {
+       "[01]","[02]","[03]","[04]","[05]","[06]","[07]","[08]","[09]","[10]","[11]","[12]","[13]","[14]","[15]","[16"
+      };
+
+    
     // Main loop
     bool done = false;
     while (!done)
@@ -127,25 +137,58 @@ int main(int, char**)
 		      cb_last_value[4],  cb_last_value[5],  cb_last_value[6],  cb_last_value[7],
 		      cb_last_value[8],  cb_last_value[9],  cb_last_value[10], cb_last_value[11],
 		      cb_last_value[12], cb_last_value[13], cb_last_value[14], cb_last_value[15]);
+
+	  ImGui::Text("last value : %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+		      cb_value[0],  cb_value[1],  cb_value[2],  cb_value[3],
+		      cb_value[4],  cb_value[5],  cb_value[6],  cb_value[7],
+		      cb_value[8],  cb_value[9],  cb_value[10], cb_value[11],
+		      cb_value[12], cb_value[13], cb_value[14], cb_value[15]);
+
+
 	  ImGui::Text("cs : %d ",cs);
 
-	  cb_last_value[0] =ImGui::Checkbox("A", &cb_value[0]);   ImGui::SameLine(50);
-	  cb_last_value[1] =ImGui::Checkbox("B", &cb_value[1]);   ImGui::SameLine(100);
-	  cb_last_value[2] =ImGui::Checkbox("C", &cb_value[2]);   ImGui::SameLine(150);
-	  cb_last_value[3] =ImGui::Checkbox("D", &cb_value[3]);   ImGui::SameLine(200);
-	  cb_last_value[4] =ImGui::Checkbox("E", &cb_value[4]);   ImGui::SameLine(250);
-	  cb_last_value[5] =ImGui::Checkbox("F", &cb_value[5]);   ImGui::SameLine(300);
-	  cb_last_value[6] =ImGui::Checkbox("G", &cb_value[6]);   ImGui::SameLine(350);
-	  cb_last_value[7] =ImGui::Checkbox("H", &cb_value[7]);  
+	  for (int i=0;i<8;i++)
+	    {
+	      static const char * txt;
+	      if (cs==i)
+		txt=value_zero_sixteen_s[i];
+	      else
+		txt=value_zero_sixteen[i];
 
-	  cb_last_value[8] =ImGui::Checkbox("I", &cb_value[8]);   ImGui::SameLine(50);
-	  cb_last_value[9] =ImGui::Checkbox("J", &cb_value[9]);   ImGui::SameLine(100);
-	  cb_last_value[10]=ImGui::Checkbox("K", &cb_value[10]);  ImGui::SameLine(150);
-	  cb_last_value[11]=ImGui::Checkbox("L", &cb_value[11]);  ImGui::SameLine(200);
-	  cb_last_value[12]=ImGui::Checkbox("M", &cb_value[12]);  ImGui::SameLine(250);
-	  cb_last_value[13]=ImGui::Checkbox("N", &cb_value[13]);  ImGui::SameLine(300);
-	  cb_last_value[14]=ImGui::Checkbox("O", &cb_value[14]);  ImGui::SameLine(350);
-	  cb_last_value[15]=ImGui::Checkbox("P", &cb_value[15]);  
+	      cb_last_value[i] =ImGui::Checkbox(txt, &cb_value[i]);
+	      if (i<7) ImGui::SameLine((i+1)*70);
+	    }
+	  for (int i=8;i<16;i++)
+	    {
+	      static const char * txt;
+	      if (cs==i)
+		txt=value_zero_sixteen_s[i];
+	      else
+		txt=value_zero_sixteen[i];
+	      
+	      cb_last_value[i] =ImGui::Checkbox(txt, &cb_value[i]);
+	      if (i<15) ImGui::SameLine((i-8+1)*70);
+	    }
+
+	  /*
+	  cb_last_value[0] =ImGui::Checkbox("01", &cb_value[0]);   ImGui::SameLine(50);
+	  cb_last_value[1] =ImGui::Checkbox("02", &cb_value[1]);   ImGui::SameLine(100);
+	  cb_last_value[2] =ImGui::Checkbox("03", &cb_value[2]); ImGui::SameLine(150);
+	  cb_last_value[3] =ImGui::Checkbox("04", &cb_value[3]);   ImGui::SameLine(200);
+	  cb_last_value[4] =ImGui::Checkbox("05", &cb_value[4]);   ImGui::SameLine(250);
+	  cb_last_value[5] =ImGui::Checkbox("06", &cb_value[5]);   ImGui::SameLine(300);
+	  cb_last_value[6] =ImGui::Checkbox("07", &cb_value[6]);   ImGui::SameLine(350);
+	  cb_last_value[7] =ImGui::Checkbox("08", &cb_value[7]);  
+	  
+	  cb_last_value[8] =ImGui::Checkbox("09", &cb_value[8]);   ImGui::SameLine(50);
+	  cb_last_value[9] =ImGui::Checkbox("10", &cb_value[9]);   ImGui::SameLine(100);
+	  cb_last_value[10]=ImGui::Checkbox("11", &cb_value[10]);  ImGui::SameLine(150);
+	  cb_last_value[11]=ImGui::Checkbox("12", &cb_value[11]);  ImGui::SameLine(200);
+	  cb_last_value[12]=ImGui::Checkbox("13", &cb_value[12]);  ImGui::SameLine(250);
+	  cb_last_value[13]=ImGui::Checkbox("14", &cb_value[13]);  ImGui::SameLine(300);
+	  cb_last_value[14]=ImGui::Checkbox("15", &cb_value[14]);  ImGui::SameLine(350);
+	  cb_last_value[15]=ImGui::Checkbox("16", &cb_value[15]);
+	  */
 	  
 	  ImGui::End();
 	  
