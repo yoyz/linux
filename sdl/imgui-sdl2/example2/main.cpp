@@ -73,7 +73,7 @@ int main(int, char**)
       };
     static const char * value_zero_sixteen_s[] =
       {
-       "[01]","[02]","[03]","[04]","[05]","[06]","[07]","[08]","[09]","[10]","[11]","[12]","[13]","[14]","[15]","[16"
+       "[01]","[02]","[03]","[04]","[05]","[06]","[07]","[08]","[09]","[10]","[11]","[12]","[13]","[14]","[15]","[16]"
       };
 
     
@@ -101,6 +101,7 @@ int main(int, char**)
 		      }
 		  }
 		if (event.key.keysym.sym == SDLK_LEFT) { cs--; if (cs<0) cs=15;  }
+		if (event.key.keysym.sym == SDLK_RIGHT) { cs++; if (cs>15) cs=0;  }
 	      }
 	    
 	    if (event.type == SDL_KEYUP)
@@ -112,7 +113,7 @@ int main(int, char**)
 			cb_inst_value[cs]=0;
 		      }
 		  }
-		if (event.key.keysym.sym == SDLK_RIGHT) { cs++; if (cs>15) cs=0;  }
+
 	      }
 
 
