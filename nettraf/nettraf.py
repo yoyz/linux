@@ -80,14 +80,17 @@ class net_int_obj:
         # rotate counter
         self.rcv_data_0=self.rcv_data_1
         self.xmit_data_0=self.xmit_data_1
-        f=open(scn+"/"+self.intName+"/statistics/rx_bytes")
-        self.rcv_data_1=float(f.readline())
-        f.close()
+        try:
+            f=open(scn+"/"+self.intName+"/statistics/rx_bytes")
+            self.rcv_data_1=float(f.readline())
+            f.close()
 
-        f=open(scn+"/"+self.intName+"/statistics/tx_bytes")
-        #out=commands.getoutput("cat "+scn+"/"+self.intName+"/statistics/tx_bytes")
-        self.xmit_data_1=float(f.readline())
-        f.close
+            f=open(scn+"/"+self.intName+"/statistics/tx_bytes")
+            self.xmit_data_1=float(f.readline())
+            f.close
+        except:
+            pass
+        
 
 
     def printMe(self):
