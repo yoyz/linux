@@ -1,0 +1,225 @@
+#!/usr/bin/env python2
+
+import sys
+import os
+import re
+import datetime
+
+from collections import defaultdict
+
+from optparse import OptionParser
+
+DEBUG = False
+# DEBUG = True
+LOG = "strace.log"
+
+TOP_NUMBER_OPERATIONS = 10
+TOP_NUMBER_VOLUME = 3
+
+OPEN_REGEX = re.compile('open\("(?P<filepath>[^"]+)", [^\)]*\) = (?P<descriptor>[0-9]+)')
+WRITE_REGEX = re.compile('write\((?P<descriptor>[0-9]+), "[^"]+"(\.)*, (?P<amount>[0-9]+)\)')
+READ_REGEX = re.compile('read\((?P<descriptor>[0-9]+), "[^"]+"(\.)*, (?P<amount>[0-9]+)\)')
+CLOSE_REGEX = re.compile('close\((?P<descriptor>[0-9]+)\)[\s]+=')
+TIME_REGEX = re.compile("([0-9]{2}):([0-9]{2}):([0-9]{2})\.([0-9]+)")
+PID_REGEX = re.compile("^(?P<pid>[0-9]+)")
+DUP_REGEX = re.compile(
+        "dup[23]?\((?P<old_descriptor>[0-9]+), [0-9]+\)[\s]+=(?P<descriptor>[0-9]+)")
+
+
+def parse_time(line):
+    time_data = TIME_REGEX.search(line)
+    return datetime.time(*map(int, time_data.groups()))
+
+
+def log(msg):
+    if not DEBUG:
+        return
+    print msg
+
+def main(logfile=LOG):
+    start_time = None
+    operations_write = defaultdict(list)
+    operations_read = defaultdict(list)
+    descriptors = defaultdict(dict)
+    writes = []
+    if not os.path.exists(logfile):
+        print "Error: file %s does not exist" % logfile
+        sys.exit(1)
+    with open(logfile) as fp:
+        prev_line = None
+        for line in fp:
+            prev_line = line
+            if start_time is None:
+                line_time = parse_time(line)
+                start_time = line_time
+
+            pid_search =   PID_REGEX.search(line)
+            open_search =  OPEN_REGEX.search(line)
+            write_search = WRITE_REGEX.search(line)
+            read_search =  READ_REGEX.search(line)
+            close_search = CLOSE_REGEX.search(line)
+            # some childs can duplicate fd
+            # dup_search = DUP_REGEX.search(line)
+            if not (write_search or open_search or close_search or read_search):
+                continue
+            pid_data = pid_search.groupdict()
+            pid = pid_data['pid']
+            if open_search:
+                open_data = open_search.groupdict()
+                descriptor = int(open_data['descriptor'])
+                log("Set descriptor %d" % descriptor)
+                descriptors[pid][descriptor] = open_data['filepath']
+            elif write_search:
+                search_data = write_search.groupdict()
+                descriptor = int(search_data['descriptor'])
+                amount = int(search_data['amount'])
+                try:
+                    operations_write[descriptors[pid][descriptor]].append(amount)
+                except KeyError:
+                    log('Unknown data\n%s' % line)
+                    operations_write['unknown'].append(amount)
+            elif read_search:
+                search_data = read_search.groupdict()
+                descriptor = int(search_data['descriptor'])
+                amount = int(search_data['amount'])
+                try:
+                    operations_read[descriptors[pid][descriptor]].append(amount)
+                except KeyError:
+                    log('Unknown data\n%s' % line)
+                    operations_read['unknown'].append(amount)
+
+            elif close_search:
+                close_data = close_search.groupdict()
+                descriptor = int(close_data['descriptor'])
+                log("Delete descriptor %d" % descriptor)
+                try:
+                    del descriptors[pid][descriptor]
+                except KeyError:
+                    log("Cannot unset descriptor %d" % descriptor)
+                    log(line)
+                    pass
+            # elif dup_search:
+            #     dup_data = dup_search.groupdict()
+            #     old_descriptor = int(dup_data['old_descriptor'])
+            #     new_descriptor = int(dup_data['new_descriptor'])
+        last_line = prev_line
+        end_time = parse_time(last_line)
+    now = datetime.datetime.now()
+    start_datetime = now.replace(
+            hour=start_time.hour,
+            minute=start_time.minute,
+            second=start_time.second,
+            microsecond=start_time.microsecond
+            )
+    end_datetime = now.replace(
+            hour=end_time.hour,
+            minute=end_time.minute,
+            second=end_time.second,
+            microsecond=end_time.microsecond
+            )
+    work_time = end_datetime - start_datetime
+    all_writes = [i for operation in operations_write.values() for i in operation]
+    all_read   = [i for operation in operations_read.values() for i in operation]
+    total_bytes_write = sum(all_writes)
+    total_bytes_read = sum(all_read)
+    write_num = len(all_writes)
+    read_num = len(all_read)
+
+    top5_write_num = sorted(operations_write, key=lambda fn: len(operations_write[fn]),
+            reverse=True)
+    top5_write_volume = sorted(operations_write, key=lambda fn: sum(operations_write[fn]),
+            reverse=True)
+
+    top5_read_num = sorted(operations_read, key=lambda fn: len(operations_read[fn]),
+            reverse=True)
+    top5_read_volume = sorted(operations_read, key=lambda fn: sum(operations_read[fn]),
+            reverse=True)
+
+    work_time_seconds = (24 * 60 * 60 * work_time.days +
+            work_time.seconds + work_time.microseconds * 10 ** -6)
+
+    print "Total strace time: %s seconds" % work_time_seconds
+    print "Total write volume: %.4f Mb" % (total_bytes_write / (1024 * 1024.0), )
+    print "Total read  volume: %.4f Mb" % (total_bytes_read / (1024 * 1024.0), )
+    print "Total write ops: %d" % write_num
+    print "Total read  ops: %d" % read_num
+    print "Average write per op: %d bytes" % (total_bytes_write / write_num,)
+    print "Average read per op: %d bytes" % (total_bytes_read / read_num,)
+    print "Average write ops per minute: %.2f" % (
+            write_num / (work_time_seconds / 60),)
+    print "Average read ops per minute: %.2f" % (
+            read_num / (work_time_seconds / 60),)
+
+    print "Average write volume per minute: %.2fKb" % (
+            total_bytes_write / (1024.0 * work_time_seconds / 60),
+            )
+
+    # WRITE
+    print ""
+    print "Top %d write ops count:\n%s" % (TOP_NUMBER_OPERATIONS,
+            '\n'.join(
+            [
+                '%d) %s %s (%.2f%%)' % (
+                    i+1, fn, len(operations_write[fn]),
+                    len(operations_write[fn]) * 100.0 / write_num)
+                for i, fn in enumerate(top5_write_num[:TOP_NUMBER_OPERATIONS])
+                ]
+            )
+            )
+    print "Top %d write volume:\n%s" % (
+            TOP_NUMBER_VOLUME,
+            '\n'.join(
+                [
+                    '%d) %s %.3fKb (%.2f%%)' % (i+1, fn, sum(operations_write[fn])/1024.0, sum(operations_write[fn]) * 100.0 / total_bytes_write)
+                    for i, fn in enumerate(top5_write_volume[:TOP_NUMBER_VOLUME])
+                    ]
+                )
+                )
+    # READ
+    print ""
+    print "Top %d read ops count:\n%s" % (TOP_NUMBER_OPERATIONS,
+            '\n'.join(
+            [
+                '%d) %s %s (%.2f%%)' % (
+                    i+1, fn, len(operations_read[fn]),
+                    len(operations_read[fn]) * 100.0 / read_num)
+                for i, fn in enumerate(top5_read_num[:TOP_NUMBER_OPERATIONS])
+                ]
+            )
+            )
+    print "Top %d read volume:\n%s" % (
+            TOP_NUMBER_VOLUME,
+            '\n'.join(
+                [
+                    '%d) %s %.3fKb (%.2f%%)' % (i+1, fn, sum(operations_read[fn])/1024.0, sum(operations_read[fn]) * 100.0 / total_bytes_read)
+                    for i, fn in enumerate(top5_read_volume[:TOP_NUMBER_VOLUME])
+                    ]
+                )
+                )
+
+#    return operations
+
+
+if __name__ == '__main__':
+
+    parser = OptionParser()
+    usage = "./strace-io-parser.py [-o 3] [-b 10] [-d] strace.log"
+    parser.set_usage(usage)
+
+    parser.add_option('-b', dest="top_bytes", default=TOP_NUMBER_VOLUME,
+            action="store", type="int",
+            help="number of files that have top volume to display")
+    parser.add_option('-o', dest="top_ops",
+            default=TOP_NUMBER_OPERATIONS, action="store", type="int",
+            help="number of files that have top operations to display")
+    parser.add_option('-d', '--debug', dest="debug", default=DEBUG,
+            action="store_true", help="turn debug on")
+
+    (option, args) = parser.parse_args()
+    TOP_NUMBER_OPERATIONS = option.top_ops
+    TOP_NUMBER_VOLUME = option.top_bytes
+    DEBUG = option.debug
+
+    if len(args) != 1:
+        parser.error("incorrect number of arguments")
+    main(args[0])
