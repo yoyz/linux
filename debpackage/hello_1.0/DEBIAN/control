@@ -1,0 +1,7 @@
+Package: hello
+Version: 1.0
+Architecture: amd64
+Maintainer: Internal Pointers <peyrard.johann@gmail.com>
+Description: A program that greets you.
+ You can add a longer description here. Mind the space at the beginning of this paragraph.
+

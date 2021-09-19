@@ -1,0 +1,4 @@
+this is only a binary package.
+So no compilation is done.
+dpkg-deb --build --root-owner-group ../hello_1.0
+
