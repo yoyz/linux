@@ -28,8 +28,7 @@ int resolveHostname(char * hostname , char* ip)
 int main(int argc , char *argv[])
 {
   char *hostname = argv[1];
-  char ip[100];     resolveHost(hostname,ip);
-
+  char ip[100];     
   if(argc <2)
     {
       printf("No hostname is given to resolve");
@@ -37,6 +36,7 @@ int main(int argc , char *argv[])
     }
   else
     {
+      resolveHostname(hostname,ip);
       printf("%s resolved to %s\n" , hostname , ip);
     }
   return 0;
