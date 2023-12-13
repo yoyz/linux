@@ -1,0 +1,6 @@
+
+mdonkers/server.py
+
+https://gist.github.com/mdonkers/63e115cc0c79b4f6b8b3a6b797e485c7
+Simple Python 3 HTTP server for logging all GET and POST requests
+Raw
